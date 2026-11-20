@@ -1221,7 +1221,15 @@ function pieteikties(nederigs) {
   const ienakt = k => { gjKods = k; try { localStorage.setItem('gjKods', k); if (loma) localStorage.setItem('gjLoma', loma); } catch (x) {} d.remove(); sakt(); };
   f.onsubmit = async e => {
     e.preventDefault();
-    if (arKodu) { if (f.kods.value.trim()) ienakt(f.kods.value.trim()); return; }
+    if (arKodu) {
+      // pieņem arī nokopētu žurnāla rindu ("Mac lietotnes atslēga: …"): ņem garāko koda gabalu
+      const k = (f.kods.value.match(/[A-Za-z0-9-]{16,}/g) || []).sort((a, b) => b.length - a.length)[0];
+      if (!k) { z.className = 'zinja kl'; z.textContent = 'Kods nav atpazīts.'; return; }
+      const b = f.querySelector('.zala'); b.disabled = true; z.className = 'zinja info'; z.textContent = 'Pārbaudu…';
+      try { await new Promise((ok, kl) => google.script.run.withSuccessHandler(ok).withFailureHandler(kl).gjApi(k, 'gjKasEsmu', [])); ienakt(k); }
+      catch (x) { z.className = 'zinja kl'; z.textContent = /piekļuv/i.test(x.message) ? 'Šis kods nav derīgs. Nokopē tikai pašu kodu (bez teksta priekšā).' : x.message; b.disabled = false; }
+      return;
+    }
     if (!loma) { z.className = 'zinja kl'; z.textContent = 'Izvēlies, kas tu esi.'; return; }
     if (!/^\d{4}$/.test(pin.value)) { z.className = 'zinja kl'; z.textContent = 'PIN ir 4 cipari.'; return; }
     const b = f.querySelector('.zala'); b.disabled = true; z.className = 'zinja info'; z.textContent = 'Pārbaudu…';
