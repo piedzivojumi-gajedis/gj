@@ -592,19 +592,37 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;
 // visi izsaukumi iet caur gjApi: serveris pēc koda (vai Toma Google konta) nosaka lomu un pārbauda piekļuvi
 let gjKods = '';
 try { gjKods = localStorage.getItem('gjKods') || ''; } catch (e) {}
-const run = (fn, ...a) => new Promise((ok, kl) => google.script.run.withSuccessHandler(ok).withFailureHandler(e => kl(e)).gjApi(gjKods, fn, a));
+// lasīšanas funkcijas; jebkurš cits izsaukums skaitās izmaiņa (rakstiNr), lai fona atjaunošana nepārraksta tikko atzīmēto
+const LASA = new Set(['gjKasEsmu', 'gjVersija', 'gjSakums', 'gjPasakumuSaraksts', 'gjSagatavosanas', 'gjCheklists', 'gjJanoperk', 'gjVaditajiem', 'gjFinanses', 'gjIzaugsme', 'gjRekini', 'gjSanemeji', 'gjKlientuBaze', 'gjCheklistaSablons']);
+let rakstiNr = 0;
+const run = (fn, ...a) => { if (!LASA.has(fn)) rakstiNr++; return new Promise((ok, kl) => google.script.run.withSuccessHandler(ok).withFailureHandler(e => kl(e)).gjApi(gjKods, fn, a)); };
+/* ātra ielāde: uzreiz parāda pēdējos zināmos datus no šīs ierīces, tad klusi atjauno no servera */
+const kAtsl = (fn, a) => 'gjK:' + LOMA.loma + ':' + fn + ':' + JSON.stringify(a);
+function kDzest() { try { Object.keys(localStorage).filter(k => k.startsWith('gjK:')).forEach(k => localStorage.removeItem(k)); } catch (e) {} }
+async function kesh(fn, a, zim) {
+  const k = kAtsl(fn, a); let ved = null;
+  try { ved = localStorage.getItem(k); if (ved) zim(JSON.parse(ved), true); } catch (e) { ved = null; }
+  const n = rakstiNr;
+  let v;
+  try { v = await run(fn, ...a); } catch (x) { if (ved) return; throw x; } // ja vecie dati jau redzami, kļūdu nerāda
+  const t = JSON.stringify(v);
+  try { localStorage.setItem(k, t); } catch (e) {}
+  if (t !== ved && n === rakstiNr) zim(v, false);
+  return v;
+}
 let LOMA = {loma: 'toms', nos: 'Toms', sadalas: []};
 const zinja = (id, t, k) => { const z = $(id); z.className = 'zinja ' + (k || 'ok'); z.innerHTML = t; };
 const forma = f => Object.fromEntries(new FormData(f).entries());
 let ielad = {}, kluss = false;
 
 /* navigācija */
+const IEL = {janoperk: ieladetJan, finanses: ieladetFin, izaugsme: ieladetIz, pasakumi: ieladetPas, sagatavosanas: ieladetSag, vaditajiem: ieladetVad, rekini: ieladetRek, epasti: ieladetEp, marketings: () => { ieladetMark(); ieladetMat(); }, kopsavilkums: () => ieladetKops(false), apmeklejums: () => ieladetApm(false), agenti: zimetKarti, noteikumi: ieladetNot, iestatijumi: ieladetIest};
 function iet(s) {
   document.querySelectorAll('.sad').forEach(x => x.classList.toggle('ak', x.id === 's-' + s));
   document.querySelectorAll('#nav button').forEach(b => { b.classList.toggle('ak', b.dataset.s === s); if (b.dataset.s === s) { b.setAttribute('aria-current', 'page'); $('#augsaNos').textContent = b.textContent.replace(b.querySelector('.ik').textContent, '').replace(/\d+$/, '').trim(); } else b.removeAttribute('aria-current'); });
   izvelne(false);
   window.scrollTo(0, 0);
-  const f = {janoperk: ieladetJan, finanses: ieladetFin, izaugsme: ieladetIz, pasakumi: ieladetPas, sagatavosanas: ieladetSag, vaditajiem: ieladetVad, rekini: ieladetRek, epasti: ieladetEp, marketings: () => { ieladetMark(); ieladetMat(); }, kopsavilkums: () => ieladetKops(false), apmeklejums: () => ieladetApm(false), agenti: zimetKarti, noteikumi: ieladetNot, iestatijumi: ieladetIest}[s];
+  const f = IEL[s];
   if (f && !ielad[s]) { ielad[s] = 1; f(); }
   if (s === 'agenti') setTimeout(liniju, 50);
 }
@@ -629,8 +647,11 @@ function kadPas(n) { return n === 0 ? 'šodien' : n === 1 ? 'rīt' : n > 0 ? `p�
 
 /* sākums */
 async function ieladetSak(gatavi) {
-  try {
-    const d = gatavi || await run('gjSakums');
+  try { if (gatavi) sakZimet(gatavi); else await kesh('gjSakums', [], sakZimet); }
+  catch (e) { $('#sakCipari').innerHTML = `<div class="karte zinja kl" style="display:block">${esc(e.message)}</div>`; }
+}
+function sakZimet(d) {
+  {
     sodienRadit();
     const kav = d.neapmaksati.filter(r => r.kavets).length;
     const darbi = d.kopsavilkums ? d.kopsavilkums.darbi : [];
@@ -649,7 +670,7 @@ async function ieladetSak(gatavi) {
     $('#sakZurn').innerHTML = d.zurnals.length ? d.zurnals.map(z => `<li><span class="c">${esc(z.kas)}</span><div><div>${esc(z.ko)}</div><div class="mazs">${esc(z.t)}</div></div></li>`).join('') : '<li class="tukss">Vēl nekas nav pierakstīts.</li>';
     $('#sakAtsl')?.remove();
     if (!d.irAtslega) $('#sakZurn').insertAdjacentHTML('beforebegin', '<p id="sakAtsl" class="zinja info" style="display:block">Čatam un gudrajam kopsavilkumam ielieciet Claude API atslēgu <a href="#" onclick="iet(\'iestatijumi\');return false">iestatījumos</a>.</p>');
-  } catch (e) { $('#sakCipari').innerHTML = `<div class="karte zinja kl" style="display:block">${esc(e.message)}</div>`; }
+  }
 }
 function darbsHtml(x) { return `<div class="darbs"><span class="prio p${x.prio}"></span><div><b>${esc(x.kas)}</b><div class="mazs">${esc(x.ko)} ${x.saite ? `<a href="${esc(x.saite)}" target="_blank">atvērt ↗</a>` : ''}</div></div></div>`; }
 
@@ -673,7 +694,7 @@ let pasDati = [], pasFiltrs = 'nak';
 const MEN = ['Janvāris', 'Februāris', 'Marts', 'Aprīlis', 'Maijs', 'Jūnijs', 'Jūlijs', 'Augusts', 'Septembris', 'Oktobris', 'Novembris', 'Decembris'];
 async function ieladetPas() {
   if (!kluss) { $('#pasTab').className = 'ielade'; $('#pasTab').textContent = 'Ielādē…'; }
-  try { pasDati = await run('gjPasakumuSaraksts', true); $('#pasTab').className = ''; pasZimet(); }
+  try { await kesh('gjPasakumuSaraksts', [true], v => { pasDati = v; $('#pasTab').className = ''; pasZimet(); }); }
   catch (x) { $('#pasTab').innerHTML = `<p class="zinja kl">${esc(x.message)}</p>`; }
 }
 document.querySelectorAll('#pasFiltrs button').forEach(b => b.onclick = () => { pasFiltrs = b.dataset.f; document.querySelectorAll('#pasFiltrs button').forEach(x => x.classList.toggle('ak', x === b)); pasZimet(); });
@@ -710,11 +731,14 @@ let sagDati = [], sagIzv = null, sagCl = null;
 const sagProg = (d, k) => `<div class="prog"><i style="width:${k ? Math.round(d / k * 100) : 0}%"></i></div>`;
 async function ieladetSag() {
   try {
-    const s = await run('gjSagatavosanas');
-    sagDati = s.pasakumi; $('#sagSaite').href = s.saite; $('#sagSaite').hidden = LOMA.loma !== 'toms';
-    if (!sagIzv || !sagDati.some(p => p.atslega === sagIzv)) { const n = sagDati.find(p => p.dienasLidz >= 0) || sagDati[0]; sagIzv = n ? n.atslega : null; }
-    sagSarZimet();
-    if (sagIzv) await sagIelade(sagIzv); else $('#sagDet').innerHTML = '<p class="tukss">Tuvākajā laikā pasākumu nav.</p>';
+    // saraksts un izvēlētā pasākuma checklists vienā izsaukumā
+    await kesh('gjSagatavosanas', [sagIzv || ''], s => {
+      sagDati = s.pasakumi; $('#sagSaite').href = s.saite; $('#sagSaite').hidden = LOMA.loma !== 'toms';
+      if (!sagIzv || !sagDati.some(p => p.atslega === sagIzv)) sagIzv = s.cl ? s.cl.atslega : ((sagDati.find(p => p.dienasLidz >= 0) || sagDati[0] || {}).atslega || null);
+      sagSarZimet();
+      if (s.cl && s.cl.atslega === sagIzv) { sagCl = s.cl; sagDetZimet(); }
+      else if (sagIzv) sagIelade(sagIzv); else $('#sagDet').innerHTML = '<p class="tukss">Tuvākajā laikā pasākumu nav.</p>';
+    });
   } catch (x) { $('#sagSar').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
 }
 function sagSarZimet() {
@@ -725,9 +749,7 @@ async function sagAtvert(atslega) { sagIzv = atslega; iet('sagatavosanas'); if (
 async function sagIelade(atslega) {
   if (!kluss) $('#sagDet').innerHTML = '<div class="ielade">Ielādē sarakstu…</div>';
   try {
-    const c = await run('gjCheklists', atslega);
-    if (atslega !== sagIzv) return;
-    sagCl = c; sagDetZimet();
+    await kesh('gjCheklists', [atslega], c => { if (atslega !== sagIzv) return; sagCl = c; sagDetZimet(); });
   } catch (x) { if (atslega === sagIzv) $('#sagDet').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
 }
 function sagPunktsHtml(x, cilveki) {
@@ -861,7 +883,7 @@ async function sabSaglabat(e) {
 let vadDati = [], vadTips = 'marsruts';
 const VAD_NOS = {marsruts: 'maršrutu', spele: 'spēļu', info: 'informācijas'};
 async function ieladetVad() {
-  try { const v = await run('gjVaditajiem'); vadDati = v.ieraksti; $('#vadSaite').href = v.saite; $('#vadSaite').hidden = LOMA.loma !== 'toms'; vadZimet(); }
+  try { await kesh('gjVaditajiem', [], v => { vadDati = v.ieraksti; $('#vadSaite').href = v.saite; $('#vadSaite').hidden = LOMA.loma !== 'toms'; vadZimet(); }); }
   catch (x) { $('#vadSar').innerHTML = `<p class="zinja kl liel" style="display:block">${esc(x.message)}</p>`; }
 }
 function vadTipsIzv(t) { vadTips = t; document.querySelectorAll('#vadTabs button').forEach(b => b.classList.toggle('ak', b.dataset.t === t)); vadZimet(); }
@@ -901,7 +923,7 @@ let janDati = null;
 function janSkaits(n) { if (n === undefined || n === null) return; $('#nJan').hidden = !n; $('#nJan').textContent = n; }
 async function ieladetJan() {
   if (!kluss) { $('#janSar').className = 'ielade'; $('#janSar').textContent = 'Ielādē…'; }
-  try { janDati = await run('gjJanoperk'); janZimet(); }
+  try { await kesh('gjJanoperk', [], v => { janDati = v; janZimet(); }); }
   catch (x) { $('#janSar').className = ''; $('#janSar').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
 }
 function janRinda(x) {
@@ -948,9 +970,7 @@ const eur = n => (Math.round(n * 100) / 100).toLocaleString('lv-LV', {minimumFra
 const finDat = x => x.datums.split('.').reverse().join('');
 async function ieladetFin() {
   try {
-    finDati = await run('gjFinanses');
-    $('#finSaite').href = finDati.saite; $('#finSaite').hidden = false;
-    finZimet();
+    await kesh('gjFinanses', [], v => { finDati = v; $('#finSaite').href = v.saite; $('#finSaite').hidden = false; finZimet(); });
   } catch (x) { $('#finTab').className = ''; $('#finTab').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; $('#finKops').innerHTML = ''; }
 }
 document.querySelectorAll('#finFiltrs button').forEach(b => b.onclick = () => { finFiltrs = b.dataset.f; document.querySelectorAll('#finFiltrs button').forEach(x => x.classList.toggle('ak', x === b)); finZimet(); });
@@ -1005,12 +1025,12 @@ $('#finTab').addEventListener('change', async e => {
 let izDati = null, izLapa = 0, izKas = '';
 async function ieladetIz() {
   try {
-    izDati = await run('gjIzaugsme');
+    await kesh('gjIzaugsme', [], v => { izDati = v;
     $('#izSaite').href = izDati.saite; $('#izSaite').hidden = false;
     if (izLapa >= izDati.lapas.length) izLapa = 0;
     $('#izLapas').innerHTML = izDati.lapas.length > 1 ? izDati.lapas.map((l, i) => `<button data-i="${i}"${i === izLapa ? ' class="ak"' : ''}>${esc(l.nos)}</button>`).join('') : '';
     $('#izLapas').querySelectorAll('button').forEach(b => b.onclick = () => { izLapa = +b.dataset.i; $('#izLapas').querySelectorAll('button').forEach(x => x.classList.toggle('ak', x === b)); izZimet(); });
-    izZimet();
+    izZimet(); });
   } catch (x) { $('#izTab').className = ''; $('#izTab').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
 }
 document.querySelectorAll('#izKas button').forEach(b => b.onclick = () => { izKas = b.dataset.k; document.querySelectorAll('#izKas button').forEach(x => x.classList.toggle('ak', x === b)); izZimet(); });
@@ -1070,9 +1090,9 @@ async function rekIzrakstit() {
 }
 async function ieladetRek() {
   try {
-    const r = await run('gjRekini');
+    await kesh('gjRekini', [], r => {
     $('#rekTab').className = '';
-    $('#rekTab').innerHTML = `<table class="tab"><tr><th>Nr.</th><th>Klients</th><th>Kopā</th><th>Pasākums</th><th>DDL</th><th>Statuss</th></tr>${r.map(x => `<tr><td data-l="Nr."><b>${esc(x.nr)}</b></td><td data-l="Klients">${esc(x.klients)}<div class="mazs">${esc(x.kontakts)}</div></td><td data-l="Kopā">${esc(x.kopa)}</td><td data-l="Pasākums">${esc(x.pasakums)}<div class="mazs">${esc(x.detalas)}</div></td><td data-l="Termiņš">${esc(x.ddl)}</td><td data-l="Statuss">${x.apmaksats ? '<span class="c ok">✓ apmaksāts</span>' : `<span class="c ${x.kavets ? 'ne' : 'br'}">${x.kavets ? 'kavēts' : 'gaida'}</span> <button class="poga gaisa maza" onclick="rekApm(${x.rinda},this)">Apmaksāts</button>`}</td></tr>`).join('')}</table>`;
+    $('#rekTab').innerHTML = `<table class="tab"><tr><th>Nr.</th><th>Klients</th><th>Kopā</th><th>Pasākums</th><th>DDL</th><th>Statuss</th></tr>${r.map(x => `<tr><td data-l="Nr."><b>${esc(x.nr)}</b></td><td data-l="Klients">${esc(x.klients)}<div class="mazs">${esc(x.kontakts)}</div></td><td data-l="Kopā">${esc(x.kopa)}</td><td data-l="Pasākums">${esc(x.pasakums)}<div class="mazs">${esc(x.detalas)}</div></td><td data-l="Termiņš">${esc(x.ddl)}</td><td data-l="Statuss">${x.apmaksats ? '<span class="c ok">✓ apmaksāts</span>' : `<span class="c ${x.kavets ? 'ne' : 'br'}">${x.kavets ? 'kavēts' : 'gaida'}</span> <button class="poga gaisa maza" onclick="rekApm(${x.rinda},this)">Apmaksāts</button>`}</td></tr>`).join('')}</table>`; });
   } catch (x) { $('#rekTab').innerHTML = `<p class="zinja kl">${esc(x.message)}</p>`; }
 }
 async function rekApm(r, b) { b.disabled = true; await run('gjAtzimetApmaksatu', r); ieladetRek(); }
@@ -1098,12 +1118,13 @@ function alertZ(t) { const z = document.createElement('div'); z.className = 'zin
 /* mārketings */
 async function ieladetMark() {
   try {
-    const s = await run('gjSanemeji');
-    $('#sanSaite').href = s.saite; bazeInfo();
+    await kesh('gjSanemeji', [], s => {
+    $('#sanSaite').href = s.saite;
     const akt = s.saraksts.filter(x => x.statuss === 'aktīvs').length;
     $('#sanInfo').className = '';
     $('#sanInfo').innerHTML = `<div class="rezgis r3" style="margin-top:8px"><div><div class="etik">Aktīvi</div><div class="cip">${akt}</div></div><div><div class="etik">Atrakstījušies</div><div class="cip">${s.saraksts.length - akt}</div></div><div><div class="etik">Kopā</div><div class="cip">${s.saraksts.length}</div></div></div>`;
-    $('#izsSar').innerHTML = s.izsutitas.length ? '<ul class="saraksts">' + s.izsutitas.map(r => `<li><div><b>${esc(r[1])}</b><div class="mazs">${esc(r[0])} · ${esc(r[2])} saņēmēji</div></div></li>`).join('') + '</ul>' : '<p class="tukss">Vēl nekas nav izsūtīts.</p>';
+    $('#izsSar').innerHTML = s.izsutitas.length ? '<ul class="saraksts">' + s.izsutitas.map(r => `<li><div><b>${esc(r[1])}</b><div class="mazs">${esc(r[0])} · ${esc(r[2])} saņēmēji</div></div></li>`).join('') + '</ul>' : '<p class="tukss">Vēl nekas nav izsūtīts.</p>'; });
+    bazeInfo();
   } catch (x) { $('#sanInfo').innerHTML = `<p class="zinja kl">${esc(x.message)}</p>`; }
 }
 async function sanPievienot() { const n = await run('gjPievienotSanemejus', $('#sanJauni').value, 'ievadīts'); $('#sanJauni').value = ''; zinja('#vZ', `Pievienoti ${n} saņēmēji.`); ieladetMark(); }
@@ -1444,9 +1465,19 @@ sodienRadit();
 async function sakt() {
   // tīmekļa versijā bez koda uzreiz pieteikšanās, programmu nerāda
   if (!gjKods && window.gjTikaiKods) return pieteikties(false);
-  $('#splash').hidden = false;
-  try { LOMA = await run('gjKasEsmu', true); }
-  catch (x) { if (/piekļuv/i.test(x.message)) return pieteikties(!!gjKods); $('#splash').querySelector('.ielade, .zinja').outerHTML = `<p class="zinja kl" style="display:block;max-width:420px">${esc(x.message)} <a href="#" onclick="location.reload();return false">Mēģināt vēlreiz</a></p>`; return; }
+  // jau ienākušai ierīcei programma atveras uzreiz ar pēdējiem datiem, serveris pārbauda fonā
+  let ved = null; try { ved = JSON.parse(localStorage.getItem('gjK::loma') || 'null'); } catch (e) {}
+  if (ved) saktUI(ved); else $('#splash').hidden = false;
+  let L;
+  try { L = await run('gjKasEsmu', true); }
+  catch (x) { if (/piekļuv/i.test(x.message)) { kDzest(); try { localStorage.removeItem('gjK::loma'); } catch (e) {} return pieteikties(!!gjKods); } if (ved) return; $('#splash').querySelector('.ielade, .zinja').outerHTML = `<p class="zinja kl" style="display:block;max-width:420px">${esc(x.message)} <a href="#" onclick="location.reload();return false">Mēģināt vēlreiz</a></p>`; return; }
+  try { localStorage.setItem('gjK::loma', JSON.stringify(L)); } catch (e) {}
+  if (!ved || ved.loma !== L.loma || ved.sadalas.join() !== L.sadalas.join()) return saktUI(L);
+  LOMA = L; versija = L.versija || versija;
+  if (L.sakums) { try { localStorage.setItem(kAtsl('gjSakums', []), JSON.stringify(L.sakums)); } catch (e) {} if ($('#s-sakums').classList.contains('ak')) ieladetSak(L.sakums); }
+}
+function saktUI(L) {
+  LOMA = L;
   $('#splash').hidden = true;
   document.querySelector('.app').hidden = false;
   document.querySelectorAll('#nav button').forEach(b => b.hidden = !LOMA.sadalas.includes(b.dataset.s));
@@ -1457,6 +1488,10 @@ async function sakt() {
   ielad = {};
   if (LOMA.sadalas.includes('sakums')) { iet('sakums'); ieladetSak(LOMA.sakums); } else iet(LOMA.sadalas[0]);
   versija = LOMA.versija || null; atjLaiks = Date.now();
+  // pārējās biežāk lietotās sadaļas ielādē jau fonā, lai tās atveras uzreiz
+  setTimeout(() => ['janoperk', 'pasakumi', 'sagatavosanas', 'vaditajiem', 'finanses', 'rekini', 'izaugsme'].forEach(s => {
+    if (LOMA.sadalas.includes(s) && !ielad[s]) { ielad[s] = 1; IEL[s](); }
+  }), 600);
 }
 /* automātiska atjaunošana: ja kāds cits kaut ko mainīja, atvērtā sadaļa atjaunojas pati */
 let versija = null, atjLaiks = Date.now(), atjIet = false;
@@ -1523,7 +1558,7 @@ function pieteikties(nederigs) {
     catch (x) { z.className = 'zinja kl'; z.textContent = x.message; pin.value = ''; pin.focus(); b.disabled = false; }
   };
 }
-function iziet() { gjKods = ''; try { localStorage.removeItem('gjKods'); } catch (e) {} pieteikties(false); }
+function iziet() { gjKods = ''; kDzest(); try { localStorage.removeItem('gjKods'); localStorage.removeItem('gjK::loma'); } catch (e) {} pieteikties(false); }
 sakt();
 </script>
 </body>
