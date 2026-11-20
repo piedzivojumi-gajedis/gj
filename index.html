@@ -470,7 +470,7 @@ svg.liniju path.blav{opacity:.15}
           <p class="mazs" style="margin:0 0 8px">Viss, ko ievadi programmā, uzreiz pierakstās tabulā "Gājēdis visi ieraksti". Katru vakaru 23:00 Drive mapē "Gājēdis programma - backup" tiek atjaunota mape "Jaunākā kopija" ar visu tabulu un programmas datu kopijām Google Sheets formātā (atveras uzreiz, arī ja programma nestrādā), un rodas zip fails vēsturei (glabājas pēdējie 60).</p>
           <div id="bakInfo" class="ielade">Ielādē…</div><div class="zinja" id="bakZ"></div></div>
         <div class="karte liel"><h3>Piekļuves</h3>
-          <p class="mazs" style="margin:0 0 8px"><b>Markuss</b> redz pasākumus, rēķinus un sagatavošanos. <b>Komanda</b> redz sagatavošanos un vadītāju lapu (maksājumu atzīmes nevar mainīt). Viņi atver programmas saiti (izvietojums ar piekļuvi "Anyone") un ievada savu kodu; Mac lietotnē kodu ieliek "Savienojums…". Katra darbība ierakstu tabulā tiek pierakstīta ar vārdu.</p>
+          <p class="mazs" style="margin:0 0 8px"><b>Markuss</b> redz pasākumus, rēķinus un sagatavošanos. <b>Komanda</b> redz sagatavošanos un vadītāju lapu (maksājumu atzīmes nevar mainīt). Viņi atver programmas saiti, izvēlas savu vārdu un ievada 4 ciparu PIN (pēc 5 kļūdām pieteikšanās tiek bloķēta uz stundu, un tev atnāk e-pasts). Ierīce to atceras. Garais kods ir rezerves variants un Mac lietotnei ("Savienojums…"). Katra darbība ierakstu tabulā tiek pierakstīta ar vārdu.</p>
           <div id="pieklInfo" class="ielade">Ielādē…</div></div>
       </div>
     </section>
@@ -1046,11 +1046,17 @@ async function ieladetPiekl() {
   try {
     const l = await run('gjPiekluves');
     $('#pieklInfo').className = '';
-    $('#pieklInfo').innerHTML = `<table class="tab"><tr><th>Kas</th><th>Redz</th><th>Kods</th><th></th></tr>${l.map(x => `<tr><td><b>${esc(x.nos)}</b></td><td class="mazs" data-l="Redz">${x.loma === 'toms' ? 'visu' : x.sadalas.map(s => SAD_NOS[s]).join(', ')}</td><td data-l="Kods"><code class="kods" data-kods="${esc(x.kods)}">••••-••••</code><button class="poga gaisa maza" onclick="kodsRadit(this)">Rādīt</button> <button class="poga gaisa maza" onclick="kodsKopet(this)">Kopēt</button></td><td><button class="poga gaisa maza" onclick="kodsMainit('${x.loma}')">Mainīt kodu</button></td></tr>`).join('')}</table>`;
+    $('#pieklInfo').innerHTML = `<table class="tab"><tr><th>Kas</th><th>Redz</th><th>PIN</th><th>Garais kods</th><th></th></tr>${l.map(x => `<tr><td><b>${esc(x.nos)}</b></td><td class="mazs" data-l="Redz">${x.loma === 'toms' ? 'visu' : x.sadalas.map(s => SAD_NOS[s]).join(', ')}</td><td data-l="PIN"><span class="c ${x.irPin ? 'ok' : 'br'}">${x.irPin ? '✓ iestatīts' : 'nav'}</span> <input class="pinIev" type="password" inputmode="numeric" maxlength="4" placeholder="jauns" aria-label="Jauns PIN: ${esc(x.nos)}" style="width:80px;display:inline-block"> <button class="poga gaisa maza" onclick="pinIestatit('${x.loma}',this)">Saglabāt</button></td><td data-l="Garais kods"><code class="kods" data-kods="${esc(x.kods)}">••••-••••</code><button class="poga gaisa maza" onclick="kodsRadit(this)">Rādīt</button> <button class="poga gaisa maza" onclick="kodsKopet(this)">Kopēt</button></td><td><button class="poga gaisa maza" onclick="kodsMainit('${x.loma}')">Mainīt kodu</button></td></tr>`).join('')}</table>`;
   } catch (x) { $('#pieklInfo').className = ''; $('#pieklInfo').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
 }
 function kodsRadit(b) { const k = b.parentNode.querySelector('.kods'), slepts = k.textContent.startsWith('•'); k.textContent = slepts ? k.dataset.kods : '••••-••••'; b.textContent = slepts ? 'Slēpt' : 'Rādīt'; }
 async function kodsKopet(b) { try { await navigator.clipboard.writeText(b.parentNode.querySelector('.kods').dataset.kods); b.textContent = 'Nokopēts'; } catch (x) { alertZ('Neizdevās nokopēt. Spied "Rādīt" un nokopē ar roku.'); } }
+async function pinIestatit(l, b) {
+  const v = b.parentNode.querySelector('.pinIev').value.trim();
+  if (!/^\d{4}$/.test(v)) return alertZ('PIN jābūt tieši 4 cipariem.');
+  if (!confirm('Jauns PIN: visas ierīces, kur šis lietotājs ir ienācis ar PIN, tiks izlogotas.' + (l === LOMA.loma ? ' Arī tu, tad ienāc ar jauno PIN.' : '') + ' Turpināt?')) return;
+  try { await run('gjIestatitPin', l, v); if (l === LOMA.loma && gjKods.charAt(0) === 'S') return iziet(); ieladetPiekl(); } catch (x) { alertZ(x.message); }
+}
 async function kodsMainit(l) {
   if (!confirm(l === 'toms' ? 'Jauns Toma kods: Mac lietotnē būs jāieliek jaunais kods (Savienojums…). Turpināt?' : 'Vecais kods uzreiz vairs nestrādās, jaunais būs jāiedod. Turpināt?')) return;
   try { await run('gjMainitKodu', l); ieladetPiekl(); } catch (x) { alertZ(x.message); }
@@ -1196,14 +1202,31 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) parb
 function pieteikties(nederigs) {
   if (window.gjSavienojums) return window.gjSavienojums(); // Mac lietotnē kods ir savienojuma iestatījumos
   document.querySelector('.app').hidden = true;
+  let loma = ''; try { loma = localStorage.getItem('gjLoma') || ''; } catch (x) {}
   const d = document.createElement('div');
   d.className = 'modal'; d.style.background = 'var(--nakts)';
-  d.innerHTML = `<form class="karte" style="width:min(420px,100%)"><img src="${$('.sanu .logo').src}" alt="" style="display:block;width:72px;margin:0 auto 12px;background:var(--nakts);border-radius:14px;padding:8px"><h2 style="text-align:center">Gājēdis</h2><p class="mazs" style="text-align:center">Ievadi savu piekļuves kodu. To tev iedod Toms.</p><label>Piekļuves kods<input name="kods" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX" required></label><div class="rinda"><button class="poga zala" style="flex:1;justify-content:center">Ienākt</button></div><div class="zinja${nederigs ? ' kl' : ''}">${nederigs ? 'Kods nav derīgs vai ir nomainīts.' : ''}</div></form>`;
-  document.body.append(d); d.querySelector('input').focus();
-  d.querySelector('form').onsubmit = e => {
-    e.preventDefault(); gjKods = e.target.kods.value.trim();
-    try { localStorage.setItem('gjKods', gjKods); } catch (x) {}
-    d.remove(); sakt();
+  d.innerHTML = `<form class="karte" style="width:min(420px,100%)"><img src="${$('.sanu .logo').src}" alt="" style="display:block;width:72px;margin:0 auto 12px;background:var(--nakts);border-radius:14px;padding:8px"><h2 style="text-align:center">Gājēdis</h2>
+    <div class="pinDala"><p class="mazs" style="text-align:center">Kas tu esi?</p><div class="tabs" id="pinKas" style="justify-content:center">${[['toms', 'Toms'], ['markuss', 'Markuss'], ['komanda', 'Komanda']].map(([l, n]) => `<button type="button" data-l="${l}"${l === loma ? ' class="ak"' : ''}>${n}</button>`).join('')}</div>
+    <label style="margin-top:14px">PIN (4 cipari)<input name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="current-password" style="text-align:center;font-size:24px;letter-spacing:12px"></label></div>
+    <div class="kodaDala" hidden><p class="mazs" style="text-align:center">Ievadi garo piekļuves kodu.</p><label>Piekļuves kods<input name="kods" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX"></label></div>
+    <div class="rinda"><button class="poga zala" style="flex:1;justify-content:center">Ienākt</button></div><div class="zinja${nederigs ? ' kl' : ''}">${nederigs ? 'Pieteikšanās beigusies, ienāc vēlreiz.' : ''}</div>
+    <p class="mazs" style="text-align:center;margin:10px 0 0"><a href="#" class="pinMaina">Man ir garais kods</a></p></form>`;
+  document.body.append(d);
+  const f = d.querySelector('form'), z = f.querySelector('.zinja'), pin = f.pin;
+  let arKodu = false;
+  f.querySelectorAll('#pinKas button').forEach(b => b.onclick = () => { loma = b.dataset.l; f.querySelectorAll('#pinKas button').forEach(x => x.classList.toggle('ak', x === b)); pin.focus(); });
+  f.querySelector('.pinMaina').onclick = e => { e.preventDefault(); arKodu = !arKodu; f.querySelector('.pinDala').hidden = arKodu; f.querySelector('.kodaDala').hidden = !arKodu; e.target.textContent = arKodu ? 'Ienākt ar PIN' : 'Man ir garais kods'; (arKodu ? f.kods : pin).focus(); };
+  pin.oninput = () => { pin.value = pin.value.replace(/\D/g, '').slice(0, 4); if (pin.value.length === 4 && loma) f.requestSubmit(); };
+  (loma ? pin : f.querySelector('#pinKas button')).focus();
+  const ienakt = k => { gjKods = k; try { localStorage.setItem('gjKods', k); if (loma) localStorage.setItem('gjLoma', loma); } catch (x) {} d.remove(); sakt(); };
+  f.onsubmit = async e => {
+    e.preventDefault();
+    if (arKodu) { if (f.kods.value.trim()) ienakt(f.kods.value.trim()); return; }
+    if (!loma) { z.className = 'zinja kl'; z.textContent = 'Izvēlies, kas tu esi.'; return; }
+    if (!/^\d{4}$/.test(pin.value)) { z.className = 'zinja kl'; z.textContent = 'PIN ir 4 cipari.'; return; }
+    const b = f.querySelector('.zala'); b.disabled = true; z.className = 'zinja info'; z.textContent = 'Pārbaudu…';
+    try { gjKods = ''; ienakt(await run('gjPieteikties', loma, pin.value)); }
+    catch (x) { z.className = 'zinja kl'; z.textContent = x.message; pin.value = ''; pin.focus(); b.disabled = false; }
   };
 }
 function iziet() { gjKods = ''; try { localStorage.removeItem('gjKods'); } catch (e) {} pieteikties(false); }
