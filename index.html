@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --papirs:#f4f1ea; --balts:#ffffff; --teksts:#1c1c1c; --pelēks:#6b6b6b; --linija:#e2ddd2;
+  --mezs:#2f5a27; --mezs-gaiss:#e3ecdc; --zals-tabula:#b6d7a8; --ugunskurs:#b5562b; --ugunskurs-gaiss:#f6e4da;
+  --nakts:#161616; --dzeltens:#c99a2e; --dzeltens-gaiss:#f7efd9;
+  --r:14px; --ena:0 1px 2px rgba(0,0,0,.04),0 6px 24px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{background:var(--papirs);color:var(--teksts);font:15px/1.55 'Nunito Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--mezs)}
+h1,h2,h3{font-family:Manrope,system-ui,sans-serif;font-weight:500;margin:0;letter-spacing:-.02em;line-height:1.08;text-wrap:balance}
+h1{font-size:40px}
+h2{font-size:26px}
+h3{font-size:18px;font-weight:600;letter-spacing:-.01em}
+.ui{font-family:Manrope,system-ui,sans-serif}
+.app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+/* sānjosla */
+.sanu{background:var(--nakts);color:#f1efe8;padding:26px 16px 18px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px}
+.sanu .logo{display:block;width:92px;margin:0 auto 18px}
+.nav{display:flex;flex-direction:column;gap:2px;font-family:Manrope,sans-serif;font-size:14px}
+.nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;color:#cfccc3;transition:.15s}
+.nav button:hover{background:#262626;color:#fff}
+.nav button.ak{background:#f1efe8;color:var(--nakts);font-weight:700}
+.nav .ik{width:18px;text-align:center;opacity:.9}
+.nav .skaits{margin-left:auto;background:var(--ugunskurs);color:#fff;border-radius:999px;font-size:11px;padding:1px 7px;font-weight:700}
+.sanu .apaksa{margin-top:auto;font-size:12px;color:#8d8a82;text-align:center;font-family:Manrope}
+.catpoga{all:unset;cursor:pointer;margin-top:12px;background:var(--mezs);color:#fff;border-radius:999px;padding:11px 14px;text-align:center;font:600 14px 'Nunito Sans',sans-serif;letter-spacing:.02em}
+.catpoga:hover{filter:brightness(1.1)}
+/* galvenā daļa */
+main{padding:34px clamp(16px,4vw,48px) 80px;max-width:1240px;width:100%}
+.sad{display:none}.sad.ak{display:block;animation:ien .25s ease}
+@keyframes ien{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+.galva{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.galva p{margin:6px 0 0;color:var(--pelēks)}
+.bulta{display:inline-block;width:46px;height:1px;background:currentColor;position:relative;vertical-align:middle;margin-left:8px}
+.bulta:after{content:'';position:absolute;right:0;top:-4px;width:8px;height:8px;border-top:1px solid currentColor;border-right:1px solid currentColor;transform:rotate(45deg)}
+.rezgis{display:grid;gap:16px}
+.r2{grid-template-columns:repeat(2,minmax(0,1fr))}.r3{grid-template-columns:repeat(3,minmax(0,1fr))}.r4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.karte{background:var(--balts);border:1px solid var(--linija);border-radius:var(--r);padding:20px;box-shadow:var(--ena)}
+.karte h3{margin-bottom:10px}
+.cip{font:700 30px Manrope;line-height:1}
+.etik{font:600 12px Manrope;color:var(--pelēks);text-transform:uppercase;letter-spacing:.8px}
+.saraksts{list-style:none;margin:0;padding:0}
+.saraksts li{padding:11px 0;border-top:1px solid var(--linija);display:flex;gap:12px;align-items:flex-start}
+.saraksts li:first-child{border-top:0}
+.datkaste{flex:none;width:52px;text-align:center;border-radius:10px;background:var(--mezs-gaiss);padding:6px 0;font-family:Manrope}
+.datkaste b{display:block;font-size:19px;line-height:1.1}.datkaste span{font-size:11px;color:var(--pelēks)}
+.mazs{font-size:13px;color:var(--pelēks)}
+.cipsi{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.c{font:600 11.5px Manrope;padding:3px 9px;border-radius:999px;background:#efece4;color:#444;white-space:nowrap}
+.c.ok{background:var(--mezs-gaiss);color:var(--mezs)}.c.ne{background:var(--ugunskurs-gaiss);color:var(--ugunskurs)}.c.br{background:var(--dzeltens-gaiss);color:#8a6512}
+.poga{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;background:var(--teksts);color:#fff;padding:10px 18px;border-radius:999px;font:600 14px 'Nunito Sans',sans-serif;letter-spacing:.02em;transition:.15s}
+.poga:hover{background:#333}.poga.zala{background:var(--mezs)}.poga.gaisa{background:transparent;color:var(--teksts);box-shadow:inset 0 0 0 1px var(--linija)}
+.poga.gaisa:hover{background:#efece4}.poga.maza{padding:6px 12px;font-size:12.5px}.poga[disabled]{opacity:.5;pointer-events:none}
+form .lauki{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+label{display:flex;flex-direction:column;gap:5px;font:600 12.5px Manrope;color:#3a3a3a}
+label.pilns,.pilns{grid-column:1/-1}
+input,textarea,select{font:15px 'Nunito Sans',sans-serif;padding:10px 12px;border:1px solid var(--linija);border-radius:10px;background:#fcfbf8;color:var(--teksts);width:100%}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--mezs);outline-offset:-1px;background:#fff}
+textarea{min-height:90px;resize:vertical}
+.rinda{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.zinja{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:14px;display:none}
+.zinja.ok{display:block;background:var(--mezs-gaiss);color:#1e3d18}.zinja.kl{display:block;background:var(--ugunskurs-gaiss);color:#7a3416}.zinja.info{display:block;background:#efece4}
+table.tab{width:100%;border-collapse:collapse;font-size:14px}
+.tab th{text-align:left;font:600 11.5px Manrope;text-transform:uppercase;letter-spacing:.6px;color:var(--pelēks);padding:8px 10px;border-bottom:1px solid var(--linija)}
+.tab td{padding:10px;border-bottom:1px solid #eeeae1;vertical-align:top}
+.tab tr:hover td{background:#faf8f3}
+.tukss{color:var(--pelēks);padding:18px 0;text-align:center;font-style:italic}
+.apm>div{background:transparent!important;padding:0!important}.apm>div>div{max-width:720px!important;margin:0!important}.apm h1{display:none}
+.ielade{color:var(--pelēks);font-style:italic;padding:12px 0}
+.ielade:before{content:'';display:inline-block;width:12px;height:12px;border:2px solid var(--linija);border-top-color:var(--mezs);border-radius:50%;margin-right:8px;vertical-align:-1px;animation:griez .8s linear infinite}
+@keyframes griez{to{transform:rotate(360deg)}}
+.darbs{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--linija)}
+.darbs:first-child{border-top:0}
+.prio{flex:none;width:8px;height:8px;border-radius:50%;margin-top:7px}
+.p1{background:var(--ugunskurs)}.p2{background:var(--dzeltens)}.p3{background:#9aa58f}
+.ietek{border-left:3px solid var(--mezs);padding:4px 0 4px 14px;margin:14px 0}
+.ietek b{font-family:Manrope}
+.noteik{white-space:pre-wrap;font-size:14.5px}
+.noteik-karte textarea{min-height:220px;font-size:14px;line-height:1.5}
+.galerija{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:8px}
+.gal{position:relative;border:1px solid var(--linija);border-radius:10px;overflow:hidden;background:#faf8f3;cursor:pointer;aspect-ratio:1}
+.gal img{width:100%;height:100%;object-fit:cover;display:block}
+.gal .pdf{display:flex;align-items:center;justify-content:center;height:100%;font:700 13px Manrope;color:var(--pelēks);padding:8px;text-align:center;word-break:break-word}
+.gal .x{all:unset;position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border-radius:50%;width:22px;height:22px;text-align:center;line-height:22px;font-size:13px;cursor:pointer}
+.gal.izv{outline:3px solid var(--mezs)}
+.sikb{width:64px;height:64px;border-radius:10px;overflow:hidden;border:1px solid var(--linija);flex:none;background:#faf8f3 center/cover}
+.sikb.tuksa{display:flex;align-items:center;justify-content:center;font:600 12px Manrope;color:var(--pelēks)}
+.ieladet{border:2px dashed var(--linija);border-radius:var(--r);padding:26px 16px;text-align:center;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;transition:.15s;font-family:'Nunito Sans'}
+.ieladet:hover,.ieladet.virs{border-color:var(--mezs);background:var(--mezs-gaiss)}
+/* sagatavošanās */
+.sagRez{display:grid;grid-template-columns:320px minmax(0,1fr);gap:16px;align-items:start}
+.sagP{all:unset;box-sizing:border-box;cursor:pointer;display:flex;gap:12px;width:100%;padding:11px 10px;border-radius:10px}
+.sagP:hover{background:#faf8f3}.sagP.ak{background:var(--mezs-gaiss)}
+.sagP .tx{flex:1;min-width:0}.sagP b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prog{height:6px;background:#efece4;border-radius:99px;overflow:hidden;margin-top:6px}
+.prog i{display:block;height:100%;background:var(--mezs);transition:width .2s}
+.posms{margin-top:22px}
+.posms h3{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.cl{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #eeeae1;font:15px 'Nunito Sans',sans-serif;color:var(--teksts)}
+.cl input[type=checkbox]{flex:none;width:18px;height:18px;padding:0;accent-color:var(--mezs);cursor:pointer}
+.cl input[disabled]{cursor:default}
+.cl .tx{flex:1;min-width:0}.cl.gat .tx{color:var(--pelēks);text-decoration:line-through}
+.cl select{width:auto;padding:3px 6px;font-size:12.5px;border-radius:8px}
+.cl .dz{all:unset;cursor:pointer;color:var(--pelēks);padding:0 6px;font-size:18px;line-height:1}
+.cl .dz:hover{color:var(--ugunskurs)}
+.clJauns{display:flex;gap:8px;margin-top:8px}.clJauns input{padding:7px 10px;font-size:14px}
+.lidzi{margin-top:30px;padding-top:22px;border-top:2px solid var(--linija)}
+.cels{margin-top:18px;border-radius:var(--r);background:var(--mezs);color:#fff;padding:18px 20px}
+.cels h3{color:#fff;margin:0}.cels .poga{background:#fff;color:var(--teksts)}.cels .poga:hover{background:#efece4}
+.modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal .karte{width:min(480px,100%);max-height:90vh;overflow:auto}
+.modal h2{margin-bottom:8px}
+/* vadītājiem */
+.kods{font:600 12.5px ui-monospace,Menlo,monospace;word-break:break-all;margin-right:6px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{all:unset;cursor:pointer;font:600 13.5px Manrope;padding:8px 14px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--linija)}
+.tabs button:hover{background:#efece4}.tabs button.ak{background:var(--teksts);color:#fff;box-shadow:none}
+.vadK .apr{white-space:pre-wrap;font-size:14.5px;margin-top:10px}
+/* aģentu karte */
+.karteA{position:relative;display:grid;grid-template-columns:1fr 150px 1fr;gap:0;align-items:start}
+.kol{display:flex;flex-direction:column;gap:12px}
+.kol h3{margin-bottom:4px}
+.ag,.vi{position:relative;z-index:1;background:#fff;border:1px solid var(--linija);border-radius:12px;padding:12px 14px;cursor:pointer;transition:.15s}
+.ag:hover,.vi:hover,.ag.ak,.vi.ak{border-color:var(--teksts);box-shadow:var(--ena)}
+.ag .nos,.vi .nos{font:700 14px Manrope;display:flex;align-items:center;gap:8px}
+.ag .kur{font-size:12.5px;color:var(--pelēks);margin-top:2px}
+.ag .stat{width:9px;height:9px;border-radius:50%;flex:none;background:#bbb}
+.ag .stat.on{background:#3aa34a;box-shadow:0 0 0 3px #dff1df}.ag .stat.off{background:var(--ugunskurs)}
+.vi{display:flex;align-items:center;gap:10px}
+.vi .em{font-size:20px}
+.liel{grid-column:1/-1}
+svg.liniju{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+svg.liniju path{fill:none;stroke:#cfc9bb;stroke-width:1.5;transition:.2s}
+svg.liniju path.ak{stroke:var(--mezs);stroke-width:2.5}
+svg.liniju path.blav{opacity:.15}
+.det{margin-top:18px}
+.tips{display:inline-block;font:700 10.5px Manrope;letter-spacing:.6px;text-transform:uppercase;padding:2px 8px;border-radius:6px;margin-left:auto}
+.t-skripts{background:var(--mezs-gaiss);color:var(--mezs)}.t-claude{background:var(--ugunskurs-gaiss);color:var(--ugunskurs)}.t-cits{background:#ececec;color:#555}
+/* čats */
+.cats{position:fixed;top:0;right:0;height:100vh;width:min(440px,100vw);background:#fff;border-left:1px solid var(--linija);box-shadow:-10px 0 40px rgba(0,0,0,.08);display:flex;flex-direction:column;transform:translateX(105%);transition:transform .25s ease;z-index:20}
+.cats.ak{transform:none}
+.cats header{padding:18px 20px;border-bottom:1px solid var(--linija);display:flex;align-items:center;gap:12px}
+.cats header h2{font-size:24px}
+.cats .aizv{all:unset;cursor:pointer;margin-left:auto;font-size:22px;color:var(--pelēks);padding:4px 8px}
+.zinas{flex:1;overflow:auto;padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.zn{max-width:88%;padding:10px 14px;border-radius:16px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
+.zn.es{align-self:flex-end;background:var(--teksts);color:#fff;border-bottom-right-radius:4px}
+.zn.vins{align-self:flex-start;background:#f2efe7;border-bottom-left-radius:4px}
+.darb{align-self:stretch;border:1px solid var(--mezs);background:#f7faf5;border-radius:12px;padding:12px 14px;font-size:13.5px}
+.darb pre{white-space:pre-wrap;font:12.5px/1.45 Manrope;margin:8px 0;color:#333}
+.cats form{display:flex;gap:8px;padding:14px;border-top:1px solid var(--linija)}
+.cats textarea{min-height:46px;max-height:140px;flex:1}
+.ieteik{display:flex;flex-wrap:wrap;gap:6px;padding:0 20px 10px}
+.ieteik button{all:unset;cursor:pointer;font:600 12px Manrope;border:1px solid var(--linija);border-radius:999px;padding:5px 10px;color:#444}
+.ieteik button:hover{border-color:var(--teksts)}
+#mic.ieraksta{background:var(--ugunskurs);color:#fff;box-shadow:none;animation:pulss 1.2s infinite}
+@keyframes pulss{50%{opacity:.6}}
+.fcat{display:none}
+/* telefons un planšete: augšējā josla + izvēlne aiz burgera */
+.augsa,.aizsegs{display:none}
+.apm,.tabWrap{overflow-x:auto}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .augsa{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20;background:var(--nakts);color:#f1efe8;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));margin:-18px -14px 18px}
+  .augsa button{all:unset;cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;flex:none}
+  .augsa button:hover,.augsa button:focus-visible{background:#262626}
+  .augsa svg{width:24px;height:24px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round}
+  .augsa img{width:34px;height:34px;flex:none}
+  .augsa b{flex:1;min-width:0;font:600 17px Manrope;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .augsa .augsaCats{width:auto;padding:0 14px;background:var(--mezs);border-radius:999px;height:38px;font:700 13.5px Manrope}
+  .sanu{position:fixed;top:0;bottom:0;left:0;width:min(300px,86vw);height:auto;z-index:40;transform:translateX(-102%);transition:transform .25s ease;overflow-y:auto;padding-top:max(22px,env(safe-area-inset-top));box-shadow:4px 0 30px rgba(0,0,0,.3)}
+  .sanu.atverts{transform:none}
+  .sanu .logo{width:72px;margin-bottom:14px}
+  .nav{font-size:15.5px}.nav button{padding:12px 14px;min-height:20px}
+  .aizsegs{position:fixed;inset:0;z-index:35;background:rgba(0,0,0,.45)}
+  .aizsegs:not([hidden]){display:block}
+  body.bezScroll{overflow:hidden}
+  main{padding:18px 14px 60px}
+  .galva{margin-bottom:16px}.galva>.rinda{width:100%}
+  h1{font-size:28px}h2{font-size:22px}
+  .karte{padding:16px}
+  .sagRez{grid-template-columns:1fr}
+  #sagSar{display:flex;gap:8px;overflow-x:auto;padding:8px!important;scroll-snap-type:x mandatory}
+  .sagP{flex:none;width:auto;min-width:220px;scroll-snap-align:start;border:1px solid var(--linija)}
+  .r2,.r3{grid-template-columns:1fr}.r4{grid-template-columns:1fr 1fr}.cip{font-size:24px}
+  form .lauki{grid-template-columns:1fr}
+  .karteA{grid-template-columns:1fr}.karteA .tukstarp{display:none}svg.liniju{display:none}
+  .cl{flex-wrap:wrap;row-gap:4px}.cl .tx{flex:1 1 150px}
+  .clJauns input{min-width:0}
+  #vadMekl{max-width:none!important;margin-left:0!important;flex-basis:100%}
+  .poga{padding:11px 16px}.poga.maza{padding:8px 12px}
+  input,select,textarea{font-size:16px} /* iOS nepietuvina */
+  /* tabulas → kartītes */
+  .tab:not(.vienk),.tab:not(.vienk) tbody,.tab:not(.vienk) tr,.tab:not(.vienk) td{display:block;width:100%}
+  .tab:not(.vienk) tr:has(th){display:none}
+  .tab:not(.vienk) tr{border:1px solid var(--linija);border-radius:12px;padding:8px 14px;margin-bottom:10px;background:#fff}
+  .tab:not(.vienk) tr:hover td{background:transparent}
+  .tab:not(.vienk) td{border:0;padding:5px 0}
+  .tab:not(.vienk) td[data-l]{display:grid;grid-template-columns:88px minmax(0,1fr);column-gap:12px;align-items:baseline}
+  .tab:not(.vienk) td[data-l]>*{grid-column:2;justify-self:start}
+  .tab:not(.vienk) td[data-l]::before{content:attr(data-l);grid-column:1;grid-row:1 / span 9;font:600 10.5px Manrope;text-transform:uppercase;letter-spacing:.6px;color:var(--pelēks)}
+  .tab:not(.vienk) td+td{border-top:1px solid #f0ede6}
+  .tab:not(.vienk) td:empty{display:none}
+  .cats{width:100vw}
+}
+@media (max-width:420px){ .r4{grid-template-columns:1fr 1fr;gap:10px}.r4 .karte{padding:12px}.cip{font-size:22px} }
+</style>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Gājēdis">
+<link rel="icon" href="https://gajedis.lv/wp-content/themes/gajedis/assets/icons/favicon-32.png">
+<title>Gājēdis</title>
+</head>
+<body>
+<div class="app">
+  <aside class="sanu" id="sanu" aria-label="Izvēlne">
+    <img class="logo" src="data:image/png;base64,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" alt="Gājēdis">
+    <nav class="nav" id="nav">
+      <button data-s="sakums" class="ak"><span class="ik">⌂</span>Sākums</button>
+      <button data-s="pasakumi"><span class="ik">⛺</span>Pasākumi</button>
+      <button data-s="sagatavosanas"><span class="ik">✓</span>Sagatavošanās</button>
+      <button data-s="vaditajiem"><span class="ik">⛰</span>Vadītājiem</button>
+      <button data-s="rekini"><span class="ik">€</span>Rēķini<span class="skaits" id="nRek" hidden></span></button>
+      <button data-s="epasti"><span class="ik">✉</span>E-pasti<span class="skaits" id="nEp" hidden></span></button>
+      <button data-s="marketings"><span class="ik">✦</span>Mārketings</button>
+      <button data-s="kopsavilkums"><span class="ik">☰</span>Kopsavilkums</button>
+      <button data-s="apmeklejums"><span class="ik">↗</span>Apmeklējums</button>
+      <button data-s="agenti"><span class="ik">⟡</span>Aģenti</button>
+      <button data-s="noteikumi"><span class="ik">§</span>Noteikumi</button>
+      <button data-s="iestatijumi"><span class="ik">⚙</span>Iestatījumi</button>
+    </nav>
+    <button class="catpoga" onclick="catsAtvert()">Jautā Gājēdim →</button>
+    <div class="apaksa" id="apaksa">Gājēdis · piedzivojumi@gajedis.lv</div>
+  </aside>
+
+  <main>
+    <div class="augsa"><button id="burger" aria-label="Atvērt izvēlni" aria-expanded="false" aria-controls="sanu" onclick="izvelne()"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><img src="data:image/png;base64,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" alt=""><b id="augsaNos">Sākums</b><button class="augsaCats" onclick="catsAtvert()">Jautā</button></div>
+
+    <!-- SĀKUMS -->
+    <section class="sad ak" id="s-sakums">
+      <div class="galva"><div><h1 id="sodien"></h1><p id="sodienDat"></p></div></div>
+      <div class="rezgis r4" id="sakCipari"><div class="karte ielade">Ielādē…</div></div>
+      <div class="rezgis r2" style="margin-top:16px">
+        <div class="karte"><div class="galva" style="margin:0 0 6px"><h3>Nākamie pasākumi</h3><button class="poga gaisa maza" onclick="iet('pasakumi')">Visi</button></div><ul class="saraksts" id="sakPas"></ul></div>
+        <div class="karte"><div class="galva" style="margin:0 0 6px"><h3>Vispirms jāizdara</h3><button class="poga gaisa maza" onclick="iet('kopsavilkums')">Kopsavilkums</button></div><div id="sakDarbi"></div></div>
+      </div>
+      <div class="karte" style="margin-top:16px"><h3>Ko programma nesen izdarīja</h3><ul class="saraksts" id="sakZurn"></ul></div>
+    </section>
+
+    <!-- PASĀKUMI -->
+    <section class="sad" id="s-pasakumi">
+      <div class="galva"><div><h1>Pasākumi</h1><p>Tabula "Pasākumi 2026" un kalendārs vienuviet.</p></div><button class="poga zala" onclick="pasFormaRadit()">+ Jauns pasākums</button></div>
+      <div class="karte" id="pasForma" hidden style="margin-bottom:16px">
+        <h3>Jauns pasākums</h3>
+        <p class="mazs" style="margin:0 0 14px">Rinda zem pareizā mēneša, gaiši zaļa, un kalendārā "Gājēdis - klients" ar ielūgumiem Markusam, Gustavam un Tomam.</p>
+        <form id="fPas" onsubmit="return pasSaglabat(event)">
+          <div class="lauki">
+            <label>Datums<input type="date" name="datums" required></label>
+            <label>Klients (Uzņēmums, kontaktpersona)<input name="klients" required></label>
+            <label>Klienta e-pasts<input type="email" name="epasts"></label>
+            <label>Tālrunis / cita kontaktinfo<input name="kontakti"></label>
+            <label>Lokācija<input name="lokacija" list="vietas"></label>
+            <label>Cilvēku skaits<input name="skaits"></label>
+            <label>Sākums<input type="time" name="sakums" value="11:00"></label>
+            <label>Beigas<input type="time" name="beigas" value="15:30"></label>
+            <label class="pilns">Papildus prasības no klienta<input name="prasibas"></label>
+            <label class="pilns">Papildus info<input name="papildus"></label>
+            <label class="pilns">Vēl ielūgt kalendārā (e-pasti, ja vajag)<input name="viesi"></label>
+          </div>
+          <datalist id="vietas"><option>Baldone</option><option>Garkalne</option><option>Raiskums</option><option>Ķegums</option><option>Līgatne</option><option>Garezeri - Jūra</option></datalist>
+          <div class="rinda"><button class="poga zala" id="pasPoga">Pievienot tabulā un kalendārā</button><button type="button" class="poga gaisa" onclick="$('#pasForma').hidden=true">Atcelt</button></div>
+          <div class="zinja" id="pasZ"></div>
+        </form>
+      </div>
+      <div class="karte"><div class="rinda" style="margin:0 0 10px"><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="pasVisi" style="width:auto" onchange="ieladetPas()">Rādīt visu gadu</label></div><div id="pasTab" class="ielade">Ielādē…</div></div>
+    </section>
+
+    <!-- SAGATAVOŠANĀS -->
+    <section class="sad" id="s-sagatavosanas">
+      <div class="galva"><div><h1>Sagatavošanās</h1><p>Katram pasākumam savs saraksts, lai nekas nepaliek neizdarīts.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="sagSaite" target="_blank" hidden>Tabula ↗</a><button class="poga gaisa" id="sabPoga" onclick="sabRadit()">Standarta saraksts</button></div></div>
+      <div class="karte" id="sabForma" hidden style="margin-bottom:16px">
+        <h3>Standarta saraksts</h3>
+        <p class="mazs" style="margin:0 0 14px">Katrā rindā viens punkts. To saņem pasākumi, kuru sarakstu vēl neesi atvēris; jau atvērtie nemainās.</p>
+        <form id="fSab" onsubmit="return sabSaglabat(event)"><div class="lauki" id="sabLauki"></div><div class="rinda"><button class="poga zala">Saglabāt</button><button type="button" class="poga gaisa" onclick="$('#sabForma').hidden=true">Atcelt</button></div><div class="zinja" id="sabZ"></div></form>
+      </div>
+      <div class="sagRez">
+        <div class="karte" id="sagSar" style="padding:10px"><div class="ielade">Ielādē…</div></div>
+        <div class="karte" id="sagDet"><p class="tukss">Izvēlies pasākumu.</p></div>
+      </div>
+    </section>
+
+    <!-- VADĪTĀJIEM -->
+    <section class="sad" id="s-vaditajiem">
+      <div class="galva"><div><h1>Pārgājienu vadītājiem</h1><p>Maršruti, spēles un viss, kas jāzina, vadot pārgājienu.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="vadSaite" target="_blank" hidden>Tabula ↗</a><button class="poga zala" onclick="vadForma()">+ Pievienot</button></div></div>
+      <div class="karte" id="vadForma" hidden style="margin-bottom:16px">
+        <h3 id="vadFV">Jauns ieraksts</h3>
+        <form id="fVad" onsubmit="return vadSaglabat(event)"><input type="hidden" name="id">
+          <div class="lauki">
+            <label>Veids<select name="tips" onchange="vadLauki()"><option value="marsruts">Maršruts</option><option value="spele">Spēle</option><option value="info">Informācija</option></select></label>
+            <label>Nosaukums<input name="nosaukums" required></label>
+            <label data-t="marsruts">Sākuma punkts (adrese vai koordinātes)<input name="kur" placeholder="Ķemeru tīrelis, stāvlaukums"></label>
+            <label data-t="marsruts">Garums<input name="garums" placeholder="6 km"></label>
+            <label data-t="marsruts spele">Ilgums<input name="ilgums" placeholder="2 h"></label>
+            <label data-t="marsruts">Grūtība<select name="grutiba"><option value="">–</option><option>viegls</option><option>vidējs</option><option>grūts</option></select></label>
+            <label data-t="spele">Cilvēku skaits<input name="cilveki" placeholder="6–30"></label>
+            <label data-t="spele">Vajag līdzi<input name="vajag" placeholder="virve, 2 bumbas"></label>
+            <label class="pilns">Apraksts<textarea name="apraksts" rows="8" placeholder="Kā iet, kur apstāties, noteikumi, svarīgi zināt…"></textarea></label>
+            <label class="pilns">Saite (karte, Wikiloc, dokuments)<input name="saite" placeholder="https://"></label>
+          </div>
+          <div class="rinda"><button class="poga zala">Saglabāt</button><button type="button" class="poga gaisa" onclick="$('#vadForma').hidden=true">Atcelt</button></div><div class="zinja" id="vadZ"></div>
+        </form>
+      </div>
+      <div class="rinda" style="margin:0 0 16px"><div class="tabs" id="vadTabs"><button data-t="marsruts" class="ak">Maršruti</button><button data-t="spele">Spēles</button><button data-t="info">Informācija</button></div><input id="vadMekl" type="search" placeholder="Meklēt…" aria-label="Meklēt" style="flex:1;min-width:180px;max-width:320px;margin-left:auto" oninput="vadZimet()"></div>
+      <div class="rezgis r2" id="vadSar"><div class="karte ielade">Ielādē…</div></div>
+    </section>
+
+    <!-- RĒĶINI -->
+    <section class="sad" id="s-rekini">
+      <div class="galva"><div><h1>Rēķini</h1><p>Izrakstām tieši kā līdz šim: jauna cilne, Apmaksas rinda, PDF un Gmail melnraksts.</p></div><button class="poga zala" onclick="$('#rekForma').hidden=false">+ Jauns rēķins</button></div>
+      <div class="karte" id="rekForma" hidden style="margin-bottom:16px">
+        <h3>Jauns rēķins</h3>
+        <form id="fRek" onsubmit="return rekPriekskats(event)">
+          <div class="lauki">
+            <label>Maksātājs (uzņēmums)<span style="display:flex;gap:6px"><input name="klients" required><button type="button" class="poga gaisa maza" onclick="rekMeklet()">Atrast</button></span></label>
+            <label>Kontaktpersona (rakstām tieši kā dots)<input name="kontaktpersona" required></label>
+            <label>Reģ. Nr. (bez LV)<input name="reg"></label>
+            <label>PVN Nr.<input name="pvnNr"></label>
+            <label class="pilns">Juridiskā adrese (ne biroja!)<input name="adrese"></label>
+            <label>Banka<input name="banka"></label>
+            <label>Konta Nr.<input name="konts"></label>
+            <label class="pilns">Apraksts (rindas teksts)<input name="apraksts" required placeholder="Dalības maksa 24.11.2026."></label>
+            <label>Summa bez PVN, €<input name="summa" required inputmode="decimal"></label>
+            <label>Apmaksas termiņš, dienas<input name="terminsDienas" type="number" value="14"></label>
+            <label>Pasākuma datums (dd.mm)<input name="pasakumaDatums" placeholder="24.11"></label>
+            <label>Detaļas Apmaksas lapā<select name="detalas"><option>Dalības maksa</option><option>Rezervācijas maksa</option><option>Izbraukuma bankets</option><option>Dzērieni</option></select></label>
+            <label class="pilns">Saņēmēja e-pasts (melnrakstam, var atstāt tukšu)<input type="email" name="epasts"></label>
+          </div>
+          <div class="rinda"><button class="poga">Priekšskatīt</button><button type="button" class="poga gaisa" onclick="$('#rekForma').hidden=true">Atcelt</button></div>
+          <div class="zinja" id="rekZ"></div>
+        </form>
+      </div>
+      <div class="karte"><div id="rekTab" class="ielade">Ielādē…</div></div>
+    </section>
+
+    <!-- E-PASTI -->
+    <section class="sad" id="s-epasti">
+      <div class="galva"><div><h1>E-pasti</h1><p>Iesūtne: kam vēl nav atbildēts. No pieprasījuma var uzreiz izveidot pasākumu.</p></div><button class="poga gaisa" onclick="ieladetEp()">Atjaunot</button></div>
+      <div class="karte"><div id="epSar" class="ielade">Ielādē…</div></div>
+    </section>
+
+    <!-- MĀRKETINGS -->
+    <section class="sad" id="s-marketings">
+      <div class="galva"><div><h1>Mārketings</h1><p>Jaunumu vēstules klientiem un sekotājiem Gājēdis stilā.</p></div></div>
+      <div class="rezgis r2">
+        <div class="karte">
+          <h3>Jauna vēstule</h3>
+          <div class="rinda" style="margin:0 0 12px"><input id="vTema" placeholder="Par ko? piem. ziemas pasākumi, dāvanu kartes Ziemassvētkos"><button class="poga gaisa maza" onclick="vIdeja()">Uzrakstīt ar Claude</button></div>
+          <form id="fVest" onsubmit="return false">
+            <div class="lauki">
+              <label class="pilns">E-pasta temats<input name="temats"></label>
+              <label class="pilns">Virsraksts<input name="virsraksts"></label>
+              <label class="pilns">Teksts<textarea name="teksts" style="min-height:150px"></textarea></label>
+              <label>Pogas teksts<input name="poga" placeholder="Uzzināt vairāk"></label>
+              <label>Pogas saite<input name="saite" placeholder="https://gajedis.lv/..."></label>
+              <div class="pilns"><div class="etik" style="margin-bottom:6px">Bilde vēstulei</div>
+                <div style="display:flex;gap:10px;align-items:center"><div id="vBilde" class="sikb tuksa">nav</div><span class="mazs">Uzspied uz bildes sadaļā "Materiāli" zemāk, vai</span><button type="button" class="poga gaisa maza" onclick="vBildeNost()">bez bildes</button></div>
+                <input type="hidden" name="bildeId"><input type="hidden" name="stils"></div>
+              <label class="pilns">vai bildes saite<input name="bilde" placeholder="https://gajedis.lv/wp-content/uploads/..."></label>
+              <div class="pilns mazs" id="vStils"></div>
+            </div>
+            <div class="rinda"><button class="poga gaisa" onclick="vPriekskats()">Priekšskatīt</button><button class="poga gaisa" onclick="vSutit(true)">Tests sev</button><button class="poga zala" onclick="vSutit(false)">Sūtīt visiem</button></div>
+            <div class="zinja" id="vZ"></div>
+          </form>
+        </div>
+        <div class="karte" style="padding:0;overflow:hidden"><iframe id="vPr" style="width:100%;height:640px;border:0;background:#f3f1ea"></iframe></div>
+      </div>
+      <div class="karte" style="margin-top:16px">
+        <div class="galva" style="margin:0 0 6px"><div><h3>Materiāli un stils</h3><p class="mazs" style="margin:4px 0 0">Bildes, ko likt vēstulēs, un paraugi, kā vēstulēm jāizskatās (bildes, ekrānuzņēmumi, PDF). Claude ņem paraugus vērā, kad raksta.</p></div><a id="matMape" target="_blank" class="mazs">Drive mape ↗</a></div>
+        <div class="rezgis r2" style="margin-top:10px">
+          <div>
+            <label class="ieladet" id="matZona"><input type="file" id="matFaili" multiple accept="image/*,application/pdf" hidden onchange="matAugsup(this.files)">
+              <b>Ievelc failus šeit vai spied, lai izvēlētos</b><span class="mazs">bildes vai PDF</span></label>
+            <div class="rinda" style="margin-top:10px"><span class="etik">Pievienot kā:</span>
+              <label style="flex-direction:row;align-items:center;gap:6px;font-weight:600"><input type="radio" name="matTips" value="bilde" checked style="width:auto">bilde vēstulēm</label>
+              <label style="flex-direction:row;align-items:center;gap:6px;font-weight:600"><input type="radio" name="matTips" value="stils" style="width:auto">stila paraugs</label></div>
+            <div class="zinja" id="matZ"></div>
+          </div>
+          <label>Kā vēstulēm jāizskatās (vārdiem)<textarea id="stilaApr" placeholder="piem. daudz gaisa, viena liela bilde augšā, tumši zaļa poga, virsraksts kā IG postos (IM Fell English Italic), īss teksts"></textarea>
+            <span class="rinda" style="margin-top:6px"><button type="button" class="poga gaisa maza" onclick="stilaSagl()">Saglabāt aprakstu</button></span></label>
+        </div>
+        <div class="etik" style="margin-top:16px">Bildes vēstulēm</div><div class="galerija" id="galBildes"></div>
+        <div class="etik" style="margin-top:16px">Stila paraugi</div><div class="galerija" id="galStils"></div>
+      </div>
+      <div class="rezgis r2" style="margin-top:16px">
+        <div class="karte"><div class="galva" style="margin:0"><h3>Saņēmēji</h3><a id="sanSaite" target="_blank" class="mazs">Atvērt tabulu ↗</a></div>
+          <div id="sanInfo" class="ielade">Ielādē…</div>
+          <label class="pilns" style="margin-top:12px">Pievienot (viens e-pasts rindā, var ar vārdu)<textarea id="sanJauni" style="min-height:70px"></textarea></label>
+          <div class="rinda"><button class="poga maza" onclick="sanPievienot()">Pievienot</button><button class="poga gaisa maza" onclick="sanKlienti()">Ielasīt klientus no Pasākumi 2026</button></div>
+          <p class="mazs">Katrā vēstulē ir saite "Atrakstīties"; programma pati atzīmē atrakstījušos.</p>
+        </div>
+        <div class="karte"><h3>Izsūtītās</h3><div id="izsSar"></div></div>
+      </div>
+    </section>
+
+    <!-- KOPSAVILKUMS -->
+    <section class="sad" id="s-kopsavilkums">
+      <div class="galva"><div><h1>Kopsavilkums</h1><p id="kopsDat">Katru rītu 7:30 programma pati savelk, kas izdarīts un kas jādara.</p></div><button class="poga" id="kopsPoga" onclick="ieladetKops(true)">Savilkt tagad</button></div>
+      <div class="karte" id="kopsTeksts" hidden style="margin-bottom:16px;border-left:4px solid var(--mezs)"></div>
+      <div class="rezgis r2">
+        <div class="karte"><h3>Jāizdara</h3><div id="kopsDarbi" class="ielade">Ielādē…</div></div>
+        <div>
+          <div class="karte"><h3>Procesu optimizētājs</h3><div id="kopsIet"><p class="mazs">Ieteikumi parādās, kad iestatījumos ir Claude API atslēga.</p></div></div>
+          <div class="karte" style="margin-top:16px"><h3>Izdarīts pēdējā nedēļā</h3><ul class="saraksts" id="kopsIzd"></ul></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- APMEKLĒJUMS -->
+    <section class="sad" id="s-apmeklejums">
+      <div class="galva"><div><h1>Apmeklējums</h1><p id="apmDat">gajedis.lv apmeklētāji no Google Analytics un Search Console. Katru pirmdienu 8:00 programma pati savelk pagājušo nedēļu un atsūta to arī e-pastā.</p></div>
+        <div class="rinda"><button class="poga gaisa" id="apmSut" onclick="apmSutit()">Sūtīt uz e-pastu</button><button class="poga" id="apmPoga" onclick="ieladetApm(true)">Atjaunot tagad</button></div></div>
+      <div class="zinja" id="apmZ"></div>
+      <div id="apmSat" class="ielade">Ielādē…</div>
+    </section>
+
+    <!-- AĢENTI -->
+    <section class="sad" id="s-agenti">
+      <div class="galva"><div><h1>Kas ko dara un kur</h1><p>Uzspied uz aģenta vai vietas, lai redzētu savienojumus. Zaļš punkts = ieslēgts.</p></div></div>
+      <div class="karte">
+        <div class="karteA" id="karteA">
+          <svg class="liniju" id="liniju"></svg>
+          <div class="kol" id="kolAg"><h3>Aģenti</h3></div>
+          <div class="tukstarp"></div>
+          <div class="kol" id="kolVi"><h3>Kur strādā</h3></div>
+        </div>
+      </div>
+      <div class="karte det" id="agDet"><p class="mazs">Izvēlies aģentu.</p></div>
+    </section>
+
+    <!-- NOTEIKUMI -->
+    <section class="sad" id="s-noteikumi">
+      <div class="galva"><div><h1>Tavi noteikumi</h1><p>Pēc tiem strādā programma, čats un Claude. Labo droši; izmaiņas stājas spēkā uzreiz.</p></div><button class="poga gaisa" onclick="notJauns()">+ Jauns noteikums</button></div>
+      <div class="rezgis r2" id="notSar"><div class="karte ielade">Ielādē…</div></div>
+    </section>
+
+    <!-- IESTATĪJUMI -->
+    <section class="sad" id="s-iestatijumi">
+      <div class="galva"><div><h1>Iestatījumi</h1></div></div>
+      <div class="rezgis r2">
+        <div class="karte"><h3>Claude API atslēga</h3>
+          <p class="mazs">Vajag čatam, kopsavilkuma tekstam, optimizētājam, e-pastu nolasīšanai un vēstuļu rakstīšanai. Atslēgu izveido console.anthropic.com → API Keys. Tā glabājas tikai šī skripta iestatījumos.</p>
+          <div class="rinda"><input id="atslega" type="password" placeholder="sk-ant-..." style="flex:1"><button class="poga" onclick="saglAtsl()">Saglabāt</button></div>
+          <div class="zinja" id="atslZ"></div>
+        </div>
+        <div class="karte"><h3>Automātika</h3><div id="autoInfo" class="ielade">Ielādē…</div>
+          <div class="rinda"><button class="poga gaisa maza" onclick="uzstadit()">Pārstartēt automātiskos laikus</button></div><div class="zinja" id="uzstZ"></div></div>
+        <div class="karte liel"><div class="galva" style="margin:0 0 8px"><h3 style="margin:0">Backup</h3><div class="rinda" style="margin:0"><a class="poga gaisa maza" id="bakIer" target="_blank" hidden>Visi ieraksti ↗</a><a class="poga gaisa maza" id="bakKop" target="_blank" hidden>Google Sheets kopija ↗</a><a class="poga gaisa maza" id="bakMape" target="_blank" hidden>Backup mape ↗</a><button class="poga zala maza" id="bakPoga" onclick="bakTagad()">Izveidot backup tagad</button></div></div>
+          <p class="mazs" style="margin:0 0 8px">Viss, ko ievadi programmā, uzreiz pierakstās tabulā "Gājēdis visi ieraksti". Katru vakaru 23:00 Drive mapē "Gājēdis programma - backup" tiek atjaunota mape "Jaunākā kopija" ar visu tabulu un programmas datu kopijām Google Sheets formātā (atveras uzreiz, arī ja programma nestrādā), un rodas zip fails vēsturei (glabājas pēdējie 60).</p>
+          <div id="bakInfo" class="ielade">Ielādē…</div><div class="zinja" id="bakZ"></div></div>
+        <div class="karte liel"><h3>Piekļuves</h3>
+          <p class="mazs" style="margin:0 0 8px"><b>Markuss</b> redz pasākumus, rēķinus un sagatavošanos. <b>Komanda</b> redz sagatavošanos un vadītāju lapu (maksājumu atzīmes nevar mainīt). Viņi atver programmas saiti (izvietojums ar piekļuvi "Anyone") un ievada savu kodu; Mac lietotnē kodu ieliek "Savienojums…". Katra darbība ierakstu tabulā tiek pierakstīta ar vārdu.</p>
+          <div id="pieklInfo" class="ielade">Ielādē…</div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="aizsegs" id="aizsegs" hidden onclick="izvelne(false)"></div>
+<div class="fcat" onclick="catsAtvert()">Jautā Gājēdim</div>
+<aside class="cats" id="cats">
+  <header><h2>Jautā Gājēdim</h2><button class="aizv" id="skalrunis" title="Lasīt atbildes balsī" onclick="balssToggle()" style="margin-left:auto;font-size:18px">🔇</button><button class="aizv" style="margin-left:0" onclick="$('#cats').classList.remove('ak')">×</button></header>
+  <div class="zinas" id="zinas"><div class="zn vins">Sveiks! Vari prasīt jebko par pasākumiem, rēķiniem, e-pastiem vai likt man sagatavot jaunu pasākumu, rēķinu vai vēstuli. Darbības tu apstiprini ar pogu.</div></div>
+  <div class="ieteik"><button>Kas šonedēļ jādara?</button><button>Kuri rēķini nav apmaksāti?</button><button>Kuriem e-pastiem jāatbild?</button><button>Cik cilvēku apmeklēja lapu?</button><button>Ko varētu darīt labāk?</button></div>
+  <form onsubmit="return catsSutit(event)"><button type="button" class="poga gaisa" id="mic" title="Runāt" onclick="klausities()" style="padding:10px 14px">🎤</button><textarea id="catsIn" placeholder="Raksti vai spied 🎤 un runā…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();catsSutit(event)}"></textarea><button class="poga zala">→</button></form>
+</aside>
+
+<script>
+// google.script.run -> fetch to the Apps Script web app (text/plain avoids a CORS preflight)
+(() => {
+  async function call(kods, fn, args) {
+    let res;
+    try { res = await fetch("https://script.google.com/macros/s/AKfycbypdlnjsqCrrTd_PxbWeTDgNYAjonu07b5rlMcMWaf6-VluemATvB9NnCP-13GndLV7/exec", { method: 'POST', body: JSON.stringify({ atslega: kods, fn, args }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } }); }
+    catch (e) { throw new Error('Nav savienojuma ar serveri. Pārbaudi internetu.'); }
+    const r = await res.json().catch(() => null);
+    if (!r || !r.ok) throw new Error((r && r.kluda) || 'Servera kļūda');
+    return r.r;
+  }
+  const runner = (ok, kl) => new Proxy({}, {
+    get(_, p) {
+      if (p === 'withSuccessHandler') return f => runner(f, kl);
+      if (p === 'withFailureHandler') return f => runner(ok, f);
+      return (...a) => { (p === 'gjApi' ? call(a[0], a[1], a[2] || []) : Promise.reject(new Error('Nezināma funkcija: ' + p))).then(r => ok && ok(r), e => kl && kl(e)); };
+    }
+  });
+  window.google = { script: { run: runner() } };
+})();
+</script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// visi izsaukumi iet caur gjApi: serveris pēc koda (vai Toma Google konta) nosaka lomu un pārbauda piekļuvi
+let gjKods = '';
+try { gjKods = localStorage.getItem('gjKods') || ''; } catch (e) {}
+const run = (fn, ...a) => new Promise((ok, kl) => google.script.run.withSuccessHandler(ok).withFailureHandler(e => kl(e)).gjApi(gjKods, fn, a));
+let LOMA = {loma: 'toms', nos: 'Toms', sadalas: []};
+const zinja = (id, t, k) => { const z = $(id); z.className = 'zinja ' + (k || 'ok'); z.innerHTML = t; };
+const forma = f => Object.fromEntries(new FormData(f).entries());
+let ielad = {}, kluss = false;
+
+/* navigācija */
+function iet(s) {
+  document.querySelectorAll('.sad').forEach(x => x.classList.toggle('ak', x.id === 's-' + s));
+  document.querySelectorAll('#nav button').forEach(b => { b.classList.toggle('ak', b.dataset.s === s); if (b.dataset.s === s) { b.setAttribute('aria-current', 'page'); $('#augsaNos').textContent = b.textContent.replace(b.querySelector('.ik').textContent, '').replace(/\d+$/, '').trim(); } else b.removeAttribute('aria-current'); });
+  izvelne(false);
+  window.scrollTo(0, 0);
+  const f = {pasakumi: ieladetPas, sagatavosanas: ieladetSag, vaditajiem: ieladetVad, rekini: ieladetRek, epasti: ieladetEp, marketings: () => { ieladetMark(); ieladetMat(); }, kopsavilkums: () => ieladetKops(false), apmeklejums: () => ieladetApm(false), agenti: zimetKarti, noteikumi: ieladetNot, iestatijumi: ieladetIest}[s];
+  if (f && !ielad[s]) { ielad[s] = 1; f(); }
+  if (s === 'agenti') setTimeout(liniju, 50);
+}
+document.querySelectorAll('#nav button').forEach(b => b.onclick = () => iet(b.dataset.s));
+/* burgera izvēlne (telefons, planšete) */
+function izvelne(atv) {
+  const s = $('#sanu'); if (atv === undefined) atv = !s.classList.contains('atverts');
+  if (!atv && !s.classList.contains('atverts')) return;
+  s.classList.toggle('atverts', atv); $('#aizsegs').hidden = !atv; document.body.classList.toggle('bezScroll', atv);
+  $('#burger').setAttribute('aria-expanded', atv); $('#burger').setAttribute('aria-label', atv ? 'Aizvērt izvēlni' : 'Atvērt izvēlni');
+  if (atv) (s.querySelector('#nav button.ak:not([hidden])') || s.querySelector('#nav button:not([hidden])')).focus(); else $('#burger').focus({preventScroll: true});
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#sanu').classList.contains('atverts')) izvelne(false); });
+matchMedia('(min-width:901px)').addEventListener('change', e => { if (e.matches) izvelne(false); });
+
+function datk(p) { const [d, m] = p.datums.split('.'); return `<div class="datkaste"><b>${d}</b><span>${['jan','feb','mar','apr','mai','jūn','jūl','aug','sep','okt','nov','dec'][+m-1]}</span></div>`; }
+function stCip(p) {
+  const s = p.statuss, c = (ok, t) => `<span class="c ${ok ? 'ok' : 'ne'}">${ok ? '✓' : '·'} ${t}</span>`;
+  return c(s.priekssapm, 'priekšapm.') + c(s.info, 'info') + c(s.edienkarte, 'ēdienkarte') + (p.dienasLidz < 0 ? c(s.galaRekins, 'gala rēķins') + c(s.noverte, 'atsauksme') + c(s.apmaksats, 'apmaksāts') : c(s.atgadinajums, 'atgādinājums'));
+}
+function kadPas(n) { return n === 0 ? 'šodien' : n === 1 ? 'rīt' : n > 0 ? `pēc ${n} d.` : `pirms ${-n} d.`; }
+
+/* sākums */
+async function ieladetSak() {
+  try {
+    const d = await run('gjSakums');
+    sodienRadit();
+    const kav = d.neapmaksati.filter(r => r.kavets).length;
+    const darbi = d.kopsavilkums ? d.kopsavilkums.darbi : [];
+    const ep = d.kopsavilkums ? d.kopsavilkums.epasti.length : '–';
+    $('#sakCipari').innerHTML = [
+      ['Pasākumi 3 nedēļās', d.pasakumi.filter(p => p.dienasLidz <= 21).length],
+      ['Neapmaksāti rēķini', d.neapmaksati.length + (kav ? ` <span class="c ne" style="vertical-align:middle">${kav} kavēti</span>` : '')],
+      ['E-pasti gaida atbildi', ep],
+      ['Darāmie', darbi.length]
+    ].map(([e, c]) => `<div class="karte"><div class="etik">${e}</div><div class="cip" style="margin-top:8px">${c}</div></div>`).join('');
+    if (d.neapmaksati.length) { $('#nRek').hidden = false; $('#nRek').textContent = d.neapmaksati.length; }
+    if (ep && ep !== '–') { $('#nEp').hidden = false; $('#nEp').textContent = ep; }
+    $('#sakPas').innerHTML = d.pasakumi.length ? d.pasakumi.map(p => `<li>${datk(p)}<div><b>${esc(p.klients)}</b><div class="mazs">${esc(p.diena)}, ${kadPas(p.dienasLidz)} · ${esc(p.lokacija || 'vieta nav norādīta')} ${p.laiks ? '· ' + esc(p.laiks) : ''}</div><div class="cipsi">${stCip(p)}</div></div></li>`).join('') : '<li class="tukss">Tuvākajā laikā pasākumu nav.</li>';
+    $('#sakDarbi').innerHTML = darbi.length ? darbi.slice(0, 7).map(darbsHtml).join('') : `<p class="mazs">${d.kopsavilkums ? 'Viss kārtībā.' : 'Kopsavilkums vēl nav savilkts.'} <a href="#" onclick="iet('kopsavilkums');ieladetKops(true);return false">Savilkt tagad</a></p>`;
+    $('#sakZurn').innerHTML = d.zurnals.length ? d.zurnals.map(z => `<li><span class="c">${esc(z.kas)}</span><div><div>${esc(z.ko)}</div><div class="mazs">${esc(z.t)}</div></div></li>`).join('') : '<li class="tukss">Vēl nekas nav pierakstīts.</li>';
+    $('#sakAtsl')?.remove();
+    if (!d.irAtslega) $('#sakZurn').insertAdjacentHTML('beforebegin', '<p id="sakAtsl" class="zinja info" style="display:block">Čatam un gudrajam kopsavilkumam ielieciet Claude API atslēgu <a href="#" onclick="iet(\'iestatijumi\');return false">iestatījumos</a>.</p>');
+  } catch (e) { $('#sakCipari').innerHTML = `<div class="karte zinja kl" style="display:block">${esc(e.message)}</div>`; }
+}
+function darbsHtml(x) { return `<div class="darbs"><span class="prio p${x.prio}"></span><div><b>${esc(x.kas)}</b><div class="mazs">${esc(x.ko)} ${x.saite ? `<a href="${esc(x.saite)}" target="_blank">atvērt ↗</a>` : ''}</div></div></div>`; }
+
+/* pasākumi */
+function pasFormaRadit(d) {
+  $('#pasForma').hidden = false; $('#pasZ').className = 'zinja';
+  if (d) Object.entries(d).forEach(([k, v]) => { const i = $('#fPas [name=' + k + ']'); if (i && v) i.value = v; });
+  $('#pasForma').scrollIntoView({behavior: 'smooth'});
+}
+async function pasSaglabat(e) {
+  e.preventDefault(); const b = $('#pasPoga'); b.disabled = true; zinja('#pasZ', 'Pievienoju tabulā un kalendārā…', 'info');
+  try {
+    const r = await run('gjPievienotPasakumu', forma(e.target));
+    zinja('#pasZ', `Gatavs: Nr. ${r.nr}, rinda ${r.rinda}, kalendārā ielūgumi nosūtīti. <a href="${r.saite}" target="_blank">Atvērt tabulā ↗</a>`);
+    e.target.reset(); ieladetPas(); delete ielad.sagatavosanas;
+  } catch (x) { zinja('#pasZ', esc(x.message), 'kl'); }
+  b.disabled = false; return false;
+}
+async function ieladetPas() {
+  if (!kluss) { $('#pasTab').className = 'ielade'; $('#pasTab').textContent = 'Ielādē…'; }
+  try {
+    const p = await run('gjPasakumuSaraksts', $('#pasVisi').checked);
+    $('#pasTab').className = '';
+    $('#pasTab').innerHTML = p.length ? `<table class="tab"><tr><th>Datums</th><th>Klients</th><th>Vieta, laiks</th><th>Komanda</th><th>Statuss</th><th></th></tr>${p.map(x => `<tr><td data-l="Datums"><b>${esc(x.datums)}</b><div class="mazs">${esc(x.diena)}, ${kadPas(x.dienasLidz)}</div></td><td data-l="Klients">${esc(x.klients)}<div class="mazs">${esc(x.epasts || x.kontakti)}</div></td><td data-l="Vieta, laiks">${esc(x.lokacija)}<div class="mazs">${esc(x.laiks)} ${x.skaits ? '· ' + esc(x.skaits) + ' cilv.' : ''}</div></td><td class="mazs" data-l="Komanda">${esc(x.komanda.join(', ') || '–')}</td><td data-l="Statuss"><div class="cipsi">${stCip(x)}</div></td><td><button class="poga gaisa maza" data-atsl="${esc(x.atslega)}" onclick="sagAtvert(this.dataset.atsl)">Sagatavoties</button></td></tr>`).join('')}</table>` : '<p class="tukss">Nav pasākumu.</p>';
+  } catch (x) { $('#pasTab').innerHTML = `<p class="zinja kl">${esc(x.message)}</p>`; }
+}
+
+/* sagatavošanās */
+let sagDati = [], sagIzv = null, sagCl = null;
+const sagProg = (d, k) => `<div class="prog"><i style="width:${k ? Math.round(d / k * 100) : 0}%"></i></div>`;
+async function ieladetSag() {
+  try {
+    const s = await run('gjSagatavosanas');
+    sagDati = s.pasakumi; $('#sagSaite').href = s.saite; $('#sagSaite').hidden = LOMA.loma !== 'toms';
+    if (!sagIzv || !sagDati.some(p => p.atslega === sagIzv)) { const n = sagDati.find(p => p.dienasLidz >= 0) || sagDati[0]; sagIzv = n ? n.atslega : null; }
+    sagSarZimet();
+    if (sagIzv) await sagIelade(sagIzv); else $('#sagDet').innerHTML = '<p class="tukss">Tuvākajā laikā pasākumu nav.</p>';
+  } catch (x) { $('#sagSar').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
+}
+function sagSarZimet() {
+  $('#sagSar').innerHTML = sagDati.length ? sagDati.map((p, i) => `<button class="sagP${p.atslega === sagIzv ? ' ak' : ''}" data-i="${i}">${datk(p)}<span class="tx"><b>${esc(p.klients)}</b><span class="mazs">${kadPas(p.dienasLidz)} · ${p.izdarits}/${p.kopa}${p.kavets ? ' · <span class="c ne">kavējas</span>' : ''}${p.sapakots ? ' · <span class="c ok">sapakots</span>' : ''}</span>${sagProg(p.izdarits, p.kopa)}</span></button>`).join('') : '<p class="tukss">Nav pasākumu.</p>';
+  $('#sagSar').querySelectorAll('.sagP').forEach(b => b.onclick = () => { sagIzv = sagDati[+b.dataset.i].atslega; sagSarZimet(); sagIelade(sagIzv); });
+}
+async function sagAtvert(atslega) { sagIzv = atslega; iet('sagatavosanas'); if (sagDati.length) { sagSarZimet(); sagIelade(atslega); } }
+async function sagIelade(atslega) {
+  if (!kluss) $('#sagDet').innerHTML = '<div class="ielade">Ielādē sarakstu…</div>';
+  try {
+    const c = await run('gjCheklists', atslega);
+    if (atslega !== sagIzv) return;
+    sagCl = c; sagDetZimet();
+  } catch (x) { if (atslega === sagIzv) $('#sagDet').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
+}
+function sagPunktsHtml(x, cilveki) {
+  const chip = (x.parnests ? `<span class="c br">${esc(x.parnests)}</span>` : '') + (x.auto ? '<span class="c">automātiski</span>' : x.tabula ? '<span class="c">tabulā</span>' : '');
+  const slegts = x.auto || (x.tabula && LOMA.loma === 'komanda');
+  const izv = x.tabula ? '' : `<select data-kas title="Atbildīgais"><option value="">kurš?</option>${cilveki.map(c => `<option${c === x.atbildigais ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select><button type="button" class="dz" data-dz title="Dzēst">×</button>`;
+  return `<div class="cl${x.izdarits ? ' gat' : ''}" data-id="${esc(x.id)}"><input type="checkbox"${x.izdarits ? ' checked' : ''}${slegts ? ' disabled' : ''} aria-label="${esc(x.teksts)}"><span class="tx">${esc(x.teksts)}</span>${chip}${izv}</div>`;
+}
+function sagDetZimet() {
+  const c = sagCl, visi = c.posmi.flatMap(m => m.punkti), d = visi.filter(x => x.izdarits).length;
+  const info = [c.lokacija, c.laiks, c.skaits ? c.skaits + ' cilv.' : '', c.komanda.join(', ')].filter(Boolean).map(esc).join(' · ');
+  const posms = m => `<div class="posms" data-posms="${m.id}"><h3>${esc(m.nos)}${m.lidzi || m.janoperk ? '' : ` <span class="mazs">līdz ${esc(m.termins)}</span><span class="c ne"${m.kavets ? '' : ' hidden'}>kavējas</span>`}</h3>${m.punkti.map(x => sagPunktsHtml(x, c.cilveki)).join('')}<form class="clJauns"><input placeholder="Pievienot punktu…" aria-label="Pievienot punktu: ${esc(m.nos)}"><button class="poga gaisa maza">Pievienot</button></form></div>`;
+  $('#sagDet').innerHTML = `<div class="galva" style="margin:0 0 8px"><div><h2>${esc(c.klients)}</h2><p>${esc(c.datums)}, ${esc(c.diena)}, ${kadPas(c.dienasLidz)}${info ? ' · ' + info : ''}</p></div><div class="cip" id="sagSk">${d}/${visi.length}</div></div><div id="sagPr">${sagProg(d, visi.length)}</div>
+    ${c.prasibas ? `<p class="zinja info" style="display:block"><b>Prasības:</b> ${esc(c.prasibas)}</p>` : ''}
+    ${c.posmi.filter(m => !m.lidzi && !m.janoperk).map(posms).join('')}
+    <div class="lidzi">${posms(c.posmi.find(m => m.janoperk))}<p class="mazs" style="margin:8px 0 0">Ko nenopērk, tas automātiski pāriet uz nākamajiem pasākumiem, līdz atzīmē.</p></div>
+    <div class="lidzi"><div class="galva" style="margin:0 0 6px"><div><h2>Ko ņemt līdzi</h2><p>Katrs punkts jāatzīmē. Kad viss atzīmēts, apstiprini, un parādīsies ceļš uz pasākumu.</p></div><div class="cip" id="lidziSk"></div></div><div id="lidziPr"></div>
+    ${c.posmi.filter(m => m.lidzi).map(posms).join('')}<div id="lidziBeigas"></div></div>`;
+  sagLidzi(false);
+}
+/* ceļš: Waze un Google Maps uz adresi vai koordinātēm */
+function navSaites(vieta) {
+  const v = String(vieta || '').trim(); if (!v) return null;
+  const k = v.match(/(-?\d{1,2}\.\d+)\s*[,; ]\s*(-?\d{1,3}\.\d+)/), q = k ? k[1] + ',' + k[2] : v;
+  return {waze: k ? `https://waze.com/ul?ll=${q}&navigate=yes` : `https://waze.com/ul?q=${encodeURIComponent(v)}&navigate=yes`, gmaps: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(q)}`};
+}
+function navPogas(vieta, maza) {
+  const n = navSaites(vieta), k = maza ? 'poga gaisa maza' : 'poga';
+  return n ? `<a class="${k}" target="_blank" href="${esc(n.waze)}">Waze ↗</a><a class="${k}" target="_blank" href="${esc(n.gmaps)}">Google Maps ↗</a>` : '';
+}
+function sagLidzi(jautat) {
+  const l = sagCl.posmi.filter(m => m.lidzi).flatMap(m => m.punkti), d = l.filter(x => x.izdarits).length, viss = l.length > 0 && d === l.length;
+  if (!viss) sagCl.sapakots = '';
+  $('#lidziSk').textContent = d + '/' + l.length; $('#lidziPr').innerHTML = sagProg(d, l.length);
+  const c = sagCl;
+  $('#lidziBeigas').innerHTML = c.sapakots
+    ? `<div class="cels"><h3>Viss ir līdzi. Brauciet!</h3><p style="margin:6px 0 0">📍 ${esc(c.lokacija || 'vieta tabulā nav norādīta')}${c.laiks ? ' · ' + esc(c.laiks) : ''}<br><span style="opacity:.8;font-size:13px">Apstiprināts ${esc(c.sapakots)}</span></p>${navSaites(c.lokacija) ? `<div class="rinda">${navPogas(c.lokacija)}</div>` : '<p style="margin:10px 0 0">Ieraksti vietu tabulā "Pasākumi 2026", lai rādītu ceļu.</p>'}</div>`
+    : viss ? '<div class="rinda"><button class="poga zala" onclick="lidziJautat()">Viss sapakots, rādīt ceļu</button></div>'
+    : `<p class="mazs" style="margin-top:14px">${l.length ? 'Vēl jāatzīmē ' + (l.length - d) + '.' : 'Saraksts tukšs. Pievieno, kas jāņem līdzi.'}</p>`;
+  if (viss && !c.sapakots && jautat) lidziJautat();
+}
+function lidziJautat() {
+  if ($('#lidziModal')) return;
+  const c = sagCl, d = document.createElement('div');
+  d.className = 'modal'; d.id = 'lidziModal';
+  d.innerHTML = `<div class="karte" role="alertdialog" aria-modal="true" aria-labelledby="lmV"><h2 id="lmV">Vai tiešām viss ir?</h2><p style="margin:0 0 8px">Pārbaudi vēlreiz, ka viss ir mašīnā pasākumam <b>${esc(c.klients)}</b>.</p><ul class="saraksts">${c.posmi.filter(m => m.lidzi).map(m => `<li><span class="c ok">✓ ${m.punkti.length}</span>${esc(m.nos)}</li>`).join('')}</ul><div class="rinda"><button class="poga zala" id="lmJa">Jā, viss ir</button><button class="poga gaisa" id="lmNe">Vēl pārbaudīšu</button></div><div class="zinja" id="lmZ"></div></div>`;
+  document.body.append(d); $('#lmJa').focus();
+  $('#lmNe').onclick = () => d.remove();
+  d.addEventListener('keydown', e => { if (e.key === 'Escape') d.remove(); });
+  $('#lmJa').onclick = async () => {
+    const b = $('#lmJa'), atsl = c.atslega; b.disabled = true; b.textContent = 'Saglabāju…';
+    try {
+      const r = await run('gjLidziApstiprinat', atsl); d.remove();
+      const p = sagDati.find(x => x.atslega === atsl); if (p) p.sapakots = true;
+      if (sagCl.atslega === atsl) { sagCl.sapakots = r.kad; sagLidzi(false); sagSarZimet(); $('#lidziBeigas').scrollIntoView({behavior: 'smooth', block: 'center'}); }
+    } catch (x) { b.disabled = false; b.textContent = 'Jā, viss ir'; zinja('#lmZ', esc(x.message), 'kl'); }
+  };
+}
+function sagPunkts(id) { for (const m of sagCl.posmi) { const x = m.punkti.find(p => p.id === id); if (x) return [m, x]; } return []; }
+function sagGaita(jautat) {
+  const visi = sagCl.posmi.flatMap(m => m.punkti), d = visi.filter(x => x.izdarits).length;
+  $('#sagSk').textContent = d + '/' + visi.length; $('#sagPr').innerHTML = sagProg(d, visi.length);
+  sagCl.posmi.filter(m => !m.lidzi && !m.janoperk).forEach(m => { m.kavets = m.pagajis && m.punkti.some(x => !x.izdarits); $(`#sagDet [data-posms="${m.id}"] h3 .c.ne`).hidden = !m.kavets; });
+  sagLidzi(jautat);
+  const p = sagDati.find(x => x.atslega === sagCl.atslega);
+  if (p) { p.izdarits = d; p.kopa = visi.length; p.kavets = sagCl.posmi.some(m => m.kavets); p.sapakots = !!sagCl.sapakots; sagSarZimet(); }
+}
+$('#sagDet').addEventListener('change', async e => {
+  const r = e.target.closest('.cl'); if (!r) return;
+  const atsl = sagCl.atslega, id = r.dataset.id, [m, x] = sagPunkts(id);
+  if (e.target.matches('input[type=checkbox]')) {
+    const on = e.target.checked; x.izdarits = on; r.classList.toggle('gat', on); sagGaita(on && m.lidzi);
+    try { await run('gjCheklistaAtzime', atsl, id, on); }
+    catch (k) { x.izdarits = !on; alertZ(k.message); if (sagCl.atslega === atsl) { sagDetZimet(); sagGaita(); } }
+  } else if (e.target.matches('select')) {
+    const ved = x.atbildigais; x.atbildigais = e.target.value;
+    try { await run('gjCheklistaAtbildigais', atsl, id, e.target.value); }
+    catch (k) { x.atbildigais = ved; alertZ(k.message); if (sagCl.atslega === atsl) sagDetZimet(); }
+  }
+});
+$('#sagDet').addEventListener('click', async e => {
+  if (!e.target.matches('[data-dz]')) return;
+  const r = e.target.closest('.cl'), atsl = sagCl.atslega, [m, x] = sagPunkts(r.dataset.id), kur = m.punkti.indexOf(x);
+  m.punkti.splice(kur, 1); r.remove(); sagGaita();
+  try { await run('gjCheklistaDzest', atsl, x.id); }
+  catch (k) { m.punkti.splice(kur, 0, x); alertZ(k.message); if (sagCl.atslega === atsl) { sagDetZimet(); sagGaita(); } }
+});
+$('#sagDet').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, i = f.querySelector('input'), b = f.querySelector('button'), t = i.value.trim(), atsl = sagCl.atslega, posms = f.closest('.posms').dataset.posms; if (!t) return;
+  b.disabled = true;
+  try {
+    const x = await run('gjCheklistaPievienot', atsl, posms, t);
+    if (sagCl.atslega !== atsl) return;
+    sagCl.posmi.find(m => m.id === posms).punkti.push(x);
+    f.insertAdjacentHTML('beforebegin', sagPunktsHtml(x, sagCl.cilveki)); i.value = ''; sagGaita();
+  } catch (k) { alertZ(k.message); }
+  b.disabled = false;
+});
+async function sabRadit() {
+  $('#sabForma').hidden = false; $('#sabLauki').innerHTML = '<div class="ielade">Ielādē…</div>'; $('#sabZ').className = 'zinja';
+  try { const s = await run('gjCheklistaSablons'); $('#sabLauki').innerHTML = s.map((m, i) => `${m.lidzi && !(s[i - 1] || {}).lidzi ? '<h3 class="pilns" style="margin:10px 0 0">Ko ņemt līdzi</h3>' : ''}<label>${esc(m.nos)}<textarea name="${m.id}" rows="6">${esc(m.punkti.join('\n'))}</textarea></label>`).join(''); }
+  catch (x) { zinja('#sabZ', esc(x.message), 'kl'); }
+}
+async function sabSaglabat(e) {
+  e.preventDefault();
+  try { await run('gjSaglabatCheklistaSablonu', forma(e.target)); zinja('#sabZ', 'Saglabāts. Jaunie pasākumi saņems šo sarakstu.'); ieladetSag(); }
+  catch (x) { zinja('#sabZ', esc(x.message), 'kl'); }
+  return false;
+}
+
+/* vadītājiem: maršruti, spēles, informācija */
+let vadDati = [], vadTips = 'marsruts';
+const VAD_NOS = {marsruts: 'maršrutu', spele: 'spēļu', info: 'informācijas'};
+async function ieladetVad() {
+  try { const v = await run('gjVaditajiem'); vadDati = v.ieraksti; $('#vadSaite').href = v.saite; $('#vadSaite').hidden = LOMA.loma !== 'toms'; vadZimet(); }
+  catch (x) { $('#vadSar').innerHTML = `<p class="zinja kl liel" style="display:block">${esc(x.message)}</p>`; }
+}
+function vadTipsIzv(t) { vadTips = t; document.querySelectorAll('#vadTabs button').forEach(b => b.classList.toggle('ak', b.dataset.t === t)); vadZimet(); }
+document.querySelectorAll('#vadTabs button').forEach(b => b.onclick = () => vadTipsIzv(b.dataset.t));
+function vadZimet() {
+  const q = $('#vadMekl').value.trim().toLowerCase();
+  const s = vadDati.filter(x => x.tips === vadTips && (!q || Object.values(x).join(' ').toLowerCase().includes(q)));
+  $('#vadSar').innerHTML = s.length ? s.map(x => {
+    const i = vadDati.indexOf(x), cipsi = [x.garums, x.ilgums, x.grutiba, x.cilveki ? x.cilveki + ' cilv.' : ''].filter(Boolean).map(c => `<span class="c">${esc(c)}</span>`).join('');
+    return `<div class="karte vadK"><div class="galva" style="margin:0;align-items:baseline"><h3 style="margin:0">${esc(x.nosaukums)}</h3><span class="mazs">${esc(x.atjaunots)}</span></div>${x.kur ? `<div class="mazs" style="margin-top:4px">📍 ${esc(x.kur)}</div>` : ''}${cipsi ? `<div class="cipsi">${cipsi}</div>` : ''}${x.apraksts ? `<div class="apr">${md(x.apraksts)}</div>` : ''}${x.vajag ? `<p class="mazs" style="margin:10px 0 0"><b>Vajag līdzi:</b> ${esc(x.vajag)}</p>` : ''}<div class="rinda">${x.tips === 'marsruts' ? navPogas(x.kur, true) : ''}${/^https?:\/\//.test(x.saite) ? `<a class="poga gaisa maza" target="_blank" href="${esc(x.saite)}">Saite ↗</a>` : ''}<button class="poga gaisa maza" onclick="vadForma(${i})">Labot</button><button class="poga gaisa maza" onclick="vadDzest(${i})">Dzēst</button></div></div>`;
+  }).join('') : `<p class="tukss liel">${q ? 'Nekas nav atrasts.' : `Vēl nav neviena ${VAD_NOS[vadTips]} ieraksta. Spied "+ Pievienot".`}</p>`;
+}
+function vadForma(i) {
+  const x = i === undefined ? {tips: vadTips} : vadDati[i], f = $('#fVad');
+  f.reset(); f.elements.id.value = '';
+  Object.entries(x).forEach(([k, v]) => { if (f.elements[k]) f.elements[k].value = v; });
+  $('#vadFV').textContent = i === undefined ? 'Jauns ieraksts' : 'Labot: ' + x.nosaukums; $('#vadZ').className = 'zinja';
+  vadLauki(); $('#vadForma').hidden = false; $('#vadForma').scrollIntoView({behavior: 'smooth'}); f.elements.nosaukums.focus();
+}
+function vadLauki() { const t = $('#fVad').elements.tips.value; document.querySelectorAll('#fVad [data-t]').forEach(l => l.hidden = !l.dataset.t.split(' ').includes(t)); }
+async function vadSaglabat(e) {
+  e.preventDefault(); const b = e.target.querySelector('.zala'); b.disabled = true;
+  try {
+    const o = await run('gjVadSaglabat', forma(e.target)), i = vadDati.findIndex(x => x.id === o.id);
+    if (i >= 0) vadDati[i] = o; else vadDati.push(o);
+    $('#vadForma').hidden = true; vadTipsIzv(o.tips);
+  } catch (x) { zinja('#vadZ', esc(x.message), 'kl'); }
+  b.disabled = false; return false;
+}
+async function vadDzest(i) {
+  const x = vadDati[i]; if (!confirm(`Dzēst "${x.nosaukums}"?`)) return;
+  try { await run('gjVadDzest', x.id); vadDati = vadDati.filter(y => y !== x); vadZimet(); } catch (k) { alertZ(k.message); }
+}
+
+/* rēķini */
+let rekDati = null;
+async function rekMeklet() {
+  const f = $('#fRek'); const r = await run('gjKlientaRekviziti', f.klients.value).catch(() => null);
+  if (!r) return zinja('#rekZ', 'Iepriekšējos rēķinos šāds klients nav atrasts.', 'info');
+  ['klients', 'reg', 'pvnNr', 'adrese', 'banka', 'konts'].forEach(k => f[k].value = r[k] || '');
+  zinja('#rekZ', `Rekvizīti paņemti no ${esc(r.no)}. Pārbaudi, ka adrese ir juridiskā, ne biroja.`, 'info');
+}
+async function rekPriekskats(e) {
+  e.preventDefault(); rekDati = forma(e.target);
+  try {
+    const p = await run('gjRekinaPriekskats', rekDati);
+    zinja('#rekZ', `<b>Gajedis_${p.nr}</b> · datums ${p.datums} · termiņš <b>${p.termins}</b>${p.parcelts ? ' (pārcelts uz darba dienu)' : ''}<br>
+      ${p.summa.toFixed(2)} € + PVN ${p.pvn.toFixed(2)} € = <b>${p.kopa.toFixed(2)} €</b><br><span class="mazs">${esc(p.vardiem)}</span>
+      <div class="rinda"><button type="button" class="poga zala" id="rekPoga" onclick="rekIzrakstit()">Izrakstīt rēķinu</button></div>`, 'info');
+  } catch (x) { zinja('#rekZ', esc(x.message), 'kl'); }
+  return false;
+}
+async function rekIzrakstit() {
+  $('#rekPoga').disabled = true; $('#rekPoga').textContent = 'Taisu cilni, PDF un melnrakstu…';
+  try {
+    const r = await run('gjIzrakstitRekinu', rekDati);
+    zinja('#rekZ', `Gatavs <b>${r.nr}</b>, kopā ${r.kopa.toFixed(2)} €, termiņš ${r.termins}.<div class="rinda"><a class="poga maza" target="_blank" href="${r.melnraksts}">Gmail melnraksts ↗</a><a class="poga gaisa maza" target="_blank" href="${r.pdf}">PDF ↗</a><a class="poga gaisa maza" target="_blank" href="${r.cilne}">Cilne ↗</a></div>`);
+    $('#fRek').reset(); ieladetRek();
+  } catch (x) { zinja('#rekZ', esc(x.message), 'kl'); }
+}
+async function ieladetRek() {
+  try {
+    const r = await run('gjRekini');
+    $('#rekTab').className = '';
+    $('#rekTab').innerHTML = `<table class="tab"><tr><th>Nr.</th><th>Klients</th><th>Kopā</th><th>Pasākums</th><th>DDL</th><th>Statuss</th></tr>${r.map(x => `<tr><td data-l="Nr."><b>${esc(x.nr)}</b></td><td data-l="Klients">${esc(x.klients)}<div class="mazs">${esc(x.kontakts)}</div></td><td data-l="Kopā">${esc(x.kopa)}</td><td data-l="Pasākums">${esc(x.pasakums)}<div class="mazs">${esc(x.detalas)}</div></td><td data-l="Termiņš">${esc(x.ddl)}</td><td data-l="Statuss">${x.apmaksats ? '<span class="c ok">✓ apmaksāts</span>' : `<span class="c ${x.kavets ? 'ne' : 'br'}">${x.kavets ? 'kavēts' : 'gaida'}</span> <button class="poga gaisa maza" onclick="rekApm(${x.rinda},this)">Apmaksāts</button>`}</td></tr>`).join('')}</table>`;
+  } catch (x) { $('#rekTab').innerHTML = `<p class="zinja kl">${esc(x.message)}</p>`; }
+}
+async function rekApm(r, b) { b.disabled = true; await run('gjAtzimetApmaksatu', r); ieladetRek(); }
+
+/* e-pasti */
+async function ieladetEp() {
+  $('#epSar').className = 'ielade'; $('#epSar').textContent = 'Lasu iesūtni…';
+  try {
+    const e = await run('gjEpastuSaraksts');
+    $('#epSar').className = '';
+    $('#nEp').hidden = !e.length; $('#nEp').textContent = e.length;
+    $('#epSar').innerHTML = e.length ? e.map(x => `<div class="darbs"><span class="prio ${x.pieprasijums ? 'p1' : x.dienas >= 3 ? 'p2' : 'p3'}"></span><div style="flex:1;min-width:0"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:baseline"><b>${esc(x.temats)}</b>${x.pieprasijums ? '<span class="c ne">pieprasījums</span>' : ''}<span class="mazs" style="margin-left:auto">${esc(x.datums)} · ${x.dienas} d.</span></div><div class="mazs">${esc(x.no)}</div><div style="font-size:13.5px;margin-top:4px;color:#444">${esc(x.fragments)}…</div><div class="rinda" style="margin-top:8px"><a class="poga gaisa maza" target="_blank" href="${esc(x.saite)}">Atvērt Gmail ↗</a><button class="poga maza" onclick="epPasakums('${x.id}',this)">Izveidot pasākumu</button></div></div></div>`).join('') : '<p class="tukss">Visiem e-pastiem atbildēts.</p>';
+  } catch (x) { $('#epSar').innerHTML = `<p class="zinja kl">${esc(x.message)}</p>`; }
+}
+async function epPasakums(id, b) {
+  b.disabled = true; b.textContent = 'Lasu e-pastu…';
+  try { const d = await run('gjPasakumsNoEpasta', id); iet('pasakumi'); pasFormaRadit(d); zinja('#pasZ', 'Lauki aizpildīti no e-pasta. Pārbaudi un spied "Pievienot".', 'info'); }
+  catch (x) { alertZ(x.message); }
+  b.disabled = false; b.textContent = 'Izveidot pasākumu';
+}
+function alertZ(t) { const z = document.createElement('div'); z.className = 'zinja kl'; z.style.cssText = 'display:block;position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:30'; z.textContent = t; document.body.append(z); setTimeout(() => z.remove(), 5000); }
+
+/* mārketings */
+async function ieladetMark() {
+  try {
+    const s = await run('gjSanemeji');
+    $('#sanSaite').href = s.saite;
+    const akt = s.saraksts.filter(x => x.statuss === 'aktīvs').length;
+    $('#sanInfo').className = '';
+    $('#sanInfo').innerHTML = `<div class="rezgis r3" style="margin-top:8px"><div><div class="etik">Aktīvi</div><div class="cip">${akt}</div></div><div><div class="etik">Atrakstījušies</div><div class="cip">${s.saraksts.length - akt}</div></div><div><div class="etik">Kopā</div><div class="cip">${s.saraksts.length}</div></div></div>`;
+    $('#izsSar').innerHTML = s.izsutitas.length ? '<ul class="saraksts">' + s.izsutitas.map(r => `<li><div><b>${esc(r[1])}</b><div class="mazs">${esc(r[0])} · ${esc(r[2])} saņēmēji</div></div></li>`).join('') + '</ul>' : '<p class="tukss">Vēl nekas nav izsūtīts.</p>';
+  } catch (x) { $('#sanInfo').innerHTML = `<p class="zinja kl">${esc(x.message)}</p>`; }
+}
+async function sanPievienot() { const n = await run('gjPievienotSanemejus', $('#sanJauni').value, 'ievadīts'); $('#sanJauni').value = ''; zinja('#vZ', `Pievienoti ${n} saņēmēji.`); ieladetMark(); }
+async function sanKlienti() { const n = await run('gjImportetKlientus'); zinja('#vZ', `No Pasākumi 2026 pievienoti ${n} klienti (esošie klienti, ar atrakstīšanās saiti katrā vēstulē).`); ieladetMark(); }
+async function vIdeja() {
+  zinja('#vZ', 'Claude raksta un skatās tavus stila paraugus…', 'info');
+  try { const v = await run('gjVestulesIdeja', $('#vTema').value || 'Gājēža jaunumi'); vAizpildit(v); zinja('#vZ', 'Melnraksts gatavs. Pārlasi un pielabo.'); }
+  catch (x) { zinja('#vZ', esc(x.message), 'kl'); }
+}
+function vAizpildit(v) { const f = $('#fVest'); Object.entries(v).forEach(([k, val]) => { if (f[k] && k !== 'bildeId') f[k].value = typeof val === 'object' ? JSON.stringify(val) : val; }); if (v.bildeId && matDati.some(m => m.id === v.bildeId)) vBildeIzv(v.bildeId); stilsRadit(); vPriekskats(); }
+async function vPriekskats() { const h = await run('gjVestulesPriekskats', forma($('#fVest'))); $('#vPr').srcdoc = h; }
+async function vSutit(tests) {
+  const v = forma($('#fVest'));
+  if (!tests && !confirm('Sūtīt "' + v.temats + '" visiem aktīvajiem saņēmējiem? To nevar atsaukt.')) return;
+  zinja('#vZ', 'Sūtu…', 'info');
+  try { const r = await run('gjSutitVestuli', v, tests); zinja('#vZ', tests ? 'Tests nosūtīts tev uz piedzivojumi@gajedis.lv.' : `Nosūtīts ${r.sutits} saņēmējiem.`); if (!tests) ieladetMark(); }
+  catch (x) { zinja('#vZ', esc(x.message), 'kl'); }
+}
+
+
+/* materiāli */
+let matDati = [];
+function samazinat(fails, max, kval) {
+  return new Promise((ok, kl) => {
+    const img = new Image(); img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+      ok(c.toDataURL('image/jpeg', kval).split(',')[1]); URL.revokeObjectURL(img.src);
+    }; img.onerror = kl; img.src = URL.createObjectURL(fails);
+  });
+}
+const lasitB64 = f => new Promise(ok => { const r = new FileReader(); r.onload = () => ok(r.result.split(',')[1]); r.readAsDataURL(f); });
+async function matAugsup(faili) {
+  const tips = document.querySelector('input[name=matTips]:checked').value;
+  let n = 0;
+  for (const f of faili) {
+    zinja('#matZ', `Augšupielādēju ${esc(f.name)}…`, 'info');
+    try {
+      let d;
+      if (f.type.startsWith('image/')) d = {nos: f.name.replace(/\.\w+$/, '') + '.jpg', mime: 'image/jpeg', dati: await samazinat(f, 1600, .85), sikbilde: await samazinat(f, 320, .75), tips};
+      else if (f.type === 'application/pdf') { if (f.size > 8e6) throw new Error(f.name + ' ir lielāks par 8 MB'); d = {nos: f.name, mime: f.type, dati: await lasitB64(f), tips}; }
+      else throw new Error(f.name + ': der tikai bildes vai PDF');
+      await run('gjAugsupieladet', d); n++;
+    } catch (x) { zinja('#matZ', esc(x.message || x), 'kl'); }
+  }
+  if (n) zinja('#matZ', `Pievienoti ${n} faili.`);
+  $('#matFaili').value = ''; ieladetMat();
+}
+async function ieladetMat() {
+  try {
+    const m = await run('gjMateriali'); matDati = m.materiali;
+    $('#matMape').href = m.mape; if (!$('#stilaApr').value) $('#stilaApr').value = m.apraksts;
+    const kart = x => `<div class="gal${$('#fVest').bildeId.value === x.id ? ' izv' : ''}" title="${esc(x.nos)}" onclick="${x.tips === 'bilde' ? `vBildeIzv('${x.id}')` : `window.open('${x.saite}')`}">${x.sikbilde ? `<img src="data:image/jpeg;base64,${x.sikbilde}" alt="">` : `<div class="pdf">${esc(x.nos)}</div>`}<button class="x" title="Dzēst" onclick="event.stopPropagation();matDzest('${x.id}')">×</button></div>`;
+    const b = m.materiali.filter(x => x.tips === 'bilde'), st = m.materiali.filter(x => x.tips === 'stils');
+    $('#galBildes').innerHTML = b.length ? b.map(kart).join('') : '<p class="mazs">Vēl nav bilžu.</p>';
+    $('#galStils').innerHTML = st.length ? st.map(kart).join('') : '<p class="mazs">Vēl nav paraugu. Pievieno, piemēram, IG postu, citu vēstuli vai Gājēža prezentāciju, kas tev patīk.</p>';
+  } catch (x) { zinja('#matZ', esc(x.message), 'kl'); }
+}
+async function matDzest(id) { if (!confirm('Dzēst šo failu? (Tas aiziet uz Drive atkritnēm.)')) return; await run('gjDzestMaterialu', id); if ($('#fVest').bildeId.value === id) vBildeNost(); ieladetMat(); }
+async function stilaSagl() { await run('gjSaglabatStilaAprakstu', $('#stilaApr').value); zinja('#matZ', 'Apraksts saglabāts. Claude to ņems vērā nākamajā vēstulē.'); }
+function vBildeIzv(id) {
+  const x = matDati.find(m => m.id === id); $('#fVest').bildeId.value = id; $('#fVest').bilde.value = '';
+  $('#vBilde').className = 'sikb'; $('#vBilde').textContent = ''; $('#vBilde').style.backgroundImage = x && x.sikbilde ? `url(data:image/jpeg;base64,${x.sikbilde})` : '';
+  document.querySelectorAll('#galBildes .gal').forEach(g => g.classList.toggle('izv', g.getAttribute('onclick').includes(id)));
+  vPriekskats();
+}
+function vBildeNost() { $('#fVest').bildeId.value = ''; $('#vBilde').className = 'sikb tuksa'; $('#vBilde').style.backgroundImage = ''; $('#vBilde').textContent = 'nav'; document.querySelectorAll('#galBildes .gal').forEach(g => g.classList.remove('izv')); vPriekskats(); }
+function stilsRadit() {
+  let st = {}; try { st = JSON.parse($('#fVest').stils.value || '{}'); } catch (e) {}
+  $('#vStils').innerHTML = Object.keys(st).length ? `<span class="etik">Claude izvēlētais izskats:</span> <span class="cipsi" style="display:inline-flex">${Object.entries(st).map(([k, v]) => `<span class="c">${/^#/.test(v) ? `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${esc(v)};vertical-align:-1px;margin-right:4px"></span>` : ''}${esc(k)}: ${esc(v)}</span>`).join('')}</span> <button type="button" class="poga gaisa maza" onclick="$('#fVest').stils.value='';stilsRadit();vPriekskats()">Noklusējuma izskats</button>` : '';
+}
+(() => { const z = $('#matZona'); ['dragenter', 'dragover'].forEach(e => z.addEventListener(e, v => { v.preventDefault(); z.classList.add('virs'); }));
+  ['dragleave', 'drop'].forEach(e => z.addEventListener(e, v => { v.preventDefault(); z.classList.remove('virs'); }));
+  z.addEventListener('drop', v => matAugsup(v.dataTransfer.files)); })();
+
+/* kopsavilkums */
+async function ieladetKops(atj) {
+  const b = $('#kopsPoga'); b.disabled = true; if (atj) { b.textContent = 'Savelku…'; $('#kopsDarbi').className = 'ielade'; $('#kopsDarbi').textContent = 'Lasu tabulas un iesūtni…'; }
+  try {
+    const k = await run('gjKopsavilkums', !!atj);
+    if (!k) { $('#kopsDarbi').className = ''; $('#kopsDarbi').innerHTML = '<p class="mazs">Vēl nav savilkts. Spied "Savilkt tagad".</p>'; return; }
+    $('#kopsDat').textContent = 'Savilkts ' + k.datums + '. Katru rītu 7:30 automātiski.';
+    $('#kopsTeksts').hidden = !k.teksts; $('#kopsTeksts').innerHTML = `<h3 style="margin-bottom:8px">Īsumā</h3><div class="noteik">${esc(k.teksts)}</div>`;
+    $('#kopsDarbi').className = '';
+    $('#kopsDarbi').innerHTML = k.darbi.length ? k.darbi.map(darbsHtml).join('') : '<p class="tukss">Viss izdarīts. 🌲</p>';
+    $('#kopsIet').innerHTML = (k.ieteikumi || []).length ? k.ieteikumi.map(i => `<div class="ietek"><b>${esc(i.virsraksts)}</b><div class="mazs">${esc(i.kapec)}</div><div style="margin-top:4px">→ ${esc(i.ka)}</div></div>`).join('') : `<p class="mazs">${k.kluda ? esc(k.kluda) : 'Ieteikumi parādās, kad iestatījumos ir Claude API atslēga.'}</p>`;
+    $('#kopsIzd').innerHTML = (k.izdarits || []).length ? k.izdarits.map(z => `<li><span class="c ok">${esc(z.kas)}</span><div>${esc(z.ko)}<div class="mazs">${esc(z.t)}</div></div></li>`).join('') : '<li class="tukss">Programma vēl neko nav pierakstījusi.</li>';
+    if (atj) ieladetSak();
+  } catch (x) { $('#kopsDarbi').innerHTML = `<p class="zinja kl">${esc(x.message)}</p>`; }
+  b.disabled = false; b.textContent = 'Savilkt tagad';
+}
+
+/* apmeklējums */
+async function ieladetApm(atj) {
+  const b = $('#apmPoga'); b.disabled = true;
+  if (atj) { b.textContent = 'Lasu…'; $('#apmSat').className = 'ielade'; $('#apmSat').textContent = 'Lasu Google Analytics un Search Console…'; }
+  try {
+    const a = await run('gjApmeklejums', !!atj);
+    if (!a) { $('#apmSat').className = ''; $('#apmSat').innerHTML = '<p class="mazs">Pārskats vēl nav savilkts. Spied "Atjaunot tagad".</p>'; return; }
+    $('#apmDat').textContent = 'Nedēļa ' + a.periods + ' · savilkts ' + a.datums + '. Katru pirmdienu 8:00 automātiski, arī e-pastā.';
+    $('#apmSat').className = 'apm'; $('#apmSat').innerHTML = a.html;
+  } catch (x) { $('#apmSat').className = ''; $('#apmSat').innerHTML = `<p class="zinja kl">${esc(x.message)}</p>`; }
+  finally { b.disabled = false; b.textContent = 'Atjaunot tagad'; }
+}
+async function apmSutit() {
+  const b = $('#apmSut'); b.disabled = true; b.textContent = 'Sūtu…';
+  try { const p = await run('gjApmeklejumsSutit'); zinja('#apmZ', 'Pārskats par ' + esc(p) + ' nosūtīts uz piedzivojumi@gajedis.lv.'); ieladetApm(false); }
+  catch (x) { zinja('#apmZ', esc(x.message), 'kl'); }
+  b.disabled = false; b.textContent = 'Sūtīt uz e-pastu';
+}
+
+/* aģentu karte */
+const VIETAS = [
+  {id: 'gmail', nos: 'Gmail', em: '✉️', apr: 'piedzivojumi@gajedis.lv'},
+  {id: 'pas', nos: 'Pasākumi 2026', em: '📋', apr: 'Google Sheets'},
+  {id: 'rek', nos: 'Rēķini 2026', em: '🧾', apr: 'Google Sheets + PDF Drive'},
+  {id: 'kal', nos: 'Kalendārs', em: '📅', apr: 'Google Calendar'},
+  {id: 'drive', nos: 'Drive un Docs', em: '📁', apr: 'info dokumenti, pārgājienu doc'},
+  {id: 'web', nos: 'gajedis.lv', em: '🌲', apr: 'WordPress, Hostinger'},
+  {id: 'stripe', nos: 'Stripe', em: '💳', apr: 'dāvanu kartes'},
+  {id: 'ig', nos: 'Instagram un FB', em: '📷', apr: 'Meta Business Suite'},
+  {id: 'jaun', nos: 'Jaunumu saraksts', em: '✦', apr: 'Google Sheets'},
+  {id: 'ga', nos: 'Google Analytics', em: '📈', apr: 'GA4 + Search Console'}
+];
+const AGENTI = [
+  {id: 'atg', nos: 'Atgādinājums', tips: 'skripts', kad: 'katru dienu 9:00', trig: 'gjAtgadinajumi', vietas: ['pas', 'gmail'], ko: 'Dienu pirms pasākuma sūta klientam "Jau rīt tiekamies Gājēdis piedzīvojumā!" un atzīmē kolonnu V.'},
+  {id: 'ats', nos: 'Atsauksmju e-pasts', tips: 'skripts', kad: 'katru dienu 20:00', trig: 'sutitAtsauksmes', vietas: ['pas', 'gmail'], ko: 'Pasākuma dienā sūta Gmail veidni "paldies-atsauksme", atzīmē kolonnu T un nokrāso A:B tumši zaļu.'},
+  {id: 'pied', nos: 'Piedāvājumu melnraksti', tips: 'skripts', kad: 'ik 10 minūtes', trig: 'sagatavotPiedavajumus', vietas: ['gmail'], ko: 'Jauniem pieprasījumiem (mājaslapas forma, atslēgvārdi, etiķete "sagatavot-piedavajumu") izveido melnrakstu ar piedāvājuma veidni. Sūti tu pats.'},
+  {id: 'kops', nos: 'Kopsavilkums un optimizētājs', tips: 'skripts', kad: 'katru dienu 7:30', trig: 'gjKopsavilkumsAuto', vietas: ['pas', 'rek', 'gmail'], ko: 'Savelk, kas izdarīts un kas jādara, neatbildētos e-pastus, kavētos rēķinus, un ar Claude iesaka, ko darīt labāk.'},
+  {id: 'bak', nos: 'Backup', tips: 'skripts', kad: 'katru dienu 23:00', trig: 'gjBackupAuto', vietas: ['pas', 'rek', 'drive', 'jaun'], ko: 'Saliek visas tabulas un noteikumus vienā zip failā Drive mapē "Gājēdis programma - backup". Ja neizdodas, atsūta e-pastu.'},
+  {id: 'atr', nos: 'Atrakstīšanās', tips: 'skripts', kad: 'ik 6 stundas', trig: 'gjAtrakstisanasAuto', vietas: ['gmail', 'jaun'], ko: 'Kas atbild "Atrakstīties", to atzīmē jaunumu sarakstā kā atrakstījušos.'},
+  {id: 'apm', nos: 'Apmeklējuma pārskats', tips: 'skripts', kad: 'pirmdienās 8:00', trig: 'apSutitParskatu', vietas: ['ga', 'web', 'gmail'], ko: 'Savelk pagājušās nedēļas gajedis.lv apmeklējumu (cilvēki, avoti, lapas, Google meklējumi), saglabā sadaļā Apmeklējums un atsūta e-pastā.'},
+  {id: 'cats', nos: 'Gājēdis čats', tips: 'claude', kad: 'kad jautā', vietas: ['pas', 'rek', 'gmail', 'kal', 'jaun'], ko: 'Šīs programmas čats. Lasa tabulas un e-pastus, sagatavo pasākumus, rēķinus, noteikumu labojumus un vēstules, ko tu apstiprini ar pogu.'},
+  {id: 'proj', nos: 'Claude projekts "Gājēdis"', tips: 'claude', kad: 'kad tu prasi', vietas: ['rek', 'pas', 'kal', 'drive', 'gmail', 'web', 'ig'], ko: 'Lielākie darbi: mājaslapa, karte un receptes, IG posti un reklāmas, pārgājienu dokumenti, info e-pasti klientiem.'},
+  {id: 'rits', nos: 'Rīta kopsavilkums', tips: 'claude', kad: 'katru dienu 8:43', vietas: ['gmail', 'kal'], ko: 'Claude ieplānotais darbs: sašķiro iesūtni (jāatbild, svarīgi, var ignorēt) un rāda šodienas un rītdienas kalendāru.'},
+  {id: 'atgC', nos: 'Atgādinājums (Claude, vecais)', tips: 'claude', kad: 'katru dienu 9:00', vietas: ['pas', 'gmail'], ko: 'Tas pats atgādinājums, ko tagad dara programma. Kad programma uzstādīta, Claude to izslēgs, lai nesūtītu divreiz.'},
+  {id: 'dk', nos: 'Dāvanu karšu spraudnis', tips: 'cits', kad: 'pēc katra pirkuma', vietas: ['stripe', 'web', 'gmail'], ko: 'Stripe maksājums → WordPress uztaisa dāvanu kartes PDF un nosūta pircējam (kopija piedzivojumi@gajedis.lv).'},
+  {id: 'meta', nos: 'Meta auto-atbildes', tips: 'cits', kad: 'uz katru ziņu', vietas: ['ig'], ko: 'IG un Messenger automātiskā atbilde ar tālruni 27013323; saglabātās atbildes privātajiem pasākumiem un dāvanu kartēm.'}
+];
+let autoDati = null, izvelets = null;
+async function zimetKarti() {
+  const ka = $('#kolAg'), kv = $('#kolVi');
+  ka.innerHTML = '<h3>Aģenti</h3>' + AGENTI.map(a => `<div class="ag" data-a="${a.id}"><div class="nos"><span class="stat" id="st-${a.id}"></span>${esc(a.nos)}<span class="tips t-${a.tips}">${{skripts: 'skripts', claude: 'Claude', cits: 'cits'}[a.tips]}</span></div><div class="kur">${esc(a.kad)} · ${a.vietas.map(v => VIETAS.find(x => x.id === v).nos).join(', ')}</div></div>`).join('');
+  kv.innerHTML = '<h3>Kur strādā</h3>' + VIETAS.map(v => `<div class="vi" data-v="${v.id}"><span class="em">${v.em}</span><div><div class="nos">${esc(v.nos)}</div><div class="mazs">${esc(v.apr)}</div></div></div>`).join('');
+  ka.querySelectorAll('.ag').forEach(el => el.onclick = () => izveleties('a', el.dataset.a));
+  kv.querySelectorAll('.vi').forEach(el => el.onclick = () => izveleties('v', el.dataset.v));
+  liniju();
+  try {
+    autoDati = await run('gjAutomatika');
+    AGENTI.forEach(a => { const s = $('#st-' + a.id); if (a.trig) s.className = 'stat ' + (autoDati.trigeri.includes(a.trig) ? 'on' : 'off'); else s.className = 'stat on'; });
+    $('#st-atgC').className = 'stat ' + (autoDati.trigeri.includes('gjAtgadinajumi') ? 'off' : 'on');
+  } catch (e) {}
+}
+function liniju() {
+  const svg = $('#liniju'), box = $('#karteA').getBoundingClientRect(); if (!box.width) return;
+  let h = '';
+  AGENTI.forEach(a => a.vietas.forEach(v => {
+    const A = document.querySelector(`.ag[data-a="${a.id}"]`), V = document.querySelector(`.vi[data-v="${v}"]`); if (!A || !V) return;
+    const ra = A.getBoundingClientRect(), rv = V.getBoundingClientRect();
+    const x1 = ra.right - box.left, y1 = ra.top + ra.height / 2 - box.top, x2 = rv.left - box.left, y2 = rv.top + rv.height / 2 - box.top, m = (x1 + x2) / 2;
+    h += `<path data-a="${a.id}" data-v="${v}" d="M${x1},${y1} C${m},${y1} ${m},${y2} ${x2},${y2}"/>`;
+  }));
+  svg.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`); svg.innerHTML = h;
+  if (izvelets) izveleties(izvelets[0], izvelets[1], true);
+}
+function izveleties(t, id, kluss) {
+  izvelets = [t, id];
+  document.querySelectorAll('.ag,.vi').forEach(e => e.classList.remove('ak'));
+  const sav = t === 'a' ? AGENTI.find(a => a.id === id).vietas : AGENTI.filter(a => a.vietas.includes(id)).map(a => a.id);
+  document.querySelectorAll('#liniju path').forEach(p => { const on = t === 'a' ? p.dataset.a === id : p.dataset.v === id; p.classList.toggle('ak', on); p.classList.toggle('blav', !on); });
+  (t === 'a' ? [id] : sav).forEach(x => document.querySelector(`.ag[data-a="${x}"]`).classList.add('ak'));
+  (t === 'a' ? sav : [id]).forEach(x => document.querySelector(`.vi[data-v="${x}"]`).classList.add('ak'));
+  if (kluss) return;
+  if (t === 'a') {
+    const a = AGENTI.find(x => x.id === id);
+    let ext = '';
+    if (autoDati && id === 'atg') ext = '<h3 style="margin-top:14px">Atgādinājumi</h3>' + (autoDati.atgadinajumi.map(x => `<div class="mazs">${x.ok ? '✓' : '·'} ${esc(x.datums)} ${esc(x.klients)}</div>`).join('') || '<p class="mazs">Tuvākajās dienās nav.</p>');
+    if (autoDati && id === 'ats') ext = '<h3 style="margin-top:14px">Pēdējās atsauksmes</h3>' + (autoDati.atsauksmes.map(x => `<div class="mazs">${x.ok ? '✓' : '·'} ${esc(x.datums)} ${esc(x.klients)}</div>`).join('') || '<p class="mazs">Pēdējā mēnesī pasākumu nebija.</p>');
+    $('#agDet').innerHTML = `<div class="galva" style="margin:0 0 8px"><h2>${esc(a.nos)}</h2><span class="tips t-${a.tips}">${esc(a.kad)}</span></div><p style="margin:0">${esc(a.ko)}</p>${ext}`;
+  } else {
+    const v = VIETAS.find(x => x.id === id);
+    $('#agDet').innerHTML = `<h2>${v.em} ${esc(v.nos)}</h2><p class="mazs">${esc(v.apr)}</p><p>Šeit strādā: ${sav.map(x => '<b>' + esc(AGENTI.find(a => a.id === x).nos) + '</b>').join(', ')}.</p>`;
+  }
+}
+window.addEventListener('resize', () => { if ($('#s-agenti').classList.contains('ak')) liniju(); });
+
+/* noteikumi */
+async function ieladetNot() {
+  const n = await run('gjNoteikumi');
+  $('#notSar').innerHTML = n.map(x => `<div class="karte noteik-karte" data-id="${esc(x.id)}"><div class="galva" style="margin:0 0 10px"><h3>${esc(x.virsraksts)}</h3><button class="poga gaisa maza" onclick="notLabot(this)">Labot</button></div><div class="noteik">${esc(x.teksts)}</div>${x.labots ? `<p class="mazs" style="margin:10px 0 0">Labots ${esc(x.labots)}</p>` : ''}</div>`).join('');
+}
+function notLabot(b, jauns) {
+  const k = b.closest('.karte'), t = jauns ? '' : k.querySelector('.noteik').textContent, v = jauns ? '' : k.querySelector('h3').textContent;
+  k.innerHTML = `<label>Virsraksts<input class="nv" value="${esc(v)}"></label><label style="margin-top:10px">Teksts<textarea class="nt">${esc(t)}</textarea></label><div class="rinda"><button class="poga zala maza" onclick="notSaglabat(this)">Saglabāt</button><button class="poga gaisa maza" onclick="ieladetNot()">Atcelt</button></div>`;
+}
+function notJauns() { const d = document.createElement('div'); d.className = 'karte noteik-karte'; d.dataset.id = 'n' + Date.now(); d.innerHTML = '<button></button>'; $('#notSar').prepend(d); notLabot(d.firstChild, true); }
+async function notSaglabat(b) { const k = b.closest('.karte'); b.disabled = true; await run('gjSaglabatNoteikumu', k.dataset.id, k.querySelector('.nt').value, k.querySelector('.nv').value); ieladetNot(); }
+
+/* iestatījumi */
+async function ieladetIest() {
+  try {
+    const a = await run('gjAutomatika');
+    const t = n => a.trigeri.includes(n) ? '<span class="c ok">ieslēgts</span>' : '<span class="c ne">nav</span>';
+    $('#autoInfo').className = '';
+    $('#autoInfo').innerHTML = `<table class="tab vienk"><tr><td>Atgādinājums 9:00</td><td>${t('gjAtgadinajumi')}</td></tr><tr><td>Atsauksmes 20:00</td><td>${t('sutitAtsauksmes')}</td></tr><tr><td>Piedāvājumu melnraksti</td><td>${t('sagatavotPiedavajumus')}</td></tr><tr><td>Kopsavilkums 7:30</td><td>${t('gjKopsavilkumsAuto')}</td></tr><tr><td>Atrakstīšanās</td><td>${t('gjAtrakstisanasAuto')}</td></tr><tr><td>Backup 23:00</td><td>${t('gjBackupAuto')}</td></tr><tr><td>Apmeklējums pirmdienās 8:00</td><td>${t('apSutitParskatu')}</td></tr></table>`;
+  } catch (x) { $('#autoInfo').innerHTML = `<p class="zinja kl">${esc(x.message)}</p>`; }
+  ieladetBak(); ieladetPiekl();
+}
+const SAD_NOS = {pasakumi: 'pasākumi', rekini: 'rēķini', sagatavosanas: 'sagatavošanās', vaditajiem: 'vadītāju lapa'};
+async function ieladetPiekl() {
+  try {
+    const l = await run('gjPiekluves');
+    $('#pieklInfo').className = '';
+    $('#pieklInfo').innerHTML = `<table class="tab"><tr><th>Kas</th><th>Redz</th><th>Kods</th><th></th></tr>${l.map(x => `<tr><td><b>${esc(x.nos)}</b></td><td class="mazs" data-l="Redz">${x.loma === 'toms' ? 'visu' : x.sadalas.map(s => SAD_NOS[s]).join(', ')}</td><td data-l="Kods"><code class="kods" data-kods="${esc(x.kods)}">••••-••••</code><button class="poga gaisa maza" onclick="kodsRadit(this)">Rādīt</button> <button class="poga gaisa maza" onclick="kodsKopet(this)">Kopēt</button></td><td><button class="poga gaisa maza" onclick="kodsMainit('${x.loma}')">Mainīt kodu</button></td></tr>`).join('')}</table>`;
+  } catch (x) { $('#pieklInfo').className = ''; $('#pieklInfo').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
+}
+function kodsRadit(b) { const k = b.parentNode.querySelector('.kods'), slepts = k.textContent.startsWith('•'); k.textContent = slepts ? k.dataset.kods : '••••-••••'; b.textContent = slepts ? 'Slēpt' : 'Rādīt'; }
+async function kodsKopet(b) { try { await navigator.clipboard.writeText(b.parentNode.querySelector('.kods').dataset.kods); b.textContent = 'Nokopēts'; } catch (x) { alertZ('Neizdevās nokopēt. Spied "Rādīt" un nokopē ar roku.'); } }
+async function kodsMainit(l) {
+  if (!confirm(l === 'toms' ? 'Jauns Toma kods: Mac lietotnē būs jāieliek jaunais kods (Savienojums…). Turpināt?' : 'Vecais kods uzreiz vairs nestrādās, jaunais būs jāiedod. Turpināt?')) return;
+  try { await run('gjMainitKodu', l); ieladetPiekl(); } catch (x) { alertZ(x.message); }
+}
+async function ieladetBak() {
+  try {
+    const b = await run('gjBackupInfo');
+    $('#bakMape').href = b.mape; $('#bakMape').hidden = false; $('#bakKop').href = b.kopijas; $('#bakKop').hidden = !b.kopijas; $('#bakIer').href = b.ieraksti; $('#bakIer').hidden = false;
+    $('#bakInfo').className = '';
+    $('#bakInfo').innerHTML = (b.ieslegts ? '' : '<p class="zinja info" style="display:block">Ikvakara backup vēl nav ieslēgts. Spied "Izveidot backup tagad", un tas ieslēgsies.</p>') + (b.pedejie.length ? `<ul class="saraksts">${b.pedejie.map(f => `<li><div style="flex:1;min-width:0"><b>${esc(f.nos)}</b><div class="mazs">${esc(f.kad)} · ${f.mb} MB</div></div><a class="poga gaisa maza" target="_blank" href="${esc(f.saite)}">Atvērt ↗</a></li>`).join('')}</ul>` : '<p class="tukss">Backup vēl nav izveidots.</p>');
+  } catch (x) { $('#bakInfo').className = ''; $('#bakInfo').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
+}
+async function bakTagad() {
+  const b = $('#bakPoga'); b.disabled = true; b.textContent = 'Veidoju backup…'; zinja('#bakZ', 'Eksportēju tabulas, tas var aizņemt minūti.', 'info');
+  try {
+    const r = await run('gjBackupTagad');
+    if (r.kludas.length) zinja('#bakZ', `Backup nav pilnīgs. Neizdevās: ${esc(r.kludas.join(', '))}`, 'kl'); else zinja('#bakZ', `Gatavs: ${esc(r.nos)}`);
+    ieladetBak(); ieladetIest();
+  } catch (x) { zinja('#bakZ', esc(x.message), 'kl'); }
+  b.disabled = false; b.textContent = 'Izveidot backup tagad';
+}
+async function saglAtsl() { try { const ok = await run('gjSaglabatAtslegu', $('#atslega').value); $('#atslega').value = ''; zinja('#atslZ', ok ? 'Atslēga saglabāta. Čats un gudrais kopsavilkums ieslēgti.' : 'Atslēga izdzēsta.'); } catch (x) { zinja('#atslZ', esc(x.message), 'kl'); } }
+async function uzstadit() { try { await run('gjUzstadit'); zinja('#uzstZ', 'Automātiskie laiki ieslēgti.'); ieladetIest(); } catch (x) { zinja('#uzstZ', esc(x.message), 'kl'); } }
+
+
+/* balss: runāt (lv-LV) un klausīties atbildes */
+let rec = null, lasit = false;
+try { lasit = localStorage.getItem('gjLasit') === '1'; } catch (e) {}
+function balssToggle() { lasit = !lasit; $('#skalrunis').textContent = lasit ? '🔊' : '🔇'; try { localStorage.setItem('gjLasit', lasit ? '1' : '0'); } catch (e) {} if (!lasit) speechSynthesis.cancel(); }
+function klausities() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return alertZ('Šis pārlūks neatbalsta runu. Spied mikrofonu uz telefona tastatūras un diktē.');
+  if (rec) { rec.stop(); return; }
+  rec = new SR(); rec.lang = 'lv-LV'; rec.interimResults = true; rec.continuous = false;
+  const sakums = $('#catsIn').value ? $('#catsIn').value + ' ' : '';
+  let gala = '';
+  rec.onresult = e => { let t = ''; for (const r of e.results) { t += r[0].transcript; if (r.isFinal) gala = t; } $('#catsIn').value = sakums + t; };
+  rec.onerror = e => alertZ(e.error === 'not-allowed' || e.error === 'service-not-allowed' ? 'Nav atļaujas mikrofonam. Atļauj to pārlūkā vai lieto diktēšanu uz tastatūras.' : 'Runu neizdevās sadzirdēt (' + e.error + ').');
+  rec.onend = () => { rec = null; $('#mic').classList.remove('ieraksta'); if (gala.trim()) catsSutit(); };
+  $('#mic').classList.add('ieraksta'); rec.start();
+}
+function runat(t) {
+  if (!lasit || !window.speechSynthesis || !t) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(t.replace(/\*\*/g, '').replace(/https?:\/\/\S+/g, '')); u.lang = 'lv-LV';
+  const v = speechSynthesis.getVoices().find(x => /^lv/i.test(x.lang)); if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+
+/* čats */
+let vesture = [];
+function catsAtvert() { $('#cats').classList.add('ak'); setTimeout(() => $('#catsIn').focus(), 200); }
+document.querySelectorAll('.ieteik button').forEach(b => b.onclick = () => { $('#catsIn').value = b.textContent; catsSutit(); });
+function md(t) { return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(https?:\/\/[^\s<)]+)/g, '<a href="$1" target="_blank">$1</a>'); }
+function zn(t, kl) { const d = document.createElement('div'); d.className = 'zn ' + kl; d.innerHTML = t; $('#zinas').append(d); $('#zinas').scrollTop = 1e9; return d; }
+async function catsSutit(e) {
+  if (e) e.preventDefault();
+  const t = $('#catsIn').value.trim(); if (!t) return false;
+  $('#catsIn').value = ''; zn(esc(t), 'es');
+  const gaida = zn('<span class="ielade" style="padding:0">domāju…</span>', 'vins');
+  try {
+    const pedeja = vesture[vesture.length - 1];
+    const jauna = pedeja && pedeja.role === 'user' && typeof pedeja.content === 'string'
+      ? vesture.slice(0, -1).concat([{role: 'user', content: pedeja.content + '\n\n' + t}])
+      : vesture.concat([{role: 'user', content: t}]);
+    const r = await run('gjCats', jauna);
+    vesture = r.vesture; gaida.innerHTML = md(r.atbilde || '(gatavs)'); runat(r.atbilde);
+    r.darbibas.forEach(darbiba);
+  } catch (x) { gaida.innerHTML = '<span style="color:var(--ugunskurs)">' + esc(x.message) + '</span>'; }
+  $('#zinas').scrollTop = 1e9; return false;
+}
+const DNOS = {piedavat_pasakumu: 'Pievienot pasākumu', piedavat_rekinu: 'Izrakstīt rēķinu', piedavat_noteikuma_labojumu: 'Labot noteikumu', piedavat_vestuli: 'Vēstules melnraksts'};
+function darbiba(d) {
+  if (d.tips === 'atvert_sadalu') { iet(d.dati.sadala); return; }
+  if (d.tips === 'piedavat_vestuli') { iet('marketings'); vAizpildit(d.dati); zn('Vēstules melnraksts ielikts sadaļā Mārketings. Pārlasi un sūti no turienes.', 'vins'); return; }
+  const el = document.createElement('div'); el.className = 'darb';
+  el.innerHTML = `<b>${DNOS[d.tips] || d.tips}</b><pre>${esc(Object.entries(d.dati).map(([k, v]) => k + ': ' + v).join('\n'))}</pre><div class="rinda" style="margin-top:6px"><button class="poga zala maza">Apstiprināt</button><button class="poga gaisa maza">Atcelt</button></div>`;
+  const [ok, nav] = el.querySelectorAll('button');
+  nav.onclick = () => { el.innerHTML = '<span class="mazs">Atcelts.</span>'; vesture.push({role: 'user', content: '(Toms atcēla: ' + (DNOS[d.tips] || d.tips) + ')'}); };
+  ok.onclick = async () => {
+    ok.disabled = true; ok.textContent = 'Daru…';
+    try {
+      const r = await run('gjApstiprinat', d.tips, d.dati);
+      el.innerHTML = '<b>✓ Izdarīts</b> ' + (r.nr ? esc(r.nr) : '') + (r.melnraksts ? ` <a target="_blank" href="${r.melnraksts}">melnraksts ↗</a> <a target="_blank" href="${r.pdf}">PDF ↗</a>` : '') + (r.saite ? ` <a target="_blank" href="${r.saite}">tabulā ↗</a>` : '');
+      vesture.push({role: 'user', content: '(Toms apstiprināja un tas ir izdarīts: ' + (DNOS[d.tips] || d.tips) + ' ' + JSON.stringify(r) + ')'});
+      ielad = {};
+    } catch (x) { ok.disabled = false; ok.textContent = 'Apstiprināt'; el.insertAdjacentHTML('beforeend', `<div style="color:var(--ugunskurs);margin-top:6px">${esc(x.message)}</div>`); }
+  };
+  $('#zinas').append(el);
+}
+
+$('#skalrunis').textContent = lasit ? '🔊' : '🔇';
+
+/* šodienas diena un datums sākumlapā (pēc datora pulksteņa, lai vienmēr ir pareizs) */
+function sodienRadit() {
+  const d = new Date(), diena = d.toLocaleDateString('lv-LV', {weekday: 'long'});
+  $('#sodien').textContent = diena.charAt(0).toUpperCase() + diena.slice(1);
+  $('#sodienDat').textContent = d.toLocaleDateString('lv-LV', {day: 'numeric', month: 'long', year: 'numeric'});
+}
+sodienRadit();
+
+/* sākums: kas es esmu un ko drīkstu redzēt */
+async function sakt() {
+  try { LOMA = await run('gjKasEsmu'); }
+  catch (x) { return /piekļuv/i.test(x.message) ? pieteikties(!!gjKods) : alertZ(x.message); }
+  document.querySelector('.app').hidden = false;
+  document.querySelectorAll('#nav button').forEach(b => b.hidden = !LOMA.sadalas.includes(b.dataset.s));
+  const toms = LOMA.loma === 'toms';
+  document.querySelectorAll('.catpoga,.augsaCats,#cats').forEach(e => e.hidden = !toms);
+  $('#sabPoga').hidden = LOMA.loma === 'komanda';
+  $('#apaksa').innerHTML = esc('Gājēdis · ' + LOMA.nos) + (gjKods ? ' · <a href="#" onclick="iziet();return false" style="color:inherit">iziet</a>' : '');
+  ielad = {};
+  if (LOMA.sadalas.includes('sakums')) { iet('sakums'); ieladetSak(); } else iet(LOMA.sadalas[0]);
+  versija = null; atjLaiks = Date.now(); parbauditIzmainas(false);
+}
+/* automātiska atjaunošana: ja kāds cits kaut ko mainīja, atvērtā sadaļa atjaunojas pati */
+let versija = null, atjLaiks = Date.now(), atjIet = false;
+const ATJ = {sakums: ieladetSak, pasakumi: ieladetPas, sagatavosanas: ieladetSag, vaditajiem: ieladetVad, rekini: ieladetRek};
+function drosiAtjaunot() {
+  if (document.querySelector('.modal') || $('#sanu').classList.contains('atverts')) return false;
+  const a = document.activeElement;
+  if (a && a.closest('.sad') && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'checkbox') return false;
+  return [...document.querySelectorAll('.sad.ak form:not([hidden])')].every(f => f.closest('[hidden]') || ![...f.elements].some(e => /^(text|textarea|email|tel|number|url|search)$/.test(e.type) && e.value && e.defaultValue !== e.value));
+}
+async function parbauditIzmainas(spiest) {
+  if (atjIet || document.hidden || document.querySelector('.app').hidden) return;
+  atjIet = true;
+  try {
+    const v = await run('gjVersija'), jauna = versija !== null && v !== versija;
+    if (versija === null) versija = v;
+    if ((jauna || spiest || Date.now() - atjLaiks > 180000) && drosiAtjaunot()) {
+      versija = v; atjLaiks = Date.now();
+      const s = (document.querySelector('.sad.ak') || {}).id?.slice(2), f = ATJ[s];
+      Object.keys(ielad).forEach(k => { if (k !== s && ATJ[k]) delete ielad[k]; });
+      if (f) { const y = scrollY; kluss = true; try { await f(); } finally { kluss = false; } scrollTo(0, y); }
+    }
+  } catch (e) {}
+  atjIet = false;
+}
+setInterval(() => parbauditIzmainas(false), 15000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) parbauditIzmainas(Date.now() - atjLaiks > 30000); });
+
+function pieteikties(nederigs) {
+  if (window.gjSavienojums) return window.gjSavienojums(); // Mac lietotnē kods ir savienojuma iestatījumos
+  document.querySelector('.app').hidden = true;
+  const d = document.createElement('div');
+  d.className = 'modal'; d.style.background = 'var(--nakts)';
+  d.innerHTML = `<form class="karte" style="width:min(420px,100%)"><img src="${$('.sanu .logo').src}" alt="" style="display:block;width:72px;margin:0 auto 12px;background:var(--nakts);border-radius:14px;padding:8px"><h2 style="text-align:center">Gājēdis</h2><p class="mazs" style="text-align:center">Ievadi savu piekļuves kodu. To tev iedod Toms.</p><label>Piekļuves kods<input name="kods" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX" required></label><div class="rinda"><button class="poga zala" style="flex:1;justify-content:center">Ienākt</button></div><div class="zinja${nederigs ? ' kl' : ''}">${nederigs ? 'Kods nav derīgs vai ir nomainīts.' : ''}</div></form>`;
+  document.body.append(d); d.querySelector('input').focus();
+  d.querySelector('form').onsubmit = e => {
+    e.preventDefault(); gjKods = e.target.kods.value.trim();
+    try { localStorage.setItem('gjKods', gjKods); } catch (x) {}
+    d.remove(); sakt();
+  };
+}
+function iziet() { gjKods = ''; try { localStorage.removeItem('gjKods'); } catch (e) {} pieteikties(false); }
+sakt();
+</script>
+</body>
+</html>
