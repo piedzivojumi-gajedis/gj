@@ -147,6 +147,7 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 .cl select{width:auto;padding:3px 6px;font-size:12.5px;border-radius:var(--r-s)}
 .cl .dz{all:unset;cursor:pointer;color:var(--pelēks);padding:2px 8px;font-size:18px;line-height:1;border-radius:var(--r-s)}
 .cl .dz:hover{color:var(--ugunskurs);background:var(--ugunskurs-gaiss)}
+.ignP{flex:none;align-self:flex-start;gap:5px}.ignP .ik{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 .clJauns{display:flex;gap:var(--s2);margin-top:var(--s2)}.clJauns input{padding:7px 10px;font-size:14px}
 .lidzi{margin-top:30px;padding-top:22px;border-top:2px solid var(--linija)}
 .cels{margin-top:18px;border-radius:var(--r);background:var(--mezs);color:#fff;padding:18px 20px}
@@ -570,7 +571,7 @@ svg.liniju path.blav{opacity:.15}
       <div class="galva"><div><h1>Kopsavilkums</h1><p id="kopsDat">Katru rītu 7:30 programma pati savelk, kas izdarīts un kas jādara.</p></div><button class="poga" id="kopsPoga" onclick="ieladetKops(true)">Savilkt tagad</button></div>
       <div class="karte" id="kopsTeksts" hidden style="margin-bottom:16px;border-color:var(--mezs);background:var(--c-mezs-0)"></div>
       <div class="rezgis r2">
-        <div class="karte"><h2 class="v3">Jāizdara</h2><p class="mazs" style="margin:-4px 0 6px">Ar × punktu var paslēpt, tad tas vairs nerādīsies.</p><div id="kopsDarbi" class="ielade">Ielādē…</div><p class="mazs" id="kopsIgn" hidden style="margin:10px 0 0"></p></div>
+        <div class="karte"><h2 class="v3">Jāizdara</h2><p class="mazs" style="margin:-4px 0 6px">Ar "Nerādīt" punktu paslēp, un tas vairs neparādīsies (arī sākumlapā).</p><div id="kopsDarbi" class="ielade">Ielādē…</div><p class="mazs" id="kopsIgn" hidden style="margin:10px 0 0"></p></div>
         <div>
           <div class="karte"><h2 class="v3">Procesu optimizētājs</h2><div id="kopsIet"><p class="mazs">Ieteikumi parādās, kad iestatījumos ir Claude API atslēga.</p></div></div>
           <div class="karte" style="margin-top:16px"><h2 class="v3">Izdarīts pēdējā nedēļā</h2><ul class="saraksts" id="kopsIzd"></ul></div>
@@ -751,10 +752,9 @@ function sakZimet(d) {
   if (!d.irAtslega) $('#sakCipari').insertAdjacentHTML('afterend', '<p id="sakAtsl" class="zinja info" style="display:block">Čatam un gudrajam kopsavilkumam ielieciet Claude API atslēgu <a href="#" onclick="iet(\'iestatijumi\');return false">iestatījumos</a>.</p>');
 }
 /* kopsavilkuma punkts ar pogu "Nerādīt vairs" (Toms) */
-function darbsHtml(x) { return `<div class="darbs" data-id="${esc(x.id || '')}"><span class="prio p${x.prio}"></span><div style="flex:1;min-width:0"><b>${esc(x.kas)}</b><div class="mazs">${esc(x.ko)} ${x.saite ? `<a href="${esc(x.saite)}" target="_blank" rel="noopener">atvērt ↗</a>` : ''}</div></div>${x.id ? '<button type="button" class="dz" data-ign title="Nerādīt vairs" aria-label="Nerādīt vairs">×</button>' : ''}</div>`; }
+function darbsHtml(x) { return `<div class="darbs" data-id="${esc(x.id || '')}"><span class="prio p${x.prio}"></span><div style="flex:1;min-width:0"><b>${esc(x.kas)}</b><div class="mazs">${esc(x.ko)} ${x.saite ? `<a href="${esc(x.saite)}" target="_blank" rel="noopener">atvērt ↗</a>` : ''}</div></div>${x.id && LOMA.loma === 'toms' ? '<button type="button" class="poga gaisa maza ignP" data-ign title="Paslēpt un vairs nerādīt"><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c5 0 9 4.5 10 7a13 13 0 0 1-2.9 4M6.6 6.6C4.3 8 2.7 10.1 2 12c1 2.5 5 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>Nerādīt</button>' : ''}</div>`; }
 async function darbsIgnoret(b) {
   const el = b.closest('.darbs'), id = el.dataset.id;
-  if (!confirm('Nerādīt šo vairs? (Atkal parādīt var kopsavilkumā.)')) return;
   document.querySelectorAll(`.darbs[data-id="${CSS.escape(id)}"]`).forEach(x => x.remove());
   try { const n = await run('gjKopsIgnoret', id); kopsIgnInfo(n); } catch (x) { alertZ(x.message); }
 }
