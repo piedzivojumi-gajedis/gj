@@ -199,6 +199,11 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 .izR.gat .izAtv b{color:var(--pelēks);text-decoration:line-through;text-decoration-color:var(--c-smilts-6)}
 .izAtv{all:unset;cursor:pointer;flex:1;min-width:0;display:flex;flex-direction:column;overflow-wrap:anywhere}
 .izApr{display:block;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.izR>.dz{display:flex;padding:6px}.izR>.dz .ik{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.izKamF{border:0;padding:0;margin:0;min-width:0;display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);align-items:center}
+.izKamF legend{padding:0;margin-bottom:var(--s1);font:600 12.5px var(--f-ui);color:var(--c-tinte-2)}
+.izKamF .cb{flex-direction:row;font-weight:500;font-size:14px;gap:var(--s2);align-items:center;cursor:pointer}
+.izKamF .cb input{width:18px;height:18px;padding:0;margin:0;accent-color:var(--mezs)}
 .izAtv:hover b{text-decoration:underline;text-decoration-color:var(--c-smilts-6)}
 .izIzd{margin-top:var(--s3);border-top:1px solid var(--linija);padding-top:var(--s2)}
 .izIzd summary,.vadD summary{cursor:pointer;font:600 13px var(--f-ui);color:var(--pelēks);padding:var(--s2) 0}
@@ -1291,6 +1296,7 @@ $('#finTab').addEventListener('change', async e => {
 /* gājēdis izaugsme: darbu checklists (tabula "AI_gajedis_programma izaugsme") */
 let izDati = null, izKas = '', izStat = 'ne';
 const sodIso = () => new Date().toLocaleDateString('sv-SE');
+const izKamL = x => x.kam ? x.kam.split(/\s*,\s*/) : [];
 const izKav = x => !!(x.iso && x.statuss !== 'Izdarīts' && x.iso < sodIso());
 async function ieladetIz() {
   if (!kluss && !izDati) { $('#izTab').className = 'ielade'; $('#izTab').textContent = 'Ielādē…'; }
@@ -1301,12 +1307,12 @@ document.querySelectorAll('#izKas button').forEach(b => b.onclick = () => { izKa
 document.querySelectorAll('#izStat button').forEach(b => b.onclick = () => { izStat = b.dataset.s; document.querySelectorAll('#izStat button').forEach(x => x.classList.toggle('ak', x === b)); izZimet(); });
 function izRinda(x) {
   const gat = x.statuss === 'Izdarīts', kav = izKav(x);
-  return `<div class="izR${kav ? ' kav' : ''}${gat ? ' gat' : ''}" data-id="${esc(x.id)}"><input type="checkbox"${gat ? ' checked' : ''} aria-label="Izdarīts: ${esc(x.uzdevums)}"><button type="button" class="izAtv"><b>${esc(x.uzdevums)}</b><span class="cipsi" style="margin-top:4px">${x.kam ? `<span class="c">${esc(x.kam)}</span>` : '<span class="c ne">nav piešķirts</span>'}${x.termins ? `<span class="c ${kav ? 'ne' : gat ? '' : 'br'}">${kav ? 'nokavēts · ' : 'līdz '}${esc(x.termins)}</span>` : ''}${x.statuss === 'Procesā' ? '<span class="c ok">procesā</span>' : ''}</span>${x.apraksts ? `<span class="mazs izApr">${esc(x.apraksts)}</span>` : ''}</button></div>`;
+  return `<div class="izR${kav ? ' kav' : ''}${gat ? ' gat' : ''}" data-id="${esc(x.id)}"><input type="checkbox"${gat ? ' checked' : ''} aria-label="Izdarīts: ${esc(x.uzdevums)}"><button type="button" class="izAtv"><b>${esc(x.uzdevums)}</b><span class="cipsi" style="margin-top:4px">${x.kam ? izKamL(x).map(k => `<span class="c">${esc(k)}</span>`).join('') : '<span class="c ne">nav piešķirts</span>'}${x.termins ? `<span class="c ${kav ? 'ne' : gat ? '' : 'br'}">${kav ? 'nokavēts · ' : 'līdz '}${esc(x.termins)}</span>` : ''}${x.statuss === 'Procesā' ? '<span class="c ok">procesā</span>' : ''}</span>${x.apraksts ? `<span class="mazs izApr">${esc(x.apraksts)}</span>` : ''}</button><button type="button" class="dz" data-dz title="Dzēst" aria-label="Dzēst: ${esc(x.uzdevums)}"><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M5.5 7l1 12.5a1.5 1.5 0 0 0 1.5 1.5h8a1.5 1.5 0 0 0 1.5-1.5l1-12.5"/><path d="M9 7V4.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V7"/></svg></button></div>`;
 }
 function izZimet() {
   if (!izDati) return;
   const q = $('#izMekl').value.trim().toLowerCase();
-  const s = izDati.darbi.filter(x => (!izKas || x.kam === izKas) && (!q || [x.uzdevums, x.apraksts, x.kam].join(' ').toLowerCase().includes(q)));
+  const s = izDati.darbi.filter(x => (!izKas || izKamL(x).includes(izKas)) && (!q || [x.uzdevums, x.apraksts, x.kam].join(' ').toLowerCase().includes(q)));
   const ne = s.filter(x => x.statuss !== 'Izdarīts').sort((a, b) => (a.iso || '9').localeCompare(b.iso || '9')), ir = s.filter(x => x.statuss === 'Izdarīts');
   $('#izTab').className = '';
   $('#izTab').innerHTML = (ne.length ? ne.map(izRinda).join('') : `<p class="tukss">${izDati.darbi.length ? 'Viss izdarīts.' : 'Vēl nav neviena darba. Spied "+ Jauns darbs".'}</p>`)
@@ -1317,14 +1323,19 @@ $('#izTab').addEventListener('change', async e => {
   const x = izDarbs(e.target), ved = x.statuss; x.statuss = e.target.checked ? 'Izdarīts' : 'Jāizdara'; izZimet(); delete ielad.sakums;
   try { await run('gjIzStatuss', await istaisId(x.id), x.statuss); } catch (k) { x.statuss = ved; izZimet(); alertZ(k.message); }
 });
-$('#izTab').addEventListener('click', e => { if (e.target.closest('.izAtv')) izAtvert(izDarbs(e.target)); });
+$('#izTab').addEventListener('click', e => { if (e.target.closest('.izAtv')) izAtvert(izDarbs(e.target)); else if (e.target.closest('[data-dz]')) izDzest(izDarbs(e.target)); });
+async function izDzest(x, pec) {
+  if (!confirm(`Dzēst "${x.uzdevums}"?`)) return;
+  izDati.darbi = izDati.darbi.filter(z => z !== x); if (pec) pec(); izZimet(); delete ielad.sakums;
+  try { await run('gjIzDzest', await istaisId(x.id)); } catch (k) { alertZ(k.message); ieladetIz(); }
+}
 /* darba logs: jauns vai labot */
 function izAtvert(x) {
   const jauns = !x, v = x || {kam: LOMA.nos === 'Markuss' ? 'Markuss' : izKas || 'Toms', statuss: 'Jāizdara'}, d = document.createElement('div');
   d.className = 'modal';
   d.innerHTML = `<form class="karte plata" role="dialog" aria-modal="true" aria-labelledby="izV"><div class="galva" style="margin:0 0 8px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="izV">${jauns ? 'Jauns darbs' : esc(v.uzdevums)}</h2>${!jauns && izKav(v) ? '<p><span class="c ne">termiņš pagājis</span></p>' : ''}</div><button type="button" class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div>
     <div class="lauki"><label class="pilns">Uzdevums<input name="uzdevums" required value="${esc(v.uzdevums || '')}"></label>
-      <label>Kam<select name="kam"><option value="">–</option>${izDati.kam.map(k => `<option${k === v.kam ? ' selected' : ''}>${k}</option>`).join('')}</select></label>
+      <fieldset class="izKamF"><legend>Kam</legend>${izDati.kam.map(k => `<label class="cb"><input type="checkbox" name="kam" value="${esc(k)}"${izKamL(v).includes(k) ? ' checked' : ''}>${esc(k)}</label>`).join('')}</fieldset>
       <label>Termiņš<input type="date" name="termins" value="${esc(v.iso || '')}"></label>
       <label>Statuss<select name="statuss">${izDati.statusi.map(k => `<option${k === v.statuss ? ' selected' : ''}>${k}</option>`).join('')}</select></label>
       <label class="pilns">Apraksts<textarea name="apraksts" rows="5">${esc(v.apraksts || '')}</textarea></label></div>
@@ -1336,7 +1347,8 @@ function izAtvert(x) {
   f.uzdevums.focus();
   f.onsubmit = e => {
     e.preventDefault();
-    const dati = forma(f), o = Object.assign({}, v, dati, {iso: dati.termins, termins: dati.termins ? dati.termins.split('-').reverse().join('.') : ''});
+    const dati = forma(f); dati.kam = [...f.querySelectorAll('[name=kam]:checked')].map(c => c.value).join(', ');
+    const o = Object.assign({}, v, dati, {iso: dati.termins, termins: dati.termins ? dati.termins.split('-').reverse().join('.') : ''});
     // uzreiz sarakstā, tabulā saglabājas fonā
     if (jauns) { o.id = 'tmp' + Date.now(); izDati.darbi.push(o); } else Object.assign(x, o);
     aizv(); izZimet(); delete ielad.sakums;
@@ -1345,11 +1357,7 @@ function izAtvert(x) {
     pagaidu[id].catch(k => { if (jauns) izDati.darbi = izDati.darbi.filter(z => z.id !== id); alertZ('Nesaglabājās: ' + k.message); ieladetIz(); });
   };
   const dz = d.querySelector('[data-dz]');
-  if (dz) dz.onclick = async () => {
-    if (!confirm(`Dzēst "${x.uzdevums}"?`)) return;
-    izDati.darbi = izDati.darbi.filter(z => z !== x); aizv(); izZimet();
-    try { await run('gjIzDzest', await istaisId(x.id)); } catch (k) { alertZ(k.message); ieladetIz(); }
-  };
+  if (dz) dz.onclick = () => izDzest(x, aizv);
 }
 
 /* rēķini */
