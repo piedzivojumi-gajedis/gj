@@ -197,6 +197,7 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 .izR.kav b{color:var(--c-uguns-9)}
 .izR.gat .izAtv b{color:var(--pelēks);text-decoration:line-through;text-decoration-color:var(--c-smilts-6)}
 .izAtv{all:unset;cursor:pointer;flex:1;min-width:0;display:flex;flex-direction:column;overflow-wrap:anywhere}
+.izApr{display:block;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .izAtv:hover b{text-decoration:underline;text-decoration-color:var(--c-smilts-6)}
 .izIzd{margin-top:var(--s3);border-top:1px solid var(--linija);padding-top:var(--s2)}
 .izIzd summary,.vadD summary{cursor:pointer;font:600 13px var(--f-ui);color:var(--pelēks);padding:var(--s2) 0}
@@ -489,9 +490,8 @@ svg.liniju path.blav{opacity:.15}
 
     <!-- GĀJĒDIS IZAUGSME -->
     <section class="sad" id="s-izaugsme">
-      <div class="galva"><div><h1>Gājēdis izaugsme</h1><p>Darāmo darbu saraksts: kas jādara, kam un līdz kuram. Atver darbu, lai redzētu un labotu visu. Sarkans = termiņš pagājis.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="izSaite" target="_blank" hidden>Tabula ↗</a><button class="poga zala" onclick="izForma()">+ Pievienot</button></div></div>
-      <div class="karte" id="izFormaK" hidden style="margin-bottom:16px"><h2 class="v3">Jauna rinda</h2><form id="fIz" onsubmit="return izSaglabat(event)"><div class="lauki" id="izLauki"></div><div class="rinda"><button class="poga zala">Pievienot</button><button type="button" class="poga gaisa" onclick="$('#izFormaK').hidden=true">Atcelt</button></div><div class="zinja" id="izZ"></div></form></div>
-      <div class="rinda" style="margin:0 0 16px"><div class="tabs" id="izKas"><button data-k="" class="ak">Visi</button><button data-k="toms">Toms</button><button data-k="markus">Markuss</button></div><div class="tabs" id="izLapas"></div><input id="izMekl" type="search" placeholder="Meklēt…" aria-label="Meklēt" style="flex:1;min-width:160px;max-width:280px;margin-left:auto" oninput="izZimet()"></div>
+      <div class="galva"><div><h1>Gājēdis izaugsme</h1><p>Darāmo darbu checklists Tomam un Markusam. Atzīmē, kas izdarīts; uzspied uz darba, lai redzētu un labotu aprakstu, termiņu un statusu. Sarkans = termiņš pagājis.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="izSaite" target="_blank" rel="noopener" hidden>Tabula ↗</a><button class="poga zala" onclick="izAtvert()">+ Jauns darbs</button></div></div>
+      <div class="rinda" style="margin:0 0 16px"><div class="tabs" id="izKas"><button data-k="" class="ak">Visi</button><button data-k="Toms">Toms</button><button data-k="Markuss">Markuss</button></div><div class="tabs" id="izStat"><button data-s="ne" class="ak">Neizdarītie</button><button data-s="visi">Visi</button></div><input id="izMekl" type="search" placeholder="Meklēt…" aria-label="Meklēt darbu" style="flex:1;min-width:160px;max-width:280px;margin-left:auto" oninput="izZimet()"></div>
       <div class="karte" style="padding:var(--s2) var(--s4)"><div id="izTab" class="ielade">Ielādē…</div></div>
     </section>
 
@@ -1283,91 +1283,68 @@ $('#finTab').addEventListener('change', async e => {
   try { await run('gjFinAtmaksats', x.id, on); } catch (k) { x.atmaksats = !on; finZimet(); alertZ(k.message); }
 });
 
-/* gājēdis izaugsme: tabula ar Toma un Markusa darāmajām lietām */
-let izDati = null, izLapa = 0, izKas = '';
+/* gājēdis izaugsme: darbu checklists (tabula "AI_gajedis_programma izaugsme") */
+let izDati = null, izKas = '', izStat = 'ne';
+const sodIso = () => new Date().toLocaleDateString('sv-SE');
+const izKav = x => !!(x.iso && x.statuss !== 'Izdarīts' && x.iso < sodIso());
 async function ieladetIz() {
-  try {
-    await kesh('gjIzaugsme', [], v => { izDati = v;
-    $('#izSaite').href = izDati.saite; $('#izSaite').hidden = false;
-    if (izLapa >= izDati.lapas.length) izLapa = 0;
-    $('#izLapas').innerHTML = izDati.lapas.length > 1 ? izDati.lapas.map((l, i) => `<button data-i="${i}"${i === izLapa ? ' class="ak"' : ''}>${esc(l.nos)}</button>`).join('') : '';
-    $('#izLapas').querySelectorAll('button').forEach(b => b.onclick = () => { izLapa = +b.dataset.i; $('#izLapas').querySelectorAll('button').forEach(x => x.classList.toggle('ak', x === b)); izZimet(); });
-    izZimet(); });
-  } catch (x) { $('#izTab').className = ''; $('#izTab').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
+  if (!kluss && !izDati) { $('#izTab').className = 'ielade'; $('#izTab').textContent = 'Ielādē…'; }
+  try { await kesh('gjIzaugsme', [], v => { izDati = v; $('#izSaite').href = v.saite; $('#izSaite').hidden = false; izZimet(); }); }
+  catch (x) { $('#izTab').className = ''; $('#izTab').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
 }
 document.querySelectorAll('#izKas button').forEach(b => b.onclick = () => { izKas = b.dataset.k; document.querySelectorAll('#izKas button').forEach(x => x.classList.toggle('ak', x === b)); izZimet(); });
-const izIso = t => { let m = String(t || '').trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`; m = String(t || '').trim().match(/^(\d{1,2})[./](\d{1,2})(?:[./](\d{2,4}))?/); if (!m) return ''; const g = m[3] ? (m[3].length === 2 ? '20' + m[3] : m[3]) : String(new Date().getFullYear()); return `${g}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`; };
-const izGat = v => v === true || /^(jā|ja|done|gatavs|izdarīts|izdarits|pabeigts|✓|x|true)$/i.test(String(v).trim());
-const sodIso = () => new Date().toLocaleDateString('sv-SE');
-function izDarbs(l, r) {
-  const k = l.kol, iso = k.ddl >= 0 ? izIso(r.s[k.ddl]) : '', gat = k.done >= 0 && izGat(r.s[k.done]);
-  return {r, iso, gat, kav: !!(iso && !gat && iso < sodIso()), t: String(r.s[k.uzd] || '').trim() || '(bez nosaukuma)', kam: k.kas >= 0 ? String(r.s[k.kas] || '') : ''};
-}
-function izRinda(l, x) {
-  const k = l.kol, ck = k.done >= 0 && typeof x.r.s[k.done] === 'boolean';
-  return `<div class="izR${x.kav ? ' kav' : ''}${x.gat ? ' gat' : ''}" data-r="${x.r.r}">${ck ? `<input type="checkbox" data-k="${k.done + 1}"${x.gat ? ' checked' : ''} aria-label="Izdarīts: ${esc(x.t)}">` : `<span class="prio ${x.gat ? 'p3' : x.kav ? 'p1' : 'p2'}"></span>`}<button type="button" class="izAtv"><b>${esc(x.t)}</b><span class="cipsi" style="margin-top:4px">${x.kam ? `<span class="c">${esc(x.kam)}</span>` : ''}${k.ddl >= 0 && x.r.s[k.ddl] ? `<span class="c ${x.kav ? 'ne' : x.gat ? '' : 'br'}">${x.kav ? 'nokavēts · ' : 'līdz '}${esc(x.r.s[k.ddl])}</span>` : ''}${!ck && k.done >= 0 && x.r.s[k.done] ? `<span class="c${x.gat ? ' ok' : ''}">${esc(x.r.s[k.done])}</span>` : ''}</span></button></div>`;
+document.querySelectorAll('#izStat button').forEach(b => b.onclick = () => { izStat = b.dataset.s; document.querySelectorAll('#izStat button').forEach(x => x.classList.toggle('ak', x === b)); izZimet(); });
+function izRinda(x) {
+  const gat = x.statuss === 'Izdarīts', kav = izKav(x);
+  return `<div class="izR${kav ? ' kav' : ''}${gat ? ' gat' : ''}" data-id="${esc(x.id)}"><input type="checkbox"${gat ? ' checked' : ''} aria-label="Izdarīts: ${esc(x.uzdevums)}"><button type="button" class="izAtv"><b>${esc(x.uzdevums)}</b><span class="cipsi" style="margin-top:4px">${x.kam ? `<span class="c">${esc(x.kam)}</span>` : '<span class="c ne">nav piešķirts</span>'}${x.termins ? `<span class="c ${kav ? 'ne' : gat ? '' : 'br'}">${kav ? 'nokavēts · ' : 'līdz '}${esc(x.termins)}</span>` : ''}${x.statuss === 'Procesā' ? '<span class="c ok">procesā</span>' : ''}</span>${x.apraksts ? `<span class="mazs izApr">${esc(x.apraksts)}</span>` : ''}</button></div>`;
 }
 function izZimet() {
-  const l = izDati.lapas[izLapa]; $('#izTab').className = '';
-  if (!l || !l.rindas.length) { $('#izTab').innerHTML = '<p class="tukss">Tabulā vēl nav ierakstu.</p>'; return; }
-  const q = $('#izMekl').value.trim().toLowerCase(), k = l.kol || {uzd: -1};
-  const atbilst = r => { const t = r.s.join(' ').toLowerCase(), kam = k.kas >= 0 ? String(r.s[k.kas]).toLowerCase() : t; return (!izKas || kam.includes(izKas)) && (!q || t.includes(q)); };
-  const s = l.rindas.filter(atbilst);
-  if (k.uzd < 0) { // tabulai nav atpazīstamas uzdevumu kolonnas: rāda kā tabulu
-    const kol = l.virsraksti.map((h, i) => i).filter(i => l.virsraksti[i] || l.rindas.some(r => r.s[i] !== '' && r.s[i] !== false));
-    $('#izTab').innerHTML = s.length ? `<table class="tab"><tr>${kol.map(i => `<th>${esc(l.virsraksti[i])}</th>`).join('')}</tr>${s.map(r => `<tr data-r="${r.r}">${kol.map(i => `<td data-l="${esc(l.virsraksti[i] || '')}">${typeof r.s[i] === 'boolean' ? `<input type="checkbox" data-k="${i + 1}" style="width:18px;height:18px;padding:0;accent-color:var(--mezs)"${r.s[i] ? ' checked' : ''}>` : md(String(r.s[i]))}</td>`).join('')}</tr>`).join('')}</table>` : '<p class="tukss">Nekas nav atrasts.</p>';
-    return;
-  }
-  const d = s.map(r => izDarbs(l, r)), ne = d.filter(x => !x.gat).sort((a, b) => (a.iso || '9').localeCompare(b.iso || '9')), ir = d.filter(x => x.gat);
-  $('#izTab').innerHTML = (ne.length ? ne.map(x => izRinda(l, x)).join('') : '<p class="tukss">Viss izdarīts.</p>') + (ir.length ? `<details class="izIzd"><summary>Izdarīts (${ir.length})</summary>${ir.map(x => izRinda(l, x)).join('')}</details>` : '');
+  if (!izDati) return;
+  const q = $('#izMekl').value.trim().toLowerCase();
+  const s = izDati.darbi.filter(x => (!izKas || x.kam === izKas) && (!q || [x.uzdevums, x.apraksts, x.kam].join(' ').toLowerCase().includes(q)));
+  const ne = s.filter(x => x.statuss !== 'Izdarīts').sort((a, b) => (a.iso || '9').localeCompare(b.iso || '9')), ir = s.filter(x => x.statuss === 'Izdarīts');
+  $('#izTab').className = '';
+  $('#izTab').innerHTML = (ne.length ? ne.map(izRinda).join('') : `<p class="tukss">${izDati.darbi.length ? 'Viss izdarīts.' : 'Vēl nav neviena darba. Spied "+ Jauns darbs".'}</p>`)
+    + (ir.length ? (izStat === 'visi' ? `<div class="clGrupa">Izdarīts (${ir.length})</div>${ir.map(izRinda).join('')}` : `<details class="izIzd"><summary>Izdarīts (${ir.length})</summary>${ir.map(izRinda).join('')}</details>`) : '');
 }
+const izDarbs = el => izDati.darbi.find(x => x.id === el.closest('[data-id]').dataset.id);
 $('#izTab').addEventListener('change', async e => {
-  if (!e.target.matches('[data-k]')) return;
-  const l = izDati.lapas[izLapa], r = +e.target.closest('[data-r]').dataset.r, k = +e.target.dataset.k, on = e.target.checked, row = l.rindas.find(x => x.r === r);
-  row.s[k - 1] = on; if (l.kol && l.kol.uzd >= 0) izZimet();
-  try { await run('gjIzaugsmeAtzime', l.id, r, k, on); delete ielad.sakums; } catch (x) { row.s[k - 1] = !on; izZimet(); alertZ(x.message); }
+  const x = izDarbs(e.target), ved = x.statuss; x.statuss = e.target.checked ? 'Izdarīts' : 'Jāizdara'; izZimet(); delete ielad.sakums;
+  try { await run('gjIzStatuss', await istaisId(x.id), x.statuss); } catch (k) { x.statuss = ved; izZimet(); alertZ(k.message); }
 });
-/* darba logs: visas kolonnas, labojamas */
-function izAtvert(r) {
-  const l = izDati.lapas[izLapa], row = l.rindas.find(x => x.r === r); if (!row) return;
-  const k = l.kol, x = izDarbs(l, row), d = document.createElement('div');
+$('#izTab').addEventListener('click', e => { if (e.target.closest('.izAtv')) izAtvert(izDarbs(e.target)); });
+/* darba logs: jauns vai labot */
+function izAtvert(x) {
+  const jauns = !x, v = x || {kam: LOMA.nos === 'Markuss' ? 'Markuss' : izKas || 'Toms', statuss: 'Jāizdara'}, d = document.createElement('div');
   d.className = 'modal';
-  d.innerHTML = `<div class="karte plata" role="dialog" aria-modal="true" aria-labelledby="izV"><div class="galva" style="margin:0 0 8px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="izV">${esc(x.t)}</h2><p>${x.kav ? '<span class="c ne">termiņš pagājis</span> ' : ''}${esc(l.nos)} · rinda ${r}</p></div><button class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div>
-    <form><div class="lauki">${l.virsraksti.map((h, i) => { const v = row.s[i], n = esc(h || 'Kolonna ' + (i + 1)); if (!h && (v === '' || v === undefined)) return ''; return typeof v === 'boolean' ? `<label style="flex-direction:row;align-items:center;gap:8px" class="pilns"><input type="checkbox" data-k="${i + 1}" style="width:auto"${v ? ' checked' : ''}>${n}</label>` : i === k.uzd || String(v).length > 60 ? `<label class="pilns">${n}<textarea data-k="${i + 1}" rows="3">${esc(v)}</textarea></label>` : `<label>${n}<input data-k="${i + 1}" value="${esc(v)}"${i === k.ddl ? ' placeholder="dd.mm.gggg"' : ''}></label>`; }).join('')}</div>
-    <div class="rinda"><button class="poga zala">Saglabāt</button>${izDati.saite ? `<a class="poga gaisa maza" target="_blank" rel="noopener" href="${esc(izDati.saite)}">Atvērt tabulā ↗</a>` : ''}</div><div class="zinja" data-z></div></form></div>`;
+  d.innerHTML = `<form class="karte plata" role="dialog" aria-modal="true" aria-labelledby="izV"><div class="galva" style="margin:0 0 8px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="izV">${jauns ? 'Jauns darbs' : esc(v.uzdevums)}</h2>${!jauns && izKav(v) ? '<p><span class="c ne">termiņš pagājis</span></p>' : ''}</div><button type="button" class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div>
+    <div class="lauki"><label class="pilns">Uzdevums<input name="uzdevums" required value="${esc(v.uzdevums || '')}"></label>
+      <label>Kam<select name="kam"><option value="">–</option>${izDati.kam.map(k => `<option${k === v.kam ? ' selected' : ''}>${k}</option>`).join('')}</select></label>
+      <label>Termiņš<input type="date" name="termins" value="${esc(v.iso || '')}"></label>
+      <label>Statuss<select name="statuss">${izDati.statusi.map(k => `<option${k === v.statuss ? ' selected' : ''}>${k}</option>`).join('')}</select></label>
+      <label class="pilns">Apraksts<textarea name="apraksts" rows="5">${esc(v.apraksts || '')}</textarea></label></div>
+    <div class="rinda"><button class="poga zala">${jauns ? 'Pievienot' : 'Saglabāt'}</button>${jauns ? '' : '<button type="button" class="poga gaisa" data-dz>Dzēst</button>'}${!jauns && v.izveidots ? `<span class="mazs" style="margin-left:auto">Izveidots ${esc(v.izveidots)}</span>` : ''}</div><div class="zinja" data-z></div></form>`;
   document.body.append(d);
-  const f = d.querySelector('form'), z = d.querySelector('[data-z]'), aizv = () => d.remove();
-  f.querySelectorAll('[data-k]').forEach(i => i.dataset.ved = i.type === 'checkbox' ? i.checked : i.value);
+  const f = d.querySelector('form'), aizv = () => d.remove();
   d.querySelector('[data-aizv]').onclick = aizv; d.onclick = e => { if (e.target === d) aizv(); };
   d.addEventListener('keydown', e => { if (e.key === 'Escape') aizv(); });
-  d.querySelector('[data-aizv]').focus();
-  f.onsubmit = async e => {
+  f.uzdevums.focus();
+  f.onsubmit = e => {
     e.preventDefault();
-    const izm = [...f.querySelectorAll('[data-k]')].filter(i => String(i.type === 'checkbox' ? i.checked : i.value) !== i.dataset.ved);
-    if (!izm.length) return zinja(z, 'Nekas nav mainīts.', 'info');
-    const b = f.querySelector('.zala'); b.disabled = true; zinja(z, 'Saglabāju tabulā…', 'info');
-    try {
-      for (const i of izm) { const v = i.type === 'checkbox' ? i.checked : i.value; await run('gjIzaugsmeLabot', l.id, r, +i.dataset.k, v); row.s[+i.dataset.k - 1] = v; i.dataset.ved = String(v); }
-      izZimet(); delete ielad.sakums; zinja(z, 'Saglabāts tabulā.'); setTimeout(aizv, 600);
-    } catch (k2) { zinja(z, esc(k2.message), 'kl'); }
-    b.disabled = false;
+    const dati = forma(f), o = Object.assign({}, v, dati, {iso: dati.termins, termins: dati.termins ? dati.termins.split('-').reverse().join('.') : ''});
+    // uzreiz sarakstā, tabulā saglabājas fonā
+    if (jauns) { o.id = 'tmp' + Date.now(); izDati.darbi.push(o); } else Object.assign(x, o);
+    aizv(); izZimet(); delete ielad.sakums;
+    const id = o.id;
+    pagaidu[id] = run('gjIzSaglabat', Object.assign(dati, {id: jauns ? '' : x.id})).then(r => { const y = izDati.darbi.find(z => z.id === id); if (y) Object.assign(y, r); izZimet(); return r.id; });
+    pagaidu[id].catch(k => { if (jauns) izDati.darbi = izDati.darbi.filter(z => z.id !== id); alertZ('Nesaglabājās: ' + k.message); ieladetIz(); });
   };
-}
-$('#izTab').addEventListener('click', e => { const b = e.target.closest('.izAtv'); if (b) izAtvert(+b.closest('[data-r]').dataset.r); });
-function izForma() {
-  const l = izDati && izDati.lapas[izLapa]; if (!l) return;
-  const bool = i => l.rindas.length && l.rindas.filter(r => typeof r.s[i] === 'boolean').length > l.rindas.length / 2;
-  $('#izLauki').innerHTML = l.virsraksti.map((h, i) => bool(i) ? `<label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" data-i="${i}" style="width:auto">${esc(h || 'Kolonna ' + (i + 1))}</label>` : `<label>${esc(h || 'Kolonna ' + (i + 1))}<input data-i="${i}"${/kas|atbild|kurš/i.test(h) && izKas ? ` value="${izKas === 'toms' ? 'Toms' : 'Markuss'}"` : ''}></label>`).join('');
-  $('#izZ').className = 'zinja'; $('#izFormaK').hidden = false; $('#izFormaK').scrollIntoView({behavior: 'smooth'}); $('#izLauki input:not([type=checkbox])')?.focus();
-}
-async function izSaglabat(e) {
-  e.preventDefault(); const b = e.target.querySelector('.zala'); b.disabled = true;
-  const v = [...$('#izLauki').querySelectorAll('[data-i]')].map(i => i.type === 'checkbox' ? i.checked : i.value);
-  const l = izDati.lapas[izLapa], tmp = {r: 0, s: v};
-  l.rindas.push(tmp); $('#izFormaK').hidden = true; izZimet(); b.disabled = false;
-  try { await run('gjIzaugsmePievienot', l.id, v); ieladetIz(); }
-  catch (x) { l.rindas.splice(l.rindas.indexOf(tmp), 1); izZimet(); $('#izFormaK').hidden = false; zinja('#izZ', esc(x.message), 'kl'); }
-  return false;
+  const dz = d.querySelector('[data-dz]');
+  if (dz) dz.onclick = async () => {
+    if (!confirm(`Dzēst "${x.uzdevums}"?`)) return;
+    izDati.darbi = izDati.darbi.filter(z => z !== x); aizv(); izZimet();
+    try { await run('gjIzDzest', await istaisId(x.id)); } catch (k) { alertZ(k.message); ieladetIz(); }
+  };
 }
 
 /* rēķini */
