@@ -382,7 +382,7 @@ svg.liniju path.blav{opacity:.15}
       </div>
       <div class="rezgis r2 tomam" style="margin-top:16px">
         <div class="karte"><div class="galva" style="margin:0 0 6px"><h2 class="v3">Vispirms jāizdara</h2><button class="poga gaisa maza" onclick="iet('kopsavilkums')">Kopsavilkums</button></div><div id="sakDarbi"></div></div>
-        <div class="karte"><h2 class="v3">Ko programma nesen izdarīja</h2><ul class="saraksts" id="sakZurn"></ul></div>
+        <div class="karte"><div class="galva" style="margin:0 0 6px"><h2 class="v3">Ko aģenti nesen izdarīja</h2><button class="poga gaisa maza" onclick="iet('agenti')">Aģenti</button></div><ul class="saraksts" id="sakZurn"></ul></div>
       </div>
     </section>
 
@@ -747,7 +747,7 @@ function sakZimet(d) {
   if (!toms) return;
   const darbi = d.kopsavilkums ? d.kopsavilkums.darbi : [];
   $('#sakDarbi').innerHTML = darbi.length ? darbi.slice(0, 7).map(darbsHtml).join('') : `<p class="mazs">${d.kopsavilkums ? 'Viss kārtībā.' : 'Kopsavilkums vēl nav savilkts.'} <a href="#" onclick="iet('kopsavilkums');ieladetKops(true);return false">Savilkt tagad</a></p>`;
-  $('#sakZurn').innerHTML = (d.zurnals || []).length ? d.zurnals.map(z => `<li><span class="c">${esc(z.kas)}</span><div style="min-width:0"><div>${esc(z.ko)}</div><div class="mazs">${esc(z.t)}</div></div></li>`).join('') : '<li class="tukss">Vēl nekas nav pierakstīts.</li>';
+  $('#sakZurn').innerHTML = (d.agenti || []).length ? d.agenti.map(z => `<li><span class="c ok">${esc(z.kas)}</span><div style="min-width:0"><div>${esc(z.ko)}</div><div class="mazs">${esc(z.t)}</div></div></li>`).join('') : '<li class="tukss">Aģenti nesen neko nav darījuši.</li>';
   $('#sakAtsl')?.remove();
   if (!d.irAtslega) $('#sakCipari').insertAdjacentHTML('afterend', '<p id="sakAtsl" class="zinja info" style="display:block">Čatam un gudrajam kopsavilkumam ielieciet Claude API atslēgu <a href="#" onclick="iet(\'iestatijumi\');return false">iestatījumos</a>.</p>');
 }
