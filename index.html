@@ -13,9 +13,13 @@
   --c-mezs:#2f5a27; --c-mezs-1:#e3ecdc; --c-mezs-0:#f7faf5; --c-mezs-9:#1e3d18;
   --c-uguns:#b5562b; --c-uguns-1:#f6e4da; --c-uguns-9:#7a3416;
   --c-zelts:#c99a2e; --c-zelts-1:#f7efd9; --c-zelts-9:#8a6512;
+  --c-ezers:#2f6690; --c-ezers-1:#e1ebf3; --c-ezers-9:#1c4262;
+  --c-ogas:#8a3f74; --c-ogas-1:#f3e3ee; --c-ogas-9:#5c2549;
   /* semantic (names used across the app and in inline styles) */
   --papirs:var(--c-papirs); --balts:var(--c-balts); --teksts:var(--c-tinte); --pelēks:var(--c-akmens); --linija:var(--c-smilts-5);
   --mezs:var(--c-mezs); --mezs-gaiss:var(--c-mezs-1); --zals-tabula:#b6d7a8; --ugunskurs:var(--c-uguns); --ugunskurs-gaiss:var(--c-uguns-1);
+  --toms:var(--c-ezers); --toms-gaiss:var(--c-ezers-1); --toms-tumss:var(--c-ezers-9);
+  --markuss:var(--c-ogas); --markuss-gaiss:var(--c-ogas-1); --markuss-tumss:var(--c-ogas-9);
   --nakts:#161616; --dzeltens:var(--c-zelts); --dzeltens-gaiss:var(--c-zelts-1);
   --virsma-hover:var(--c-smilts-1); --virsma-neitr:var(--c-smilts-3); --linija-viegla:var(--c-smilts-4); --teksts-2:var(--c-tinte-3);
   /* type */
@@ -219,6 +223,11 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 .izR{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) var(--s2);border-top:1px solid var(--linija-viegla);border-radius:var(--r-m)}
 .izR:first-child{border-top:0}
 .izR.atl{background:var(--mezs-gaiss)}
+/* Toms un Markuss katrs savā krāsā */
+.c.p-toms{background:var(--toms-gaiss);color:var(--toms-tumss)}.c.p-markuss{background:var(--markuss-gaiss);color:var(--markuss-tumss)}
+.persP{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}.persP.p-toms{background:var(--toms)}.persP.p-markuss{background:var(--markuss)}
+.persZ{display:inline-block;font:700 12px var(--f-ui);padding:3px 10px;border-radius:var(--r-pill)}.persZ.p-toms{background:var(--toms-gaiss);color:var(--toms-tumss)}.persZ.p-markuss{background:var(--markuss-gaiss);color:var(--markuss-tumss)}
+.bilP{border-radius:var(--r-m);padding:var(--s3);background:var(--virsma-neitr);min-width:0}
 .izJosla{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);padding:var(--s2) 0 var(--s3);border-bottom:1px solid var(--linija-viegla);margin-bottom:var(--s1)}
 .izJosla .cb{flex-direction:row;align-items:center;gap:6px;font:600 13.5px var(--f-ui)}.izJosla .cb input{width:18px;height:18px;padding:0;accent-color:var(--mezs)}
 .izJoslaP{display:flex;flex-wrap:wrap;gap:var(--s2);margin-left:auto}
@@ -535,7 +544,7 @@ svg.liniju path.blav{opacity:.15}
     <!-- GĀJĒDIS IZAUGSME -->
     <section class="sad" id="s-izaugsme">
       <div class="galva"><div><h1>Gājēdis izaugsme</h1><p>Darāmo darbu checklists Tomam un Markusam. Atzīmē, kas izdarīts; uzspied uz darba, lai redzētu un labotu aprakstu, termiņu un statusu. Sarkans = termiņš pagājis.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="izSaite" target="_blank" rel="noopener" hidden>Tabula ↗</a><button class="poga zala" onclick="izAtvert()">+ Jauns darbs</button></div></div>
-      <div class="rinda" style="margin:0 0 16px"><div class="tabs" id="izKas"><button data-k="" class="ak">Visiem</button><button data-k="Toms">Toms</button><button data-k="Markuss">Markuss</button></div><div class="tabs" id="izStat"><button data-s="visi" class="ak">Visi darbi</button><button data-s="ne">Tikai neizdarītie</button></div><button type="button" class="poga gaisa maza" id="izAtlP" onclick="izAtlase()">Atlasīt vairākus</button><input id="izMekl" type="search" placeholder="Meklēt…" aria-label="Meklēt darbu" style="flex:1;min-width:160px;max-width:280px;margin-left:auto" oninput="izZimet()"></div>
+      <div class="rinda" style="margin:0 0 16px"><div class="tabs" id="izKas"><button data-k="" class="ak">Visiem</button><button data-k="Toms"><i class="persP p-toms"></i>Toms</button><button data-k="Markuss"><i class="persP p-markuss"></i>Markuss</button></div><div class="tabs" id="izStat"><button data-s="visi" class="ak">Visi darbi</button><button data-s="ne">Tikai neizdarītie</button></div><button type="button" class="poga gaisa maza" id="izAtlP" onclick="izAtlase()">Atlasīt vairākus</button><input id="izMekl" type="search" placeholder="Meklēt…" aria-label="Meklēt darbu" style="flex:1;min-width:160px;max-width:280px;margin-left:auto" oninput="izZimet()"></div>
       <div class="karte" style="padding:var(--s2) var(--s4)"><div class="izJosla" id="izJosla" hidden></div><div id="izTab" class="ielade">Ielādē…</div></div>
     </section>
 
@@ -1363,8 +1372,15 @@ async function kopZimet() {
   const d = kopDati, P = d.pasakumi, sum = f => P.reduce((a, p) => a + f(p), 0), zime = n => `<span style="color:${n < 0 ? 'var(--ugunskurs)' : 'var(--mezs)'}">${eur(n)}</span>`;
   const sanT = sum(p => p.sanem.Toms || 0), sanM = sum(p => p.sanem.Markuss || 0);
   const bloks = (vards, r) => { const izm = r.reduce((a, x) => a + x[1], 0), atm = r.reduce((a, x) => a + x[2], 0); return `<div class="karte"><h2 class="v3">${vards}</h2><div class="rezgis r2" style="margin-bottom:10px"><div><div class="etik">Izmaksas</div><div class="cip" style="font-size:22px">${eur(izm)}</div></div><div><div class="etik">Atmaksāts</div><div class="cip" style="font-size:22px">${eur(atm)}</div></div></div><details class="izIzd"><summary>Visi ieraksti (${r.length})</summary><table class="tab fin vienk"><tr><th>Nosaukums</th><th style="text-align:right">Izmaksas</th><th style="text-align:right">Atmaksāts</th></tr>${r.map(x => `<tr><td>${esc(x[0])}</td><td class="sum">${x[1] ? eur(x[1]) : ''}</td><td class="sum">${x[2] ? eur(x[2]) : ''}</td></tr>`).join('')}</table></details></div>`; };
+  // bilance = izmaksāts no savas kabatas − saņemts no Gājēža; plus = Gājēdis viņam parādā, mīnus = paņēmis vairāk
+  const bil = r => r.reduce((a, x) => a + x[1] - x[2], 0), bT = bil(d.toms), bM = bil(d.markuss), star = Math.abs(bT - bM);
+  const bilK = (v, b, kl) => `<div class="bilP ${kl}"><span class="persZ ${kl}">${v}</span><div class="cip" style="margin-top:6px">${zime(b)}</div><div class="mazs">${b >= 0 ? 'plusā: Gājēdis viņam parādā' : 'mīnusā: paņēmis vairāk, nekā ielicis'}</div></div>`;
+  const bilance = `<div class="karte" style="margin-bottom:16px"><h2 class="v3">Kurš ir lielākā plusā</h2>
+    <div class="rezgis r2">${bilK('Toms', bT, 'p-toms')}${bilK('Markuss', bM, 'p-markuss')}</div>
+    <p style="margin:12px 0 0;font-weight:600">${star < 0.01 ? 'Abi ir vienādi.' : `${bT > bM ? 'Toms' : 'Markuss'} ir par ${eur(star)} lielākā plusā nekā ${bT > bM ? 'Markuss' : 'Toms'}.`}</p>
+    <p class="mazs" style="margin:4px 0 0">Izmaksāts no savas kabatas mīnus atmaksāts / saņemts no Gājēža (lapa Galvenais)${d.parads && (d.parads.toms || d.parads.markuss) ? `. Tabulā "Gājēža parāds": Toms ${eur(d.parads.toms || 0)}, Markuss ${eur(d.parads.markuss || 0)}` : ''}.</p></div>`;
   $('#finTab').className = '';
-  $('#finTab').innerHTML = `<div class="galva" style="margin:0 0 12px"><p class="mazs" style="margin:0">No tabulas <a href="${esc(d.saite)}" target="_blank" rel="noopener">${esc(d.nos)} ↗</a>. Pasākuma "saņem": cik katram pienākas (mīnus = jāatdod).</p></div>
+  $('#finTab').innerHTML = bilance + `<div class="galva" style="margin:0 0 12px"><p class="mazs" style="margin:0">No tabulas <a href="${esc(d.saite)}" target="_blank" rel="noopener">${esc(d.nos)} ↗</a>. Pasākuma "saņem": cik katram pienākas (mīnus = jāatdod).</p></div>
     <div class="rezgis r4" style="margin-bottom:16px">
       <div class="karte"><div class="etik">Ienākumi (pasākumi)</div><div class="cip" style="margin-top:8px">${eur(sum(p => p.ien))}</div></div>
       <div class="karte"><div class="etik">Peļņa (pasākumi)</div><div class="cip" style="margin-top:8px">${zime(sum(p => p.pel))}</div><div class="mazs" style="margin-top:6px">izdevumi ${eur(sum(p => p.izd))}</div></div>
@@ -1419,6 +1435,7 @@ $('#finTab').addEventListener('change', async e => {
 /* gājēdis izaugsme: darbu checklists (tabula "AI_gajedis_programma izaugsme") */
 let izDati = null, izKas = '', izStat = 'visi', izAtl = null; // izAtl: atlasīto darbu id (Set), kad ieslēgta atlase
 const sodIso = () => new Date().toLocaleDateString('sv-SE');
+const persK = v => /^tom/i.test(v) ? 'p-toms' : /^mark/i.test(v) ? 'p-markuss' : '';
 const izKamL = x => x.kam ? x.kam.split(/\s*,\s*/) : [];
 const izKav = x => !!(x.iso && x.statuss !== 'Izdarīts' && x.iso < sodIso());
 async function ieladetIz() {
@@ -1430,7 +1447,7 @@ document.querySelectorAll('#izKas button').forEach(b => b.onclick = () => { izKa
 document.querySelectorAll('#izStat button').forEach(b => b.onclick = () => { izStat = b.dataset.s; document.querySelectorAll('#izStat button').forEach(x => x.classList.toggle('ak', x === b)); izZimet(); });
 function izRinda(x) {
   const gat = x.statuss === 'Izdarīts', kav = izKav(x), atl = izAtl && izAtl.has(x.id);
-  return `<div class="izR${kav ? ' kav' : ''}${gat ? ' gat' : ''}${atl ? ' atl' : ''}" data-id="${esc(x.id)}">${izAtl ? `<input type="checkbox" class="izSel"${atl ? ' checked' : ''} aria-label="Atlasīt: ${esc(x.uzdevums)}">` : `<input type="checkbox"${gat ? ' checked' : ''} aria-label="Izdarīts: ${esc(x.uzdevums)}">`}<button type="button" class="izAtv"><b>${esc(x.uzdevums)}</b><span class="cipsi" style="margin-top:4px">${x.kam ? izKamL(x).map(k => `<span class="c">${esc(k)}</span>`).join('') : '<span class="c ne">nav piešķirts</span>'}${x.termins ? `<span class="c ${kav ? 'ne' : gat ? '' : 'br'}">${kav ? 'nokavēts · ' : 'līdz '}${esc(x.termins)}</span>` : ''}${x.statuss === 'Procesā' ? '<span class="c ok">procesā</span>' : ''}</span>${x.apraksts ? `<span class="mazs izApr">${esc(x.apraksts)}</span>` : ''}</button>${izAtl ? '' : `<button type="button" class="dz" data-dz title="Dzēst" aria-label="Dzēst: ${esc(x.uzdevums)}"><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M5.5 7l1 12.5a1.5 1.5 0 0 0 1.5 1.5h8a1.5 1.5 0 0 0 1.5-1.5l1-12.5"/><path d="M9 7V4.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V7"/></svg></button>`}</div>`;
+  return `<div class="izR${kav ? ' kav' : ''}${gat ? ' gat' : ''}${atl ? ' atl' : ''}" data-id="${esc(x.id)}">${izAtl ? `<input type="checkbox" class="izSel"${atl ? ' checked' : ''} aria-label="Atlasīt: ${esc(x.uzdevums)}">` : `<input type="checkbox"${gat ? ' checked' : ''} aria-label="Izdarīts: ${esc(x.uzdevums)}">`}<button type="button" class="izAtv"><b>${esc(x.uzdevums)}</b><span class="cipsi" style="margin-top:4px">${x.kam ? izKamL(x).map(k => `<span class="c ${persK(k)}">${esc(k)}</span>`).join('') : '<span class="c ne">nav piešķirts</span>'}${x.termins ? `<span class="c ${kav ? 'ne' : gat ? '' : 'br'}">${kav ? 'nokavēts · ' : 'līdz '}${esc(x.termins)}</span>` : ''}${x.statuss === 'Procesā' ? '<span class="c ok">procesā</span>' : ''}</span>${x.apraksts ? `<span class="mazs izApr">${esc(x.apraksts)}</span>` : ''}</button>${izAtl ? '' : `<button type="button" class="dz" data-dz title="Dzēst" aria-label="Dzēst: ${esc(x.uzdevums)}"><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M5.5 7l1 12.5a1.5 1.5 0 0 0 1.5 1.5h8a1.5 1.5 0 0 0 1.5-1.5l1-12.5"/><path d="M9 7V4.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V7"/></svg></button>`}</div>`;
 }
 /* atlase: vairākus darbus var atzīmēt kā izdarītus vai dzēst kopā */
 function izAtlase(on = !izAtl) {
