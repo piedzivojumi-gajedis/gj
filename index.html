@@ -999,9 +999,10 @@ async function ieladetSag() {
 function sagSarZimet() {
   // nākamie augšā (tuvākais pirmais), jau notikušie atsevišķā grupā zem tiem
   const nak = sagDati.filter(p => p.dienasLidz >= 0).length, virs = (i, t) => i === 0 && nak ? '<div class="pasMen">Nākamie</div>' : i === nak ? '<div class="pasMen">Jau notikuši</div>' : '';
-  sagDati = sagDati.filter(p => p.dienasLidz >= 0).concat(sagDati.filter(p => p.dienasLidz < 0).reverse());
-  $('#sagSar').innerHTML = sagDati.length ? sagDati.map((p, i) => virs(i) + `<button class="sagP${p.dienasLidz < 0 ? ' pag' : ''}${p.atslega === sagIzv ? ' ak' : ''}" data-i="${i}">${datk(p)}<span class="tx"><b>${esc(p.klients)}</b><span class="mazs">${kadPas(p.dienasLidz)} · ${p.izdarits}/${p.kopa}${p.kavets ? ' · <span class="c ne">kavējas</span>' : ''}${p.sapakots ? ' · <span class="c ok">sapakots</span>' : ''}</span>${sagProg(p.izdarits, p.kopa)}</span></button>`).join('') : '<p class="tukss">Nav pasākumu.</p>';
-  $('#sagSar').querySelectorAll('.sagP').forEach(b => b.onclick = () => { sagIzv = sagDati[+b.dataset.i].atslega; sagSarZimet(); sagIelade(sagIzv); });
+  // secība tikai attēlošanai (sagDati nemaina, citādi katrs klikšķis apgrieztu notikušos)
+  const ord = sagDati.filter(p => p.dienasLidz >= 0).concat(sagDati.filter(p => p.dienasLidz < 0).sort((a, b) => b.dienasLidz - a.dienasLidz));
+  $('#sagSar').innerHTML = ord.length ? ord.map((p, i) => virs(i) + `<button class="sagP${p.dienasLidz < 0 ? ' pag' : ''}${p.atslega === sagIzv ? ' ak' : ''}" data-i="${i}">${datk(p)}<span class="tx"><b>${esc(p.klients)}</b><span class="mazs">${kadPas(p.dienasLidz)} · ${p.izdarits}/${p.kopa}${p.kavets ? ' · <span class="c ne">kavējas</span>' : ''}${p.sapakots ? ' · <span class="c ok">sapakots</span>' : ''}</span>${sagProg(p.izdarits, p.kopa)}</span></button>`).join('') : '<p class="tukss">Nav pasākumu.</p>';
+  $('#sagSar').querySelectorAll('.sagP').forEach(b => b.onclick = () => { sagIzv = ord[+b.dataset.i].atslega; sagSarZimet(); sagIelade(sagIzv); });
 }
 async function sagAtvert(atslega) { sagIzv = atslega; iet('sagatavosanas'); if (sagDati.length) { sagSarZimet(); sagIelade(atslega); } }
 async function sagIelade(atslega) {
