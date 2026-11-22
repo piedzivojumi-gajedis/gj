@@ -440,7 +440,7 @@ svg.liniju path.blav{opacity:.15}
 
     <!-- PASĀKUMI -->
     <section class="sad" id="s-pasakumi">
-      <div class="galva"><div><h1>Pasākumi</h1><p>Visi pasākumi vienuviet (tabula "AI_gajedis_programma pasākumi") un kalendārs.</p></div><button class="poga zala" onclick="pasFormaRadit()">+ Jauns pasākums</button></div>
+      <div class="galva"><div><h1>Pasākumi</h1><p>Visi pasākumi vienuviet (tabula "AI_gajedis_programma pasākumi") un kalendārs.</p></div><button class="poga zala" id="pasJauns" onclick="pasFormaRadit()">+ Jauns pasākums</button></div>
       <div class="karte" id="pasForma" hidden style="margin-bottom:16px">
         <h2 class="v3">Jauns pasākums</h2>
         <p class="mazs" style="margin:0 0 14px">Jauna rinda tabulā pēc datuma, un kalendārā "Gājēdis - klients" ar ielūgumiem Markusam, Gustavam un Tomam.</p>
@@ -865,7 +865,7 @@ function pasAtvert(x) {
   const d = document.createElement('div'), kv = k => { const c = (x.kol || [])[k - 1]; return c ? String(c[1] ?? '') : ''; };
   const kom = (x.komandaL || x.komanda.map(v => ({vards: v, loma: ''}))).map(c => ({...c}));
   const lauks = (k, n, t) => { const v = kv(k); return t === 'gars' ? `<label class="pilns">${n}<textarea data-k="${k}" rows="3">${esc(v)}</textarea></label>` : t === 'date' ? `<label>${n}<input type="date" data-k="${k}" value="${isoD(v)}"></label>` : `<label>${n}<input data-k="${k}" value="${esc(v)}"></label>`; };
-  const atzHtml = a => { const pz = (x.piez || {})[a.s] || ''; return `<div class="pasAtz" data-s="${a.s}"><label class="rut"><input type="checkbox" data-k="${a.k}"${x.statuss[a.s] ? ' checked' : ''}><span>${esc(a.n)}</span></label><button type="button" class="poga gaisa maza ikP" data-kom="${a.k}" aria-label="Komentārs: ${esc(a.n)}" title="Komentārs">${IK_KOM}</button>${pz ? `<div class="komT">${esc(pz)}</div>` : ''}</div>`; };
+  const atzHtml = a => { const pz = (x.piez || {})[a.s] || ''; return `<div class="pasAtz" data-s="${a.s}"><label class="rut"><input type="checkbox" data-k="${a.k}"${x.statuss[a.s] ? ' checked' : ''}${LOMA.loma === 'komanda' ? ' disabled' : ''}><span>${esc(a.n)}</span></label><button type="button" class="poga gaisa maza ikP"${LOMA.loma === 'komanda' ? ' hidden' : ''} data-kom="${a.k}" aria-label="Komentārs: ${esc(a.n)}" title="Komentārs">${IK_KOM}</button>${pz ? `<div class="komT">${esc(pz)}</div>` : ''}</div>`; };
   d.className = 'modal';
   d.innerHTML = `<div class="karte plata pasK" role="dialog" aria-modal="true" aria-labelledby="pmV"><div class="galva" style="margin:0 0 4px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="pmV">${esc(x.klients)}</h2><p data-apak>${esc(pasApak(x))}</p></div><button class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div>
     <form class="pasLab">
@@ -1991,6 +1991,7 @@ function saktUI(L) {
   $('#splash').hidden = true;
   document.querySelector('.app').hidden = false;
   document.querySelectorAll('#nav button').forEach(b => b.hidden = !LOMA.sadalas.includes(b.dataset.s));
+  $('#pasJauns').hidden = LOMA.loma === 'komanda';
   const toms = LOMA.loma === 'toms';
   document.querySelectorAll('.catpoga,.augsaCats,#cats,.tomam').forEach(e => e.hidden = !toms);
   $('#sabPoga').hidden = LOMA.loma === 'komanda';
