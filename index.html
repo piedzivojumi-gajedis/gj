@@ -516,7 +516,7 @@ svg.liniju path.blav{opacity:.15}
         <form class="clJauns" id="janForma" style="margin:0 0 10px" onsubmit="return janPievienot(event)"><input placeholder="Ko vajag nopirkt?" aria-label="Ko vajag nopirkt" required><button class="poga zala">Pievienot</button></form>
         <div id="janSar" class="ielade">Ielādē…</div>
       </div>
-      <div class="karte" style="margin-top:16px"><h2 class="v3">Nopirkts</h2><div id="janNop"></div></div>
+      <div class="karte" style="margin-top:16px"><div class="galva" style="margin:0 0 6px"><h2 class="v3" style="margin:0">Nopirkts</h2><button type="button" class="poga gaisa maza" id="janDzVisus" hidden onclick="janDzestNopirktos()">Dzēst visus nopirktos</button></div><div id="janNop"></div></div>
     </section>
 
     <!-- FINANSES -->
@@ -1291,9 +1291,16 @@ const janKad = x => x.kad.split(' ')[0].split('.').reverse().join('');
 function janZimet() {
   const ne = janDati.punkti.filter(x => !x.izdarits), ir = janDati.punkti.filter(x => x.izdarits).sort((a, b) => janKad(b).localeCompare(janKad(a))).slice(0, 30);
   $('#janSar').className = '';
-  $('#janSar').innerHTML = ne.length ? ne.map(janRinda).join('') : '<p class="tukss">Viss nopirkts. 🎉</p>';
+  $('#janSar').innerHTML = ne.length ? ne.map(janRinda).join('') : '<p class="tukss">Viss nopirkts.</p>';
   $('#janNop').innerHTML = ir.length ? ir.map(janRinda).join('') : '<p class="tukss">Vēl nekas nav atzīmēts.</p>';
+  $('#janDzVisus').hidden = !janDati.punkti.some(x => x.izdarits);
   janSkaits(ne.length);
+}
+async function janDzestNopirktos() {
+  const ir = janDati.punkti.filter(x => x.izdarits);
+  if (!ir.length || !confirm(`Dzēst visus nopirktos (${ir.length})?`)) return;
+  janDati.punkti = janDati.punkti.filter(x => !x.izdarits); janZimet();
+  try { await run('gjJanoperkDzestNopirktos'); delete ielad.sagatavosanas; } catch (k) { alertZ(k.message); ieladetJan(); }
 }
 async function janPievienot(e) {
   e.preventDefault();
