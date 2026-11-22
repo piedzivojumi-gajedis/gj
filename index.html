@@ -227,6 +227,8 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 .c.p-toms{background:var(--toms-gaiss);color:var(--toms-tumss)}.c.p-markuss{background:var(--markuss-gaiss);color:var(--markuss-tumss)}
 .persP{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}.persP.p-toms{background:var(--toms)}.persP.p-markuss{background:var(--markuss)}
 .persZ{display:inline-block;font:700 12px var(--f-ui);padding:3px 10px;border-radius:var(--r-pill)}.persZ.p-toms{background:var(--toms-gaiss);color:var(--toms-tumss)}.persZ.p-markuss{background:var(--markuss-gaiss);color:var(--markuss-tumss)}
+.galvT .tab{font-size:13.5px}.galvT tr.izcelt td{background:var(--dzeltens-gaiss);font-weight:600}.galvT tr.kopa td{font-weight:700;border-top:2px solid var(--linija)}
+.galvT tr.parads td{font-weight:700;font-size:15px;background:var(--virsma-neitr)}.galvT tr.parads td.sum{background:var(--mezs-gaiss);color:var(--mezs)}
 .bilP{border-radius:var(--r-m);padding:var(--s3);background:var(--virsma-neitr);min-width:0}
 .izJosla{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);padding:var(--s2) 0 var(--s3);border-bottom:1px solid var(--linija-viegla);margin-bottom:var(--s1)}
 .izJosla .cb{flex-direction:row;align-items:center;gap:6px;font:600 13.5px var(--f-ui)}.izJosla .cb input{width:18px;height:18px;padding:0;accent-color:var(--mezs)}
@@ -518,8 +520,8 @@ svg.liniju path.blav{opacity:.15}
 
     <!-- FINANSES -->
     <section class="sad" id="s-finanses">
-      <div class="galva"><div><h1>Finanses</h1><p>Ienākumi no rēķiniem, izdevumi un kurš par ko samaksājis (arī privāti), lai zinām, kam kas jāatmaksā.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="finSaite" target="_blank" hidden>Tabula ↗</a><button class="poga zala" onclick="finForma()">+ Jauns ieraksts</button></div></div>
-      <div class="rezgis r3" id="finKops" style="margin-bottom:16px"><div class="karte ielade">Ielādē…</div></div>
+      <div class="galva"><div><h1>Finanses</h1><p>Toma un Markusa savstarpējās finanses: kurš ir plusā, kas jāatmaksā, kurš par ko samaksājis. Rēķinu kopsavilkums ir sadaļā Rēķini.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="finSaite" target="_blank" hidden>Tabula ↗</a><button class="poga zala" onclick="finForma()">+ Jauns ieraksts</button></div></div>
+      <div class="rezgis r2" id="finKops" style="margin-bottom:16px"><div class="karte ielade">Ielādē…</div></div>
       <div class="karte" id="finFormaK" hidden style="margin-bottom:16px">
         <h2 class="v3" id="finFV">Jauns ieraksts</h2>
         <form id="fFin" onsubmit="return finSaglabat(event)"><input type="hidden" name="id">
@@ -538,7 +540,7 @@ svg.liniju path.blav{opacity:.15}
           <div class="rinda"><button class="poga zala">Saglabāt</button><button type="button" class="poga gaisa" onclick="$('#finFormaK').hidden=true">Atcelt</button></div><div class="zinja" id="finZ"></div>
         </form>
       </div>
-      <div class="karte"><div class="rinda" style="margin:0 0 10px"><div class="tabs" id="finFiltrs"><button data-f="visi" class="ak">Izdevumi</button><button data-f="jaatm">Jāatmaksā</button><button data-f="Toms">Toms</button><button data-f="Markuss">Markuss</button><button data-f="Uzņēmums">Uzņēmums</button><button data-f="ien">Ienākumi (rēķini)</button><button data-f="men">Pa mēnešiem</button><button data-f="kop">Toms un Markuss</button></div><input id="finMekl" type="search" placeholder="Meklēt…" aria-label="Meklēt" style="flex:1;min-width:160px;max-width:280px;margin-left:auto" oninput="finZimet()"></div><div id="finTab" class="ielade">Ielādē…</div></div>
+      <div class="karte"><div class="rinda" style="margin:0 0 10px"><div class="tabs" id="finFiltrs"><button data-f="kop" class="ak">Toms un Markuss</button><button data-f="visi">Izdevumi</button><button data-f="jaatm">Jāatmaksā</button><button data-f="Toms">Toms</button><button data-f="Markuss">Markuss</button><button data-f="Uzņēmums">Uzņēmums</button></div><input id="finMekl" type="search" placeholder="Meklēt…" aria-label="Meklēt" style="flex:1;min-width:160px;max-width:280px;margin-left:auto" oninput="finZimet()"></div><div id="finTab" class="ielade">Ielādē…</div></div>
     </section>
 
     <!-- GĀJĒDIS IZAUGSME -->
@@ -573,6 +575,7 @@ svg.liniju path.blav{opacity:.15}
           <div class="zinja" id="rekZ"></div>
         </form>
       </div>
+      <div class="rezgis r3" id="rekKops" style="margin-bottom:16px"></div>
       <div class="karte"><div id="rekTab" class="ielade">Ielādē…</div></div>
     </section>
 
@@ -1318,7 +1321,7 @@ document.querySelector('#s-janoperk').addEventListener('click', async e => {
 });
 
 /* finanses: kurš par ko samaksājis */
-let finDati = null, finFiltrs = 'visi';
+let finDati = null, finFiltrs = 'kop';
 const eur = n => (Math.round(n * 100) / 100).toLocaleString('lv-LV', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
 const finDat = x => x.datums.split('.').reverse().join('');
 async function ieladetFin() {
@@ -1329,33 +1332,15 @@ async function ieladetFin() {
 }
 document.querySelectorAll('#finFiltrs button').forEach(b => b.onclick = () => { finFiltrs = b.dataset.f; document.querySelectorAll('#finFiltrs button').forEach(x => x.classList.toggle('ak', x === b)); finZimet(); });
 const finJaatm = x => x.ka === 'privāti' && x.kas !== 'Uzņēmums';
-const finMen = x => { const p = x.datums.split('.'); return p[2] + '-' + p[1]; };
-const rekMen = r => { const m = String(r.pasakums).match(/(\d{1,2})\.(\d{1,2})/), g = '20' + (String(r.nr).split('-')[1] || String(new Date().getFullYear()).slice(2)); return m ? g + '-' + m[2].padStart(2, '0') : ''; };
 function finZimet() {
-  const v = finDati.ieraksti, rek = finDati.rekini || [], gads = String(new Date().getFullYear()), g2 = gads.slice(2);
-  const ienG = rek.filter(r => String(r.nr).endsWith('-' + g2)), izdG = v.filter(x => x.datums.endsWith(gads));
-  const ien = ienG.reduce((a, r) => a + r.summa, 0), izd = izdG.reduce((a, x) => a + x.summa, 0), neapm = rek.filter(r => !r.apmaksats);
+  const v = finDati.ieraksti;
   const karte = (e, c, apr, kr) => `<div class="karte"><div class="etik">${e}</div><div class="cip" style="margin-top:8px${kr ? ';color:' + kr : ''}">${c}</div><div class="mazs" style="margin-top:6px">${apr}</div></div>`;
-  $('#finKops').innerHTML = karte('Ienākumi ' + gads, eur(ien), `${ienG.length} rēķini, bez PVN`) + karte('Izdevumi ' + gads, eur(izd), `${izdG.length} ieraksti`) +
-    karte('Starpība ' + gads, eur(ien - izd), 'ienākumi mīnus izdevumi', ien - izd < 0 ? 'var(--ugunskurs)' : 'var(--mezs)') +
-    karte('Neapmaksāti rēķini', eur(neapm.reduce((a, r) => a + r.kopa, 0)), `${neapm.length} rēķini${neapm.filter(r => r.kavets).length ? ', ' + neapm.filter(r => r.kavets).length + ' kavēti' : ''} (ar PVN)`, neapm.length ? 'var(--ugunskurs)' : '') +
+  // finansēs tikai Toma un Markusa savstarpējais (rēķinu kopsavilkums ir sadaļā Rēķini)
+  $('#finKops').innerHTML = 
     ['Toms', 'Markuss'].map(k => { const p = v.filter(x => x.kas === k && finJaatm(x)), jaatm = p.filter(x => !x.atmaksats).reduce((a, x) => a + x.summa, 0); return karte(k + ': jāatmaksā', eur(jaatm), 'Privāti samaksāts kopā ' + eur(p.reduce((a, x) => a + x.summa, 0)), jaatm ? 'var(--ugunskurs)' : 'var(--mezs)'); }).join('');
   const q = $('#finMekl').value.trim().toLowerCase();
   $('#finTab').className = '';
-  if (finFiltrs === 'ien') {
-    const s = rek.filter(r => !q || Object.values(r).join(' ').toLowerCase().includes(q)).slice().reverse();
-    $('#finTab').innerHTML = s.length ? `<table class="tab fin"><tr><th>Nr.</th><th>Klients</th><th>Pasākums</th><th style="text-align:right">Bez PVN</th><th style="text-align:right">Ar PVN</th><th>Statuss</th></tr>${s.map(r => `<tr><td data-l="Nr."><b>${esc(r.nr)}</b></td><td data-l="Klients">${esc(r.klients)}</td><td data-l="Pasākums">${esc(r.pasakums)}<div class="mazs">${esc(r.detalas)}</div></td><td class="sum" data-l="Bez PVN">${eur(r.summa)}</td><td class="sum" data-l="Ar PVN"><b>${eur(r.kopa)}</b></td><td data-l="Statuss">${r.apmaksats ? '<span class="c ok">apmaksāts</span>' : `<span class="c ${r.kavets ? 'ne' : 'br'}">${r.kavets ? 'kavēts' : 'gaida'} · ${esc(r.ddl)}</span>`}</td></tr>`).join('')}</table>` : `<p class="tukss">${esc(finDati.rekKluda || 'Rēķinu nav.')}</p>`;
-    return;
-  }
   if (finFiltrs === 'kop') return kopZimet();
-  if (finFiltrs === 'men') {
-    const m = {};
-    rek.forEach(r => { const k = rekMen(r) || 'bez datuma'; (m[k] = m[k] || {i: 0, z: 0}).i += r.summa; });
-    v.forEach(x => { const k = finMen(x); (m[k] = m[k] || {i: 0, z: 0}).z += x.summa; });
-    const k = Object.keys(m).sort().reverse();
-    $('#finTab').innerHTML = k.length ? `<table class="tab fin"><tr><th>Mēnesis</th><th style="text-align:right">Ienākumi</th><th style="text-align:right">Izdevumi</th><th style="text-align:right">Starpība</th></tr>${k.map(x => `<tr><td data-l="Mēnesis"><b>${x === 'bez datuma' ? x : MEN[+x.slice(5) - 1] + ' ' + x.slice(0, 4)}</b></td><td class="sum" data-l="Ienākumi">${eur(m[x].i)}</td><td class="sum" data-l="Izdevumi">${eur(m[x].z)}</td><td class="sum" data-l="Starpība" style="color:${m[x].i - m[x].z < 0 ? 'var(--ugunskurs)' : 'var(--mezs)'}"><b>${eur(m[x].i - m[x].z)}</b></td></tr>`).join('')}</table><p class="mazs" style="margin:10px 0 0">Ienākumi bez PVN pēc pasākuma datuma rēķinā; izdevumi pēc ieraksta datuma.</p>` : '<p class="tukss">Nav datu.</p>';
-    return;
-  }
   const s = v.filter(x => (finFiltrs === 'visi' || (finFiltrs === 'jaatm' ? finJaatm(x) && !x.atmaksats : x.kas === finFiltrs)) && (!q || Object.values(x).join(' ').toLowerCase().includes(q)))
     .sort((a, b) => finDat(b).localeCompare(finDat(a)));
   $('#finTab').innerHTML = s.length ? `<table class="tab fin"><tr><th>Datums</th><th>Kas</th><th>Par ko</th><th style="text-align:right">Summa</th><th>Kā</th><th>Atmaksāts</th><th></th></tr>${s.map(x => `<tr data-id="${esc(x.id)}"><td data-l="Datums">${esc(x.datums)}</td><td data-l="Kas"><b>${esc(x.kas)}</b></td><td data-l="Par ko">${esc(x.par)}${x.kategorija || x.pasakums ? `<div class="mazs">${esc([x.kategorija, x.pasakums].filter(Boolean).join(' · '))}</div>` : ''}${x.piezimes ? `<div class="mazs">${esc(x.piezimes)}</div>` : ''}</td><td class="sum" data-l="Summa"><b>${eur(x.summa)}</b></td><td data-l="Kā">${esc(x.ka)}</td><td data-l="Atmaksāts">${finJaatm(x) ? `<label style="flex-direction:row;align-items:center;gap:6px;font-weight:500"><input type="checkbox" data-atm style="width:auto"${x.atmaksats ? ' checked' : ''}>${x.atmaksats ? 'jā' : 'nē'}</label>` : '<span class="mazs">–</span>'}</td><td><div class="rinda" style="margin:0;flex-wrap:nowrap"><button class="poga gaisa maza" data-lab>Labot</button><button class="poga gaisa maza" data-dz>Dzēst</button></div></td></tr>`).join('')}</table>` : `<p class="tukss">${v.length ? 'Nekas nav atrasts.' : 'Vēl nav neviena ieraksta. Spied "+ Jauns ieraksts".'}</p>`;
@@ -1371,7 +1356,13 @@ async function kopZimet() {
   }
   const d = kopDati, P = d.pasakumi, sum = f => P.reduce((a, p) => a + f(p), 0), zime = n => `<span style="color:${n < 0 ? 'var(--ugunskurs)' : 'var(--mezs)'}">${eur(n)}</span>`;
   const sanT = sum(p => p.sanem.Toms || 0), sanM = sum(p => p.sanem.Markuss || 0);
-  const bloks = (vards, r) => { const izm = r.reduce((a, x) => a + x[1], 0), atm = r.reduce((a, x) => a + x[2], 0); return `<div class="karte"><h2 class="v3">${vards}</h2><div class="rezgis r2" style="margin-bottom:10px"><div><div class="etik">Izmaksas</div><div class="cip" style="font-size:22px">${eur(izm)}</div></div><div><div class="etik">Atmaksāts</div><div class="cip" style="font-size:22px">${eur(atm)}</div></div></div><details class="izIzd"><summary>Visi ieraksti (${r.length})</summary><table class="tab fin vienk"><tr><th>Nosaukums</th><th style="text-align:right">Izmaksas</th><th style="text-align:right">Atmaksāts</th></tr>${r.map(x => `<tr><td>${esc(x[0])}</td><td class="sum">${x[1] ? eur(x[1]) : ''}</td><td class="sum">${x[2] ? eur(x[2]) : ''}</td></tr>`).join('')}</table></details></div>`; };
+  // tāpat kā lapā Galvenais: visi ieraksti, kopsummas, Gājēža parāds un rindas aiz tā
+  const galv = (vards, r, k) => { const izm = r.reduce((a, x) => a + x[1], 0), atm = r.reduce((a, x) => a + x[2], 0), par = (d.parads || {})[k];
+    return `<div class="karte galvT"><h2 class="v3"><span class="persZ p-${k}">${vards}</span></h2><table class="tab vienk"><tr><th>Nosaukums</th><th style="text-align:right">Izmaksas</th><th style="text-align:right">Atmaksāts</th></tr>
+      ${r.map(x => `<tr${/^no pasākumiem/i.test(x[0]) ? ' class="izcelt"' : ''}><td>${esc(x[0])}</td><td class="sum">${x[1] ? eur(x[1]) : ''}</td><td class="sum">${x[2] ? eur(x[2]) : ''}</td></tr>`).join('')}
+      <tr class="kopa"><td>Kopā</td><td class="sum">${eur(izm)}</td><td class="sum">${eur(atm)}</td></tr>
+      ${par !== undefined ? `<tr class="parads"><td>Gājēža parāds</td><td></td><td class="sum">${eur(par)}</td></tr>` : ''}
+      ${((d.beigas || {})[k] || []).map(x => `<tr><td>${esc(x[0])}</td><td></td><td class="sum">${esc(x[1])}</td></tr>`).join('')}</table></div>`; };
   // bilance = izmaksāts no savas kabatas − saņemts no Gājēža; plus = Gājēdis viņam parādā, mīnus = paņēmis vairāk
   const bil = r => r.filter(x => !/^(gājēža parāds|ieguldīts|dabūts)/i.test(x[0])).reduce((a, x) => a + x[1] - x[2], 0), bT = bil(d.toms), bM = bil(d.markuss), star = Math.abs(bT - bM);
   const bilK = (v, b, kl) => `<div class="bilP ${kl}"><span class="persZ ${kl}">${v}</span><div class="cip" style="margin-top:6px">${zime(b)}</div><div class="mazs">${b >= 0 ? 'plusā: Gājēdis viņam parādā' : 'mīnusā: paņēmis vairāk, nekā ielicis'}</div></div>`;
@@ -1387,11 +1378,11 @@ async function kopZimet() {
       <div class="karte"><div class="etik">Toms saņem</div><div class="cip" style="margin-top:8px">${zime(sanT)}</div></div>
       <div class="karte"><div class="etik">Markuss saņem</div><div class="cip" style="margin-top:8px">${zime(sanM)}</div></div>
     </div>
+    <div class="rezgis r2" style="margin-bottom:16px">${galv('Toms', d.toms, 'toms')}${galv('Markuss', d.markuss, 'markuss')}</div>
     <h2 class="v3">Pa pasākumiem</h2>
     <table class="tab fin"><tr><th>Pasākums</th><th style="text-align:right">Ienākumi</th><th style="text-align:right">Izdevumi</th><th style="text-align:right">Peļņa</th><th style="text-align:right">Toms saņem</th><th style="text-align:right">Markuss saņem</th></tr>
       ${P.slice().reverse().map(p => `<tr><td data-l="Pasākums"><b>${esc(p.nos.replace(/_/g, ' '))}</b></td><td class="sum" data-l="Ienākumi">${eur(p.ien)}</td><td class="sum" data-l="Izdevumi">${eur(p.izd)}</td><td class="sum" data-l="Peļņa"><b>${zime(p.pel)}</b></td><td class="sum" data-l="Toms saņem">${zime(p.sanem.Toms || 0)}</td><td class="sum" data-l="Markuss saņem">${zime(p.sanem.Markuss || 0)}</td></tr>`).join('')}
       <tr><td data-l="Kopā"><b>Kopā</b></td><td class="sum" data-l="Ienākumi"><b>${eur(sum(p => p.ien))}</b></td><td class="sum" data-l="Izdevumi"><b>${eur(sum(p => p.izd))}</b></td><td class="sum" data-l="Peļņa"><b>${zime(sum(p => p.pel))}</b></td><td class="sum" data-l="Toms saņem"><b>${zime(sanT)}</b></td><td class="sum" data-l="Markuss saņem"><b>${zime(sanM)}</b></td></tr></table>
-    <div class="rezgis r2" style="margin-top:16px">${bloks('Toms', d.toms)}${bloks('Markuss', d.markuss)}</div>
     <div class="rezgis r2" style="margin-top:16px">
       <div class="karte"><h2 class="v3">Vidēji un kopā</h2><table class="tab vienk"><tr><th></th><th style="text-align:right">Ar PVN</th><th style="text-align:right">Bez PVN</th></tr>${d.videji.map(x => `<tr><td>${esc(x[0])}</td><td class="sum">${esc(x[1])}</td><td class="sum">${esc(x[2])}</td></tr>`).join('')}</table></div>
       <div class="karte"><h2 class="v3">Uz rokas un cash</h2>${d.rokas.length ? `<table class="tab vienk">${d.rokas.map(x => `<tr><td>${esc(x[0])}</td><td class="sum">${eur(x[1])}</td></tr>`).join('')}</table>` : '<p class="mazs">Nav datu.</p>'}
@@ -1554,9 +1545,20 @@ async function rekIzrakstit() {
     $('#fRek').reset(); ieladetRek();
   } catch (x) { zinja('#rekZ', esc(x.message), 'kl'); }
 }
+/* izrakstīto rēķinu kopsavilkums: šis gads (pēc Nr. beigām -GG) */
+const naudaN = t => { let s = String(t || '').replace(/[€\s\u00a0]/g, ''); const k = Math.max(s.lastIndexOf(','), s.lastIndexOf('.')); s = k >= 0 && s.length - k - 1 !== 3 ? s.slice(0, k).replace(/[.,]/g, '') + '.' + s.slice(k + 1) : s.replace(/[.,]/g, ''); return parseFloat(s) || 0; };
+function rekKopsZimet(r) {
+  const g = String(new Date().getFullYear()), g2 = g.slice(2), sg = r.filter(x => String(x.nr).endsWith('-' + g2));
+  const sum = (a, k) => a.reduce((s, x) => s + (k === 'cena' && !naudaN(x.cena) ? naudaN(x.kopa) / 1.21 : naudaN(x[k])), 0), ne = sg.filter(x => !x.apmaksats), kav = ne.filter(x => x.kavets);
+  const k = (e, c, apr, kr) => `<div class="karte"><div class="etik">${e}</div><div class="cip" style="margin-top:8px${kr ? ';color:' + kr : ''}">${c}</div><div class="mazs" style="margin-top:6px">${apr}</div></div>`;
+  $('#rekKops').innerHTML = k('Izrakstīts ' + g, eur(sum(sg, 'cena')), `${sg.length} rēķini, bez PVN · ar PVN ${eur(sum(sg, 'kopa'))}`)
+    + k('Apmaksāts', eur(sum(sg.filter(x => x.apmaksats), 'kopa')), `${sg.length - ne.length} rēķini, ar PVN`, 'var(--mezs)')
+    + k('Neapmaksāts', eur(sum(ne, 'kopa')), `${ne.length} rēķini${kav.length ? ', ' + kav.length + ' kavēti' : ''} (ar PVN)`, ne.length ? 'var(--ugunskurs)' : 'var(--mezs)');
+}
 async function ieladetRek() {
   try {
     await kesh('gjRekini', [], r => {
+    rekKopsZimet(r);
     $('#rekTab').className = '';
     $('#rekTab').innerHTML = `<table class="tab rekT"><tr><th>Nr.</th><th>Klients</th><th>Kopā</th><th>Pasākums</th><th>DDL</th><th>Statuss</th></tr>${r.map(x => `<tr data-nr="${esc(x.nr)}" tabindex="0" title="Atvērt PDF"><td data-l="Nr."><b>${esc(x.nr)}</b></td><td data-l="Klients">${esc(x.klients)}<div class="mazs">${esc(x.kontakts)}</div></td><td data-l="Kopā">${esc(x.kopa)}</td><td data-l="Pasākums">${esc(x.pasakums)}<div class="mazs">${esc(x.detalas)}</div></td><td data-l="Termiņš">${esc(x.ddl)}</td><td data-l="Statuss">${x.apmaksats ? '<span class="c ok">✓ apmaksāts</span>' : `<span class="c ${x.kavets ? 'ne' : 'br'}">${x.kavets ? 'kavēts' : 'gaida'}</span> <button class="poga gaisa maza" onclick="rekApm(${x.rinda},this)">Apmaksāts</button>`}</td></tr>`).join('')}</table>`; });
   } catch (x) { $('#rekTab').innerHTML = `<p class="zinja kl">${esc(x.message)}</p>`; }
