@@ -199,6 +199,7 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 .vieta{background:var(--virsma-neitr);border-radius:var(--r-m);padding:var(--s3);font-size:14px;overflow-wrap:anywhere;min-width:0}.vieta .etik{display:block;margin-bottom:2px}
 .komJauns{display:flex;gap:var(--s2);margin-top:var(--s2)}.komJauns input{padding:7px 10px;font-size:14px;min-width:0;flex:1}
 .pasR .tx{flex:1;min-width:0}.pasR.pag{opacity:.7}
+.sagP.pag .datkaste{background:var(--virsma-neitr);color:var(--pelēks)}.sagP.pag .datkaste span{color:var(--pelēks)}
 .pasR.tuv .datkaste,.pasLeg .tuv i{background:var(--dzeltens-gaiss);color:var(--c-zelts-9)}.pasR.tuv .datkaste span{color:var(--c-zelts-9)}
 .pasR.tal .datkaste,.pasLeg .tal i{background:var(--mezs-gaiss)}
 .pasR.pag .datkaste,.pasLeg .pag i{background:var(--virsma-neitr);color:var(--pelēks)}.pasR.pag .datkaste span{color:var(--pelēks)}
@@ -996,7 +997,10 @@ async function ieladetSag() {
   } catch (x) { $('#sagSar').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
 }
 function sagSarZimet() {
-  $('#sagSar').innerHTML = sagDati.length ? sagDati.map((p, i) => `<button class="sagP${p.atslega === sagIzv ? ' ak' : ''}" data-i="${i}">${datk(p)}<span class="tx"><b>${esc(p.klients)}</b><span class="mazs">${kadPas(p.dienasLidz)} · ${p.izdarits}/${p.kopa}${p.kavets ? ' · <span class="c ne">kavējas</span>' : ''}${p.sapakots ? ' · <span class="c ok">sapakots</span>' : ''}</span>${sagProg(p.izdarits, p.kopa)}</span></button>`).join('') : '<p class="tukss">Nav pasākumu.</p>';
+  // nākamie augšā (tuvākais pirmais), jau notikušie atsevišķā grupā zem tiem
+  const nak = sagDati.filter(p => p.dienasLidz >= 0).length, virs = (i, t) => i === 0 && nak ? '<div class="pasMen">Nākamie</div>' : i === nak ? '<div class="pasMen">Jau notikuši</div>' : '';
+  sagDati = sagDati.filter(p => p.dienasLidz >= 0).concat(sagDati.filter(p => p.dienasLidz < 0).reverse());
+  $('#sagSar').innerHTML = sagDati.length ? sagDati.map((p, i) => virs(i) + `<button class="sagP${p.dienasLidz < 0 ? ' pag' : ''}${p.atslega === sagIzv ? ' ak' : ''}" data-i="${i}">${datk(p)}<span class="tx"><b>${esc(p.klients)}</b><span class="mazs">${kadPas(p.dienasLidz)} · ${p.izdarits}/${p.kopa}${p.kavets ? ' · <span class="c ne">kavējas</span>' : ''}${p.sapakots ? ' · <span class="c ok">sapakots</span>' : ''}</span>${sagProg(p.izdarits, p.kopa)}</span></button>`).join('') : '<p class="tukss">Nav pasākumu.</p>';
   $('#sagSar').querySelectorAll('.sagP').forEach(b => b.onclick = () => { sagIzv = sagDati[+b.dataset.i].atslega; sagSarZimet(); sagIelade(sagIzv); });
 }
 async function sagAtvert(atslega) { sagIzv = atslega; iet('sagatavosanas'); if (sagDati.length) { sagSarZimet(); sagIelade(atslega); } }
