@@ -2034,7 +2034,6 @@ setInterval(() => parbauditIzmainas(false), 15000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) parbauditIzmainas(Date.now() - atjLaiks > 30000); });
 
 function pieteikties(nederigs) {
-  if (window.gjSavienojums) return window.gjSavienojums(); // Mac lietotnē kods ir savienojuma iestatījumos
   document.querySelector('.app').hidden = true; $('#splash').hidden = true;
   let loma = ''; try { loma = localStorage.getItem('gjLoma') || ''; } catch (x) {}
   const d = document.createElement('div');
@@ -2044,12 +2043,12 @@ function pieteikties(nederigs) {
     <label style="margin-top:14px">PIN (4 cipari)<input name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="current-password" style="text-align:center;font-size:24px;letter-spacing:12px"></label></div>
     <div class="kodaDala" hidden><p class="mazs" style="text-align:center">Ievadi garo piekļuves kodu.</p><label>Piekļuves kods<input name="kods" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX"></label></div>
     <div class="rinda"><button class="poga zala" style="flex:1;justify-content:center">Ienākt</button></div><div class="zinja${nederigs ? ' kl' : ''}">${nederigs ? 'Pieteikšanās beigusies, ienāc vēlreiz.' : ''}</div>
-    <p class="mazs" style="text-align:center;margin:10px 0 0"><a href="#" class="pinMaina">Man ir garais kods</a></p></form>`;
+</form>`;
   document.body.append(d);
   const f = d.querySelector('form'), z = f.querySelector('.zinja'), pin = f.pin;
   let arKodu = false;
   f.querySelectorAll('#pinKas button').forEach(b => b.onclick = () => { loma = b.dataset.l; f.querySelectorAll('#pinKas button').forEach(x => x.classList.toggle('ak', x === b)); pin.focus(); });
-  f.querySelector('.pinMaina').onclick = e => { e.preventDefault(); arKodu = !arKodu; f.querySelector('.pinDala').hidden = arKodu; f.querySelector('.kodaDala').hidden = !arKodu; e.target.textContent = arKodu ? 'Ienākt ar PIN' : 'Man ir garais kods'; (arKodu ? f.kods : pin).focus(); };
+  // ienāk tikai ar vārdu un PIN (garā koda ievade noņemta)
   pin.oninput = () => { pin.value = pin.value.replace(/\D/g, '').slice(0, 4); if (pin.value.length === 4 && loma) f.requestSubmit(); };
   (loma ? pin : f.querySelector('#pinKas button')).focus();
   const ienakt = k => { gjKods = k; try { localStorage.setItem('gjKods', k); if (loma) localStorage.setItem('gjLoma', loma); } catch (x) {} d.remove(); sakt(); };
