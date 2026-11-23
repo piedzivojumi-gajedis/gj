@@ -277,7 +277,7 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 .vadCipsi{display:flex;flex-wrap:wrap;gap:var(--s2)}.vadCipsi .vieta{padding:var(--s2) var(--s3);flex:1 1 140px}
 .vadVar{display:grid;gap:6px}.vadVp{display:flex;flex-wrap:wrap;gap:var(--s2)}
 .vadVp .poga{display:inline-flex;align-items:center;gap:8px;min-width:0;white-space:normal;text-align:left}
-.vadVp .ik,.zinaK .ik,.vadKl .ik{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.vadVp .ik,.zinaK .ik,.vadKl .ik,[data-saite] .ik{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 .vadKl{background:var(--virsma-neitr);border-radius:var(--r-m);padding:var(--s3);font-size:14.5px;white-space:pre-wrap;overflow-wrap:anywhere}.vadKl .etik{display:block;margin-bottom:4px;white-space:normal}
 .vadPTabs{margin:var(--s5) 0 var(--s2)}.vadPan .apr{white-space:pre-wrap;font-size:14.5px;overflow-wrap:anywhere}
 .zinaK .zt{white-space:pre-wrap;font-size:14.5px;overflow-wrap:anywhere;margin:var(--s2) 0 0;max-height:260px;overflow:auto}
@@ -800,13 +800,39 @@ let ielad = {}, kluss = false;
 
 /* navigācija */
 const IEL = {janoperk: ieladetJan, finanses: ieladetFin, izaugsme: ieladetIz, pasakumi: ieladetPas, sagatavosanas: ieladetSag, vaditajiem: ieladetVad, rekini: ieladetRek, epasti: ieladetEp, marketings: ieladetMark, kopsavilkums: () => ieladetKops(false), apmeklejums: () => ieladetApm(false), agenti: zimetKarti, sagataves: ieladetZin, noteikumi: ieladetNot, iestatijumi: ieladetIest};
-/* katrai sadaļai sava saite (#sadala): var nosūtīt, un pārlādējot paliek tajā pašā sadaļā */
+/* katrai sadaļai sava saite (#sadala): var nosūtīt, un pārlādējot paliek tajā pašā sadaļā;
+   atvērtam pasākumam #sadala/atslēga (Pasākumi, Vadītājiem), logs atveras, kad dati ielādēti */
 const GAS_VEST = !!(window.google && google.script && google.script.history);
-let urlSad = decodeURIComponent((location.hash || '').slice(1));
+const WEB_SAITE = 'https://piedzivojumi-gajedis.github.io/gj/#';
+const urlDal = h => { const i = h.indexOf('/'), dec = t => { try { return decodeURIComponent(t); } catch (x) { return t; } }; return i < 0 ? [h, ''] : [h.slice(0, i), dec(h.slice(i + 1))]; };
+let urlSad = (location.hash || '').slice(1), urlAtv = null;
+function urlIet(h) {
+  const [s, a] = urlDal(h); if (!s || !LOMA.sadalas.includes(s)) return;
+  urlAtv = a ? {s, a} : null; iet(s, true); urlLikt(h, true); urlAtvert(s);
+}
 if (GAS_VEST) {
   google.script.url.getLocation(l => { if (l.hash) urlSad = l.hash; });
-  google.script.history.setChangeHandler(e => { const s = e.location.hash; if (s && LOMA.sadalas.includes(s)) iet(s, true); });
-} else window.addEventListener('hashchange', () => { const s = decodeURIComponent(location.hash.slice(1)); if (s && LOMA.sadalas.includes(s)) iet(s, true); });
+  google.script.history.setChangeHandler(e => { if (e.location.hash) urlIet(e.location.hash); });
+} else window.addEventListener('hashchange', () => urlIet(location.hash.slice(1)));
+// saites ar pasākumu: atver logu, tiklīdz sadaļas dati ir klāt (vienreiz)
+function urlAtvert(s) {
+  if (!urlAtv || urlAtv.s !== s) return;
+  const a = urlAtv.a;
+  if (s === 'vaditajiem' && vadPas.some(x => x.atslega === a)) { urlAtv = null; vadAtvert(a); }
+  if (s === 'pasakumi') { const x = pasDati.find(p => p.atslega === a); if (x) { urlAtv = null; pasAtvert(x); } }
+}
+// logs atvērts/aizvērts: adrese rāda pasākumu, lai to var nosūtīt
+const urlLogs = (s, a) => urlLikt(a ? s + '/' + encodeURIComponent(a) : s, true);
+const IK_SAITE = '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg>';
+const saitesPoga = () => `<button type="button" class="poga gaisa maza" data-saite>${IK_SAITE}Kopēt saiti</button>`;
+function saitesPogaSiet(d) {
+  const b = d.querySelector('[data-saite]'); if (!b) return;
+  b.onclick = async () => {
+    try { await navigator.clipboard.writeText(WEB_SAITE + urlSad); b.innerHTML = IK_SAITE + 'Nokopēts'; }
+    catch (x) { b.innerHTML = IK_SAITE + 'Neizdevās'; }
+    setTimeout(() => { if (b.isConnected) b.innerHTML = IK_SAITE + 'Kopēt saiti'; }, 1800);
+  };
+}
 function urlLikt(s, aizst) {
   if (GAS_VEST) { if (urlSad !== s) google.script.history[aizst ? 'replace' : 'push'](null, null, s); }
   else if (location.hash.slice(1) !== s) history[aizst ? 'replaceState' : 'pushState'](null, '', '#' + s);
@@ -902,7 +928,7 @@ let pasDati = [], pasFiltrs = 'nak';
 const MEN = ['Janvāris', 'Februāris', 'Marts', 'Aprīlis', 'Maijs', 'Jūnijs', 'Jūlijs', 'Augusts', 'Septembris', 'Oktobris', 'Novembris', 'Decembris'];
 async function ieladetPas() {
   if (!kluss) { $('#pasTab').className = 'ielade'; $('#pasTab').textContent = 'Ielādē…'; }
-  try { await kesh('gjPasakumuSaraksts', [true], v => { pasDati = v; $('#pasTab').className = ''; pasZimet(); }); }
+  try { await kesh('gjPasakumuSaraksts', [true], v => { pasDati = v; $('#pasTab').className = ''; pasZimet(); urlAtvert('pasakumi'); }); }
   catch (x) { $('#pasTab').innerHTML = `<p class="zinja kl">${esc(x.message)}</p>`; }
 }
 document.querySelectorAll('#pasFiltrs button').forEach(b => b.onclick = () => { pasFiltrs = b.dataset.f; document.querySelectorAll('#pasFiltrs button').forEach(x => x.classList.toggle('ak', x === b)); pasZimet(); });
@@ -938,7 +964,7 @@ function pasAtvert(x) {
   const lauks = (k, n, t) => { const v = kv(k); if (lasit) return `<input type="hidden" data-k="${k}" value="${esc(v)}">` + (v.trim() ? `<div class="lauksL${t === 'gars' ? ' pilns' : ''}"><span class="etik">${n}</span><div>${t === 'gars' ? md(v) : esc(v)}</div></div>` : ''); return t === 'gars' ? `<label class="pilns">${n}<textarea data-k="${k}" rows="3">${esc(v)}</textarea></label>` : t === 'date' ? `<label>${n}<input type="date" data-k="${k}" value="${isoD(v)}"></label>` : `<label>${n}<input data-k="${k}" value="${esc(v)}"></label>`; };
   const atzHtml = a => { const pz = (x.piez || {})[a.s] || ''; return `<div class="pasAtz" data-s="${a.s}"><label class="rut"><input type="checkbox" data-k="${a.k}"${x.statuss[a.s] ? ' checked' : ''}${LOMA.loma === 'komanda' ? ' disabled' : ''}><span>${esc(a.n)}</span></label><button type="button" class="poga gaisa maza ikP"${LOMA.loma === 'komanda' ? ' hidden' : ''} data-kom="${a.k}" aria-label="Komentārs: ${esc(a.n)}" title="Komentārs">${IK_KOM}</button>${pz ? `<div class="komT">${esc(pz)}</div>` : ''}</div>`; };
   d.className = 'modal';
-  d.innerHTML = `<div class="karte plata pasK" role="dialog" aria-modal="true" aria-labelledby="pmV"><div class="galva" style="margin:0 0 4px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="pmV">${esc(x.klients)}</h2><p data-apak>${esc(pasApak(x))}</p></div><button class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div>
+  d.innerHTML = `<div class="karte plata pasK" role="dialog" aria-modal="true" aria-labelledby="pmV"><div class="galva" style="margin:0 0 4px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="pmV">${esc(x.klients)}</h2><p data-apak>${esc(pasApak(x))}</p></div><div class="rinda" style="margin:0;flex-wrap:nowrap">${saitesPoga()}<button class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div></div>
     <form class="pasLab">
       <div class="clGrupa">Pasākums</div>
       <div class="lauki">${lauks(2, 'Pasākuma datums', 'date')}${lauks(3, 'Klienta vārds')}${lauks(4, 'Klienta kontaktinformācija')}${lauks(6, 'Pasākuma lokācija')}${lauks(5, 'Dalībnieku skaits')}${lauks(7, 'Starta laiks')}</div>
@@ -960,7 +986,8 @@ function pasAtvert(x) {
   document.body.append(d);
   const f = d.querySelector('form'), z = d.querySelector('[data-z]');
   f.querySelectorAll('[data-k]').forEach(i => i.dataset.ved = i.value);
-  const aizv = () => d.remove();
+  urlLogs('pasakumi', x.atslega); saitesPogaSiet(d);
+  const aizv = () => { d.remove(); if (urlSad.startsWith('pasakumi/')) urlLogs('pasakumi'); };
   d.querySelector('[data-aizv]').onclick = aizv;
   d.onclick = e => { if (e.target === d) aizv(); };
   d.addEventListener('keydown', e => { if (e.key === 'Escape') aizv(); });
@@ -1259,7 +1286,7 @@ let vadDati = [], vadPas = [], vadTips = 'pasakumi';
 const VAD_NOS = {marsruts: 'maršrutu', spele: 'spēļu', plans: 'dienas plāna', ekipejums: 'ekipējuma'};
 const vadTipi = t => t === 'plans' ? ['plans', 'info'] : [t];
 async function ieladetVad() {
-  try { await kesh('gjVaditajiem', [], v => { vadDati = v.ieraksti; vadPas = v.pasakumi || []; $('#vadSaite').href = v.saite; $('#vadSaite').hidden = LOMA.loma !== 'toms'; vadZimet(); }); }
+  try { await kesh('gjVaditajiem', [], v => { vadDati = v.ieraksti; vadPas = v.pasakumi || []; $('#vadSaite').href = v.saite; $('#vadSaite').hidden = LOMA.loma !== 'toms'; vadZimet(); urlAtvert('vaditajiem'); }); }
   catch (x) { $('#vadSar').innerHTML = `<p class="zinja kl liel" style="display:block">${esc(x.message)}</p>`; }
 }
 function vadTipsIzv(t) { vadTips = t; document.querySelectorAll('#vadTabs button').forEach(b => b.classList.toggle('ak', b.dataset.t === t)); vadZimet(); }
@@ -1341,7 +1368,7 @@ function vadAtvert(atsl) {
     ? `<div class="vieta"><span class="etik">Vada</span>${esc(p.vaditajs || 'nav norādīts')}</div>` : '';
   const d = document.createElement('div');
   d.className = 'modal';
-  d.innerHTML = `<div class="karte plata" role="dialog" aria-modal="true" aria-labelledby="vmV"><div class="galva" style="margin:0 0 4px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="vmV">${esc(p.klients)}</h2><p>${esc(p.datums)}, ${esc(p.diena)}, ${kadPas(p.dienasLidz)}${p.lokacija ? ' · ' + esc(p.lokacija) : ''}</p></div><button class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div>
+  d.innerHTML = `<div class="karte plata" role="dialog" aria-modal="true" aria-labelledby="vmV"><div class="galva" style="margin:0 0 4px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="vmV">${esc(p.klients)}</h2><p>${esc(p.datums)}, ${esc(p.diena)}, ${kadPas(p.dienasLidz)}${p.lokacija ? ' · ' + esc(p.lokacija) : ''}</p></div><div class="rinda" style="margin:0;flex-wrap:nowrap">${saitesPoga()}<button class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div></div>
     <div class="vadAug">
       <div class="vadCipsi"><div class="vieta"><span class="etik">Starta laiks</span>${esc(p.laiks || 'nav norādīts')}</div>${p.skaits ? `<div class="vieta"><span class="etik">Cilvēki</span>${esc(p.skaits)}</div>` : ''}${m ? `<div class="vieta"><span class="etik">Maršruts</span>${esc(m.nosaukums)}</div>` : ''}${vad}</div>
       ${vietas}
@@ -1355,7 +1382,8 @@ function vadAtvert(atsl) {
     <div class="vadPan" data-pan="ekip" hidden><div class="vadSoma" style="margin-top:0"><h2 class="v3">Vadītāja soma: ko ņemt līdzi <span class="c" data-lsk></span></h2><div data-lidzi class="ielade">Ielādē sarakstu…</div></div>${ekip.map(x => det(x, false)).join('')}</div>
     <div class="vadPan" data-pan="mars" hidden>${m ? `<h2 class="v3">${esc(m.nosaukums)}</h2>${[m.sezona, m.garums, m.ilgums, m.grutiba].filter(Boolean).length ? `<div class="cipsi">${[m.sezona, m.garums, m.ilgums, m.grutiba].filter(Boolean).map(c => `<span class="c">${esc(c)}</span>`).join('')}</div>` : ''}<div class="apr">${md(marsApr)}</div>` : `<p class="mazs">${p.lokacija ? 'Vietai "' + esc(p.lokacija) + '" maršruts nav atrasts.' : 'Tabulā vieta nav norādīta.'} Maršrutu nosaka pasākuma vieta tabulā.</p>`}</div></div>`;
   document.body.append(d);
-  const aizv = () => d.remove();
+  urlLogs('vaditajiem', atsl); saitesPogaSiet(d);
+  const aizv = () => { d.remove(); if (urlSad.startsWith('vaditajiem/')) urlLogs('vaditajiem'); };
   d.querySelector('[data-aizv]').onclick = aizv;
   d.onclick = e => { if (e.target === d) aizv(); };
   d.addEventListener('keydown', e => { if (e.key === 'Escape') aizv(); });
@@ -2182,8 +2210,9 @@ function saktUI(L) {
   document.body.classList.toggle('lasit', LOMA.loma === 'komanda');
   $('#apaksa').innerHTML = esc('Gājēdis · ' + LOMA.nos) + (gjKods ? ' · <a href="#" onclick="iziet();return false" style="color:inherit">iziet</a>' : '');
   ielad = {};
-  const sakS = LOMA.sadalas.includes(urlSad) ? urlSad : LOMA.sadalas.includes('sakums') ? 'sakums' : LOMA.sadalas[0];
-  iet(sakS, true); urlLikt(sakS, true);
+  const [uS, uA] = urlDal(urlSad), sakS = LOMA.sadalas.includes(uS) ? uS : LOMA.sadalas.includes('sakums') ? 'sakums' : LOMA.sadalas[0];
+  urlAtv = uA && sakS === uS ? {s: uS, a: uA} : null;
+  iet(sakS, true); urlLikt(urlAtv ? urlSad : sakS, true);
   if (LOMA.sadalas.includes('sakums')) ieladetSak(LOMA.sakums);
   versija = LOMA.versija || null; atjLaiks = Date.now();
   // pārējās biežāk lietotās sadaļas ielādē jau fonā, lai tās atveras uzreiz
