@@ -1405,13 +1405,13 @@ async function kopZimet() {
       <tr class="kopa"><td>Kopā</td><td class="sum">${eur(izm)}</td><td class="sum">${eur(atm)}</td></tr>
       ${par !== undefined ? `<tr class="parads"><td>Gājēža parāds</td><td></td><td class="sum">${eur(par)}</td></tr>` : ''}
       ${((d.beigas || {})[k] || []).map(x => `<tr><td>${esc(x[0])}</td><td></td><td class="sum">${esc(x[1])}</td></tr>`).join('')}</table></div>`; };
-  // bilance = izmaksāts no savas kabatas − saņemts no Gājēža; plus = Gājēdis viņam parādā, mīnus = paņēmis vairāk
-  const bil = r => r.filter(x => !/^(gājēža parāds|ieguldīts|dabūts)/i.test(x[0])).reduce((a, x) => a + x[1] - x[2], 0), bT = bil(d.toms), bM = bil(d.markuss), star = Math.abs(bT - bM);
-  const bilK = (v, b, kl) => `<div class="bilP ${kl}"><span class="persZ ${kl}">${v}</span><div class="cip" style="margin-top:6px">${zime(b)}</div><div class="mazs">${b >= 0 ? 'plusā: Gājēdis viņam parādā' : 'mīnusā: paņēmis vairāk, nekā ielicis'}</div></div>`;
+  // balance = what Gājēdis owes the person (same sign as the sheet's "Gājēža parāds"); plus = still to receive, minus = took more
+  const bil = (r, k) => (d.parads || {})[k] !== undefined ? d.parads[k] : r.filter(x => !/^(gājēža parāds|ieguldīts|dabūts)/i.test(x[0])).reduce((a, x) => a + x[2] - x[1], 0), bT = bil(d.toms, 'toms'), bM = bil(d.markuss, 'markuss'), star = Math.abs(bT - bM);
+  const bilK = (v, b, kl) => `<div class="bilP ${kl}"><span class="persZ ${kl}">${v}</span><div class="cip" style="margin-top:6px">${zime(b)}</div><div class="mazs">${b >= 0 ? 'plusā: tik daudz vēl jāsaņem no Gājēža' : 'mīnusā: paņēmis vairāk, nekā ielicis'}</div></div>`;
   const bilance = `<div class="karte" style="margin-bottom:16px"><h2 class="v3">Kurš ir lielākā plusā</h2>
     <div class="rezgis r2">${bilK('Toms', bT, 'p-toms')}${bilK('Markuss', bM, 'p-markuss')}</div>
-    <p style="margin:12px 0 0;font-weight:600">${star < 0.01 ? 'Abi ir vienādi.' : `${bT > bM ? 'Toms' : 'Markuss'} ir par ${eur(star)} lielākā plusā nekā ${bT > bM ? 'Markuss' : 'Toms'}.`}</p>
-    <p class="mazs" style="margin:4px 0 0">Izmaksāts no savas kabatas mīnus atmaksāts / saņemts no Gājēža (lapa Galvenais)${d.parads && (d.parads.toms || d.parads.markuss) ? `. Tabulā "Gājēža parāds": Toms ${eur(d.parads.toms || 0)}, Markuss ${eur(d.parads.markuss || 0)}` : ''}.</p></div>`;
+    <p style="margin:12px 0 0;font-weight:600">${star < 0.01 ? 'Abi ir vienādi, abiem jāsaņem tikpat.' : `${bT > bM ? 'Tomam' : 'Markusam'} jāsaņem par <span style="color:var(--mezs)">${eur(star)}</span> vairāk, ${bT > bM ? 'Markusam' : 'Tomam'} par tik mazāk.`}</p>
+    <p class="mazs" style="margin:4px 0 0">${star < 0.01 ? '' : `${bT > bM ? 'Toms' : 'Markuss'} ir lielākā plusā. `}Skaitļi no lapas Galvenais, rinda "Gājēža parāds".</p></div>`;
   $('#finTab').className = '';
   $('#finTab').innerHTML = bilance + `<div class="galva" style="margin:0 0 12px"><p class="mazs" style="margin:0">No tabulas <a href="${esc(d.saite)}" target="_blank" rel="noopener">${esc(d.nos)} ↗</a>. Pasākuma "saņem": cik katram pienākas (mīnus = jāatdod).</p></div>
     <div class="rezgis r4" style="margin-bottom:16px">
