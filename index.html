@@ -737,20 +737,29 @@ let gjKods = '';
 try { gjKods = localStorage.getItem('gjKods') || ''; } catch (e) {}
 // lasīšanas funkcijas; jebkurš cits izsaukums skaitās izmaiņa (rakstiNr), lai fona atjaunošana nepārraksta tikko atzīmēto
 const LASA = new Set(['gjKasEsmu', 'gjVersija', 'gjSakums', 'gjPasakumuSaraksts', 'gjSagatavosanas', 'gjCheklists', 'gjJanoperk', 'gjVaditajiem', 'gjFinanses', 'gjIzaugsme', 'gjRekini', 'gjSanemeji', 'gjKlientuBaze', 'gjCheklistaSablons', 'gjRekinaPdf', 'gjKopejasFinanses', 'gjEpastuSaraksts', 'gjVestules', 'gjMateriali', 'gjKopsavilkums', 'gjNoteikumi']);
-let rakstiNr = 0;
-const run = (fn, ...a) => { if (!LASA.has(fn)) rakstiNr++; return new Promise((ok, kl) => google.script.run.withSuccessHandler(ok).withFailureHandler(e => kl(e)).gjApi(gjKods, fn, a)); };
+// rakstiGaida: cik izmaiņu vēl saglabājas; rakstiBeidz: kad pēdējā saglabājās (savas izmaiņas nepārzīmē sarakstu)
+let rakstiNr = 0, rakstiGaida = 0, rakstiBeidz = 0;
+const run = (fn, ...a) => {
+  const raksta = !LASA.has(fn); if (raksta) { rakstiNr++; rakstiGaida++; }
+  const p = new Promise((ok, kl) => google.script.run.withSuccessHandler(ok).withFailureHandler(e => kl(e)).gjApi(gjKods, fn, a));
+  if (raksta) p.finally(() => { rakstiGaida--; rakstiNr++; rakstiBeidz = Date.now(); }).catch(() => {});
+  return p;
+};
 /* ātra ielāde: uzreiz parāda pēdējos zināmos datus no šīs ierīces, tad klusi atjauno no servera */
 const kAtsl = (fn, a) => 'gjK:' + LOMA.loma + ':' + fn + ':' + JSON.stringify(a);
 function kDzest() { try { Object.keys(localStorage).filter(k => k.startsWith('gjK:')).forEach(k => localStorage.removeItem(k)); } catch (e) {} }
 async function kesh(fn, a, zim) {
   const k = kAtsl(fn, a); let ved = null;
-  try { ved = localStorage.getItem(k); if (ved) zim(JSON.parse(ved), true); } catch (e) { ved = null; }
-  const n = rakstiNr;
+  // fona atjaunošanā (kluss) ekrānā jau ir jaunāki dati nekā ierīces kešā: veco nezīmē
+  try { ved = localStorage.getItem(k); if (ved && !kluss) zim(JSON.parse(ved), true); } catch (e) { ved = null; }
+  const n = rakstiNr, gaida = rakstiGaida;
   let v;
   try { v = await run(fn, ...a); } catch (x) { if (ved) return; throw x; } // ja vecie dati jau redzami, kļūdu nerāda
+  // ja kāda izmaiņa saglabājās ielādes laikā, dati var būt veci: nerāda un nesaglabā
+  if ((gaida || n !== rakstiNr) && (ved || kluss)) return v;
   const t = JSON.stringify(v);
   try { localStorage.setItem(k, t); } catch (e) {}
-  if (t !== ved && n === rakstiNr) zim(v, false);
+  if (t !== ved) zim(v, false);
   return v;
 }
 let LOMA = {loma: 'toms', nos: 'Toms', sadalas: []};
@@ -2050,11 +2059,13 @@ function drosiAtjaunot() {
   return [...document.querySelectorAll('.sad.ak form:not([hidden])')].every(f => f.closest('[hidden]') || ![...f.elements].some(e => /^(text|textarea|email|tel|number|url|search)$/.test(e.type) && e.value && e.defaultValue !== e.value));
 }
 async function parbauditIzmainas(spiest) {
-  if (atjIet || document.hidden || document.querySelector('.app').hidden) return;
+  if (atjIet || rakstiGaida || document.hidden || document.querySelector('.app').hidden) return;
   atjIet = true;
   try {
     const v = await run('gjVersija'), jauna = versija !== null && v !== versija;
     if (versija === null) versija = v;
+    // versija mainījās no pašu tikko saglabātā: pieņem bez pārzīmēšanas (citu izmaiņas atnāks ar nākamo vai pēc 3 min)
+    if (jauna && !spiest && Date.now() - rakstiBeidz < 20000) { versija = v; atjIet = false; return; }
     if ((jauna || spiest || Date.now() - atjLaiks > 180000) && drosiAtjaunot()) {
       versija = v; atjLaiks = Date.now();
       const s = (document.querySelector('.sad.ak') || {}).id?.slice(2), f = ATJ[s];
