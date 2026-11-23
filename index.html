@@ -1338,10 +1338,10 @@ function vadMarsKarte(x, i) {
 }
 /* spēle: aizvērtā rindā nosaukums, ilgums un kad paredzēta; detaļas pēc klikšķa, bez saites */
 function vadSpeleSaturs(x) {
-  const cipsi = [x.grutiba, x.cilveki ? x.cilveki + ' cilv.' : '', x.sezona].filter(Boolean).map(c => `<span class="c">${esc(c)}</span>`).join('');
+  const cipsi = [x.ilgums, x.kur, x.grutiba, x.cilveki ? x.cilveki + ' cilv.' : '', x.sezona].filter(Boolean).map(c => `<span class="c">${esc(c)}</span>`).join('');
   return `${cipsi ? `<div class="cipsi" style="margin-top:var(--s2)">${cipsi}</div>` : ''}${x.apraksts ? `<div class="apr">${md(x.apraksts)}</div>` : ''}${x.vajag ? `<p class="mazs" style="margin:8px 0 0"><b>Vajag līdzi:</b> ${esc(x.vajag)}</p>` : ''}`;
 }
-const vadSpeleGalva = x => `<b>${esc(x.nosaukums)}</b>${x.iezime === 'jauna' ? '<span class="c jn">Jauna</span>' : ''}${[x.ilgums, x.kur].filter(Boolean).map(c => `<span class="c">${esc(c)}</span>`).join('')}`;
+const vadSpeleGalva = x => `<b>${esc(x.nosaukums)}</b>${x.iezime === 'jauna' ? '<span class="c jn">Jauna</span>' : ''}`;
 function vadKarte(x, i) {
   if (x.tips === 'marsruts') return vadMarsKarte(x, i);
   if (x.tips === 'spele') return `<details class="karte vadK vadM${x.iezime === 'jauna' ? ' jauna' : ''}"><summary><span class="tx"><span class="cipsi" style="margin:0;align-items:center">${vadSpeleGalva(x)}</span></span><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>${vadSpeleSaturs(x)}<div class="rinda"><span class="mazs" style="margin-right:auto">${esc(x.atjaunots)}</span><button class="poga gaisa maza vadLab" onclick="vadForma(${i})">Labot</button><button class="poga gaisa maza vadLab" onclick="vadDzest(${i})">Dzēst</button></div></details>`;
