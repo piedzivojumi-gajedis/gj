@@ -280,8 +280,15 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 .vadVp .ik,.zinaK .ik,.vadKl .ik,[data-saite] .ik{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 .vadKl{background:var(--virsma-neitr);border-radius:var(--r-m);padding:var(--s3);font-size:14.5px;white-space:pre-wrap;overflow-wrap:anywhere}.vadKl .etik{display:block;margin-bottom:4px;white-space:normal}
 .vadPTabs{margin:var(--s5) 0 var(--s2)}.vadPan .apr{white-space:pre-wrap;font-size:14.5px;overflow-wrap:anywhere}
-.zinaK .zt{white-space:pre-wrap;font-size:14.5px;overflow-wrap:anywhere;margin:var(--s2) 0 0;max-height:260px;overflow:auto}
+.zinaK .zt{white-space:pre-wrap;font-size:14.5px;overflow-wrap:anywhere;margin:var(--s2) 0 0}
 .zinaK .rinda .poga{display:inline-flex;align-items:center;gap:6px}
+.karte.zinL{padding:0;overflow:hidden}.zinaR+.zinaR{border-top:1px solid var(--linija-viegla)}
+.zinaR summary{list-style:none;cursor:pointer;display:flex;gap:var(--s3);align-items:center;padding:var(--s3) var(--s4);transition:background-color var(--t-atri) var(--ease)}
+.zinaR summary::-webkit-details-marker{display:none}.zinaR summary:hover{background:var(--virsma-hover)}
+.zinaR summary .tx{flex:1;min-width:0;display:grid;gap:2px}.zinaR summary b{overflow-wrap:anywhere}
+.zinaR summary>.ik.zinB{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;color:var(--pelēks);transition:transform var(--t-atri) var(--ease)}.zinaR[open] summary>.ik.zinB{transform:rotate(180deg)}
+.zinaR .zinV{padding:0 var(--s4) var(--s4)}
+@media (prefers-reduced-motion:reduce){.zinaR summary,.zinaR summary>.ik.zinB{transition:none}}
 .vadF{margin-top:10px}.vadFr{display:flex;gap:var(--s2);align-items:center}.vadFr input{flex:1;min-width:0}
 .vadSoma{margin-top:16px;background:var(--c-mezs-0);border:1px solid var(--mezs-gaiss);border-radius:var(--r);padding:var(--s4)}
 .vadSoma .v3{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap}
@@ -2010,9 +2017,10 @@ async function ieladetZin() {
   catch (x) { $('#zinSar').innerHTML = `<p class="zinja kl liel" style="display:block">${esc(x.message)}</p>`; }
 }
 function zinZimet() {
+  // saraksts ar nosaukumiem; atverot redz visu ziņu; "Kopēt" strādā jau aizvērtā rindā
   $('#zinSar').innerHTML = Object.entries(ZIN_KAT).map(([k, n]) => {
     const z = zinDati.filter(x => x.kat === k);
-    return `<h2 class="v3" style="margin:22px 0 10px">${n}</h2><div class="rezgis r2">${z.map(x => `<div class="karte zinaK"><div class="galva" style="margin:0;align-items:baseline"><h2 class="v3" style="margin:0">${esc(x.nosaukums)}</h2><span class="mazs">${esc(x.atjaunots)}</span></div><div class="zt">${esc(x.teksts)}</div><div class="rinda"><button class="poga zala maza" onclick="zinKopet(this,'${esc(x.id)}')">${ZIN_IK_KOP}Kopēt</button><button class="poga gaisa maza" onclick="zinForma('${esc(x.id)}')">Labot</button><button class="poga gaisa maza" onclick="zinDzest('${esc(x.id)}')">Dzēst</button></div></div>`).join('') || `<button class="karte tukss" style="text-align:left;cursor:pointer;width:100%;font:inherit" onclick="zinForma(undefined,'${k}')">Vēl nav ziņu. Spied, lai pievienotu.</button>`}</div>`;
+    return `<h2 class="v3" style="margin:22px 0 10px">${n}</h2>${z.length ? `<div class="karte zinaK zinL">${z.map(x => `<details class="zinaR"><summary><span class="tx"><b>${esc(x.nosaukums)}</b><span class="mazs">${esc(x.atjaunots)}</span></span><button type="button" class="poga zala maza" onclick="event.preventDefault();event.stopPropagation();zinKopet(this,'${esc(x.id)}')">${ZIN_IK_KOP}Kopēt</button><svg class="ik zinB" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="zinV"><div class="zt">${esc(x.teksts)}</div><div class="rinda"><button class="poga gaisa maza" onclick="zinForma('${esc(x.id)}')">Labot</button><button class="poga gaisa maza" onclick="zinDzest('${esc(x.id)}')">Dzēst</button></div></div></details>`).join('')}</div>` : `<button class="karte tukss" style="text-align:left;cursor:pointer;width:100%;font:inherit" onclick="zinForma(undefined,'${k}')">Vēl nav ziņu. Spied, lai pievienotu.</button>`}`;
   }).join('');
 }
 async function zinKopet(b, id) {
