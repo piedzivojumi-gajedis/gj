@@ -1042,6 +1042,8 @@ function pasAtvert(x) {
   function komSagl() { const t = komTeksts(); if (t === komVed) return; komVed = t; saglabat({komanda: kom.map(c => ({vards: c.vards.trim(), loma: c.loma.trim()}))}); }
   komZim();
   f.onsubmit = e => e.preventDefault();
+  // Enter vienrindas ailē: saglabā un iziet no ailes (blur izsauc change)
+  f.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input[data-k],input[data-loma]')) { e.preventDefault(); e.target.blur(); } });
   if (lasit) f.querySelectorAll('input[data-k],textarea[data-k]').forEach(i => { i.readOnly = true; });
   f.querySelectorAll('input[data-k],textarea[data-k]').forEach(i => i.addEventListener('change', () => {
     if (i.value === i.dataset.ved) return;
