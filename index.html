@@ -895,7 +895,7 @@ function sakZimet(d) {
   ].map(([e, c, uz]) => `<div class="karte" style="cursor:pointer" role="link" tabindex="0" onclick="iet('${uz}')" onkeydown="if(event.key==='Enter')iet('${uz}')"><div class="etik">${e}</div><div class="cip" style="margin-top:8px">${c}</div></div>`).join('');
   janSkaits(d.janoperk);
   $('#nRek').hidden = !d.neapmaksati.length; $('#nRek').textContent = d.neapmaksati.length;
-  $('#sakPas').innerHTML = d.pasakumi.length ? d.pasakumi.map(p => `<li>${datk(p)}<div style="min-width:0"><b>${esc(p.klients)}</b><div class="mazs">${esc(p.diena)}, ${kadPas(p.dienasLidz)} · ${esc(p.lokacija || 'vieta nav norādīta')} ${p.laiks ? '· ' + esc(p.laiks) + esc(izbrT(p.laiks)) : ''}</div><div class="cipsi">${stCip(p)}</div></div></li>`).join('') : '<li class="tukss">Tuvākajā laikā pasākumu nav.</li>';
+  $('#sakPas').innerHTML = d.pasakumi.length ? d.pasakumi.map(p => `<li>${datk(p)}<div style="min-width:0"><b>${esc(p.klients)}</b><div class="mazs">${esc(p.diena)}, ${kadPas(p.dienasLidz)} · ${esc(p.lokacija || 'vieta nav norādīta')} ${p.laiks ? '· ' + esc(p.laiks) : ''}${esc(izbrT(p))}</div><div class="cipsi">${stCip(p)}</div></div></li>`).join('') : '<li class="tukss">Tuvākajā laikā pasākumu nav.</li>';
   // izaugsmes darbi tam, kas ienācis
   $('#sakManiV').textContent = (toms ? 'Toma' : LOMA.nos === 'Markuss' ? 'Markusa' : LOMA.nos) + ' izaugsmes darbi';
   $('#sakManiK').hidden = !LOMA.sadalas.includes('izaugsme');
@@ -954,7 +954,7 @@ function pasZimet() {
   // jaunākie (vēlākais datums) vienmēr augšā
   const grupas = {}, leg = `<div class="pasLeg" aria-label="Krāsas"><span class="tuv"><i></i>Tuvākie (${PAS_TUV} d.)</span><span class="tal"><i></i>Tālākie</span>${pasFiltrs === 'visi' ? '<span class="pag"><i></i>Jau bijuši</span>' : ''}</div>`;
   s.slice().sort((a, b) => b.iso.localeCompare(a.iso)).forEach(x => (grupas[x.iso.slice(0, 7)] = grupas[x.iso.slice(0, 7)] || []).push(x));
-  $('#pasTab').innerHTML = leg + Object.entries(grupas).map(([m, xs]) => `<div class="pasMen">${MEN[+m.slice(5) - 1]} ${m.slice(0, 4)}<span style="text-transform:none;letter-spacing:0;font-weight:500">· ${xs.length} ${xs.length === 1 ? 'pasākums' : 'pasākumi'}</span></div>` + xs.map(x => `<button class="pasR ${pasLaiks(x)}" data-i="${pasDati.indexOf(x)}">${datk(x)}<span class="tx"><b>${esc(x.klients)}</b><span class="mazs" style="display:block">${esc(x.datums)}, ${esc(x.diena)}, ${kadPas(x.dienasLidz)}${x.laiks ? ' · sākums ' + esc(x.laiks) + esc(izbrT(x.laiks)) : ''}</span></span><span class="pasMeta"><span>${x.skaits ? esc(x.skaits) + ' dalībn.' : '<span class="mazs">skaits nav</span>'}</span><span class="mazs">${esc(x.lokacija || 'vieta nav norādīta')}</span></span></button>`).join('')).join('')
+  $('#pasTab').innerHTML = leg + Object.entries(grupas).map(([m, xs]) => `<div class="pasMen">${MEN[+m.slice(5) - 1]} ${m.slice(0, 4)}<span style="text-transform:none;letter-spacing:0;font-weight:500">· ${xs.length} ${xs.length === 1 ? 'pasākums' : 'pasākumi'}</span></div>` + xs.map(x => `<button class="pasR ${pasLaiks(x)}" data-i="${pasDati.indexOf(x)}">${datk(x)}<span class="tx"><b>${esc(x.klients)}</b><span class="mazs" style="display:block">${esc(x.datums)}, ${esc(x.diena)}, ${kadPas(x.dienasLidz)}${x.laiks ? ' · sākums ' + esc(x.laiks) : ''}${esc(izbrT(x))}</span></span><span class="pasMeta"><span>${x.skaits ? esc(x.skaits) + ' dalībn.' : '<span class="mazs">skaits nav</span>'}</span><span class="mazs">${esc(x.lokacija || 'vieta nav norādīta')}</span></span></button>`).join('')).join('')
     + (pasFiltrs === 'nak' && pag ? `<p class="mazs" style="text-align:center;margin:16px 0 0">${pag} pagājušie pasākumi paslēpti. <a href="#" onclick="$('#pasFiltrs [data-f=visi]').click();return false">Rādīt visus</a></p>` : '');
   $('#pasTab').querySelectorAll('.pasR').forEach(b => b.onclick = () => pasAtvert(pasDati[+b.dataset.i]));
 }
@@ -970,8 +970,10 @@ const IK_KOM = '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="
 const isoD = t => { const m = String(t).match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})/); return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : ''; };
 // izbraukšana no Viskaļiem vienmēr 3 h pirms pasākuma sākuma
 const izbr = l => { const m = String(l || '').match(/(\d{1,2})[:.](\d{2})/); if (!m) return ''; const t = (+m[1] * 60 + +m[2] + 1260) % 1440; return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
-const izbrT = l => izbr(l) ? ' · izbraukšana no Viskaļiem ' + izbr(l) : '';
-const pasApak = x => `${x.datums}, ${x.diena}, ${kadPas(x.dienasLidz)}${x.laiks ? ' · sākums ' + x.laiks + izbrT(x.laiks) : ''}${x.skaits ? ' · ' + x.skaits + ' dalībnieki' : ''}`;
+// ierakstītais laiks (kolonna "Izbraukšana no Viskaļiem") vai sākums − 3 h
+const izbrP = p => (p && p.izbrauksana) || izbr(p && p.laiks);
+const izbrT = p => izbrP(p) ? ' · izbraukšana no Viskaļiem ' + izbrP(p) : '';
+const pasApak = x => `${x.datums}, ${x.diena}, ${kadPas(x.dienasLidz)}${x.laiks ? ' · sākums ' + x.laiks : ''}${izbrT(x)}${x.skaits ? ' · ' + x.skaits + ' dalībnieki' : ''}`;
 function pasAtvert(x) {
   const d = document.createElement('div'), kv = k => { const c = (x.kol || [])[k - 1]; return c ? String(c[1] ?? '') : ''; };
   const kom = (x.komandaL || x.komanda.map(v => ({vards: v, loma: ''}))).map(c => ({...c}));
@@ -982,7 +984,7 @@ function pasAtvert(x) {
   d.innerHTML = `<div class="karte plata pasK" role="dialog" aria-modal="true" aria-labelledby="pmV"><div class="galva" style="margin:0 0 4px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="pmV">${esc(x.klients)}</h2><p data-apak>${esc(pasApak(x))}</p></div><div class="rinda" style="margin:0;flex-wrap:nowrap">${saitesPoga()}<button class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div></div>
     <form class="pasLab">
       <div class="clGrupa">Pasākums</div>
-      <div class="lauki">${lauks(2, 'Pasākuma datums', 'date')}${lauks(3, 'Klienta vārds')}${lauks(4, 'Klienta kontaktinformācija')}${lauks(6, 'Pasākuma lokācija')}${lauks(5, 'Dalībnieku skaits')}${lauks(7, 'Starta laiks')}</div>
+      <div class="lauki">${lauks(2, 'Pasākuma datums', 'date')}${lauks(3, 'Klienta vārds')}${lauks(4, 'Klienta kontaktinformācija')}${lauks(6, 'Pasākuma lokācija')}${lauks(5, 'Dalībnieku skaits')}${lauks(7, 'Starta laiks')}${lauks(26, 'Izbraukšana no Viskaļiem')}</div>
       <div class="clGrupa">Ēdiens un prasības</div>
       <div class="lauki">${lauks(12, 'Izvēlētā ēdienkarte', 'gars')}${lauks(13, 'Ēdiena alternatīvas', 'gars')}${lauks(14, 'Papildus prasības', 'gars')}${lauks(15, 'Info no klienta', 'gars')}</div>
       <div class="clGrupa">Vietas${x.vietas ? ` <span style="text-transform:none;letter-spacing:0;font-weight:500">· no vadītāju faila, maršruts ${esc(x.vietas.marsruts)}</span>` : ''}</div>
@@ -1001,6 +1003,10 @@ function pasAtvert(x) {
   document.body.append(d);
   const f = d.querySelector('form'), z = d.querySelector('[data-z]');
   f.querySelectorAll('[data-k]').forEach(i => i.dataset.ved = i.value);
+  // tukša izbraukšana = sākums − 3 h (redzams kā ieteikums ailē)
+  const izA = f.querySelector('input[data-k="26"]'), stA = f.querySelector('input[data-k="7"]');
+  const izV = () => { if (izA) izA.placeholder = izbr(stA ? stA.value : kv(7)) ? izbr(stA ? stA.value : kv(7)) + ' (sākums − 3 h)' : 'sākums − 3 h'; };
+  izV(); if (stA) stA.addEventListener('input', izV);
   urlLogs('pasakumi', x.atslega); saitesPogaSiet(d);
   const aizv = () => { d.remove(); if (urlSad.startsWith('pasakumi/')) urlLogs('pasakumi'); };
   d.querySelector('[data-aizv]').onclick = aizv;
@@ -1217,7 +1223,7 @@ function sagLidzi(jautat) {
   $('#lidziPr').innerHTML = sagProg(d, l.length);
   const c = sagCl;
   $('#lidziBeigas').innerHTML = c.sapakots
-    ? `<div class="cels"><h2 class="v3">Viss ir līdzi. Brauciet!</h2><p style="margin:6px 0 0">📍 ${esc(c.lokacija || 'vieta tabulā nav norādīta')}${c.laiks ? ' · ' + esc(c.laiks) + esc(izbrT(c.laiks)) : ''}<br><span style="opacity:.8;font-size:13px">Apstiprināts ${esc(c.sapakots)}</span></p>${navSaites(c.lokacija) ? `<div class="rinda">${navPogas(c.lokacija)}</div>` : '<p style="margin:10px 0 0">Ieraksti vietu tabulā "Pasākumi 2026", lai rādītu ceļu.</p>'}</div>`
+    ? `<div class="cels"><h2 class="v3">Viss ir līdzi. Brauciet!</h2><p style="margin:6px 0 0">📍 ${esc(c.lokacija || 'vieta tabulā nav norādīta')}${c.laiks ? ' · ' + esc(c.laiks) : ''}${esc(izbrT(c))}<br><span style="opacity:.8;font-size:13px">Apstiprināts ${esc(c.sapakots)}</span></p>${navSaites(c.lokacija) ? `<div class="rinda">${navPogas(c.lokacija)}</div>` : '<p style="margin:10px 0 0">Ieraksti vietu tabulā "Pasākumi 2026", lai rādītu ceļu.</p>'}</div>`
     : viss ? '<div class="rinda"><button class="poga zala" onclick="lidziJautat()">Viss sapakots, rādīt ceļu</button></div>'
     : `<p class="mazs" style="margin-top:14px">${l.length ? 'Vēl jāatzīmē ' + (l.length - d) + '.' : 'Saraksts tukšs. Pievieno, kas jāņem līdzi.'}</p>`;
   if (viss && !c.sapakots && jautat) lidziJautat();
@@ -1352,7 +1358,7 @@ function vadZimet() {
   const q = $('#vadMekl').value.trim().toLowerCase();
   if (vadTips === 'pasakumi') {
     const s = vadPas.filter(p => !q || [p.klients, p.lokacija, p.vaditajs, p.datums].join(' ').toLowerCase().includes(q));
-    $('#vadSar').innerHTML = s.length ? s.map(p => { const m = vadMarsruts(p); return `<button class="karte vadP" data-a="${esc(p.atslega)}">${datk(p)}<span class="tx"><b>${esc(p.klients)}</b><span class="mazs">${esc(p.diena)}, ${kadPas(p.dienasLidz)}${p.laiks ? ' · ' + esc(p.laiks) + esc(izbrT(p.laiks)) : ''}${p.skaits ? ' · ' + esc(p.skaits) + ' cilv.' : ''}</span><span class="cipsi"><span class="c ${p.vaditajs ? 'ok' : 'ne'}">${p.vaditajs ? 'Vada: ' + esc(p.vaditajs) : 'Vadītājs nav norādīts'}</span>${m ? `<span class="c">${esc(m.nosaukums)}</span>` : p.lokacija ? `<span class="c">${esc(p.lokacija)}</span>` : ''}</span></span></button>`; }).join('') : `<p class="tukss liel">${q ? 'Nekas nav atrasts.' : 'Tuvākajā laikā pasākumu nav.'}</p>`;
+    $('#vadSar').innerHTML = s.length ? s.map(p => { const m = vadMarsruts(p); return `<button class="karte vadP" data-a="${esc(p.atslega)}">${datk(p)}<span class="tx"><b>${esc(p.klients)}</b><span class="mazs">${esc(p.diena)}, ${kadPas(p.dienasLidz)}${p.laiks ? ' · ' + esc(p.laiks) : ''}${esc(izbrT(p))}${p.skaits ? ' · ' + esc(p.skaits) + ' cilv.' : ''}</span><span class="cipsi"><span class="c ${p.vaditajs ? 'ok' : 'ne'}">${p.vaditajs ? 'Vada: ' + esc(p.vaditajs) : 'Vadītājs nav norādīts'}</span>${m ? `<span class="c">${esc(m.nosaukums)}</span>` : p.lokacija ? `<span class="c">${esc(p.lokacija)}</span>` : ''}</span></span></button>`; }).join('') : `<p class="tukss liel">${q ? 'Nekas nav atrasts.' : 'Tuvākajā laikā pasākumu nav.'}</p>`;
     $('#vadSar').querySelectorAll('.vadP').forEach(b => b.onclick = () => vadAtvert(b.dataset.a));
     return;
   }
@@ -1394,7 +1400,7 @@ function vadAtvert(atsl) {
   d.className = 'modal';
   d.innerHTML = `<div class="karte plata" role="dialog" aria-modal="true" aria-labelledby="vmV"><div class="galva" style="margin:0 0 4px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="vmV">${esc(p.klients)}</h2><p>${esc(p.datums)}, ${esc(p.diena)}, ${kadPas(p.dienasLidz)}${p.lokacija ? ' · ' + esc(p.lokacija) : ''}</p></div><div class="rinda" style="margin:0;flex-wrap:nowrap">${saitesPoga()}<button class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div></div>
     <div class="vadAug">
-      <div class="vadCipsi"><div class="vieta"><span class="etik">Starta laiks</span>${esc(p.laiks || 'nav norādīts')}</div>${izbr(p.laiks) ? `<div class="vieta"><span class="etik">Izbraukšana no Viskaļiem</span>${izbr(p.laiks)}</div>` : ''}${p.skaits ? `<div class="vieta"><span class="etik">Cilvēki</span>${esc(p.skaits)}</div>` : ''}${m ? `<div class="vieta"><span class="etik">Maršruts</span>${esc(m.nosaukums)}</div>` : ''}${vad}</div>
+      <div class="vadCipsi"><div class="vieta"><span class="etik">Starta laiks</span>${esc(p.laiks || 'nav norādīts')}</div>${izbrP(p) ? `<div class="vieta"><span class="etik">Izbraukšana no Viskaļiem</span>${esc(izbrP(p))}</div>` : ''}${p.skaits ? `<div class="vieta"><span class="etik">Cilvēki</span>${esc(p.skaits)}</div>` : ''}${m ? `<div class="vieta"><span class="etik">Maršruts</span>${esc(m.nosaukums)}</div>` : ''}${vad}</div>
       ${vietas}
       ${kont}
       ${kl ? `<div class="vadKl"><span class="etik">Papildus info no klienta</span>${md(kl)}</div>` : ''}
