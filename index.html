@@ -1291,6 +1291,8 @@ function vadAtvert(atsl) {
   const kopejas = (cita ? poga('ed', 'Ēdināšanas vieta' + (p.edVieta ? ': ' + esc(p.edVieta) : ''), cita) : '') + (vr.length > 1 ? '' : poga('mars', 'Maršruts', marsU));
   if (kopejas) vietas += `<div class="vadVp">${kopejas}</div>`;
   if (!vietas) vietas = `<p class="mazs" style="margin:0">${p.lokacija ? 'Vietai "' + esc(p.lokacija) + '" vietas un maršruts nav atrasti.' : 'Tabulā "Pasākumi" vieta nav norādīta.'}</p>`;
+  // maršruta apraksts bez vietu un maršruta saitēm: tās jau ir pogās augšā
+  const marsApr = m ? String(m.apraksts || '').split('\n').filter(r => !/^\s*(Tikšanās vieta|Ēdināšanas vieta|Maršruts:|Variants\s*\d|Divi varianti)/i.test(r)).join('\n').replace(/\n{3,}/g, '\n\n').trim() : '';
   const kl = [p.info, p.prasibas ? 'Prasības: ' + p.prasibas : ''].filter(Boolean).join('\n\n');
   // klienta kontakti: teksts no tabulas + pogas zvanīt / rakstīt
   const tel = [...new Set((String(p.kontakti || '').match(/\+?\d[\d ]{6,}\d/g) || []).map(t => t.replace(/ /g, '')))];
@@ -1312,7 +1314,7 @@ function vadAtvert(atsl) {
     <div class="vadPan" data-pan="plans"><dl class="lauki2" style="margin-top:0">${lauks('Komanda', [p.komanda.join(', '), p.extra].filter(Boolean).join(', '))}${lauks('Ēdienkarte', p.edienkarte)}${lauks('Alternatīvā ēdienkarte', p.alt)}</dl>${plans.map((x, i) => det(x, i === 0)).join('') || '<p class="mazs">Dienas plāns vēl nav ierakstīts.</p>'}</div>
     <div class="vadPan" data-pan="speles" hidden>${speles.map(x => det(x, false)).join('') || '<p class="mazs">Nav spēļu.</p>'}</div>
     <div class="vadPan" data-pan="ekip" hidden><div class="vadSoma" style="margin-top:0"><h2 class="v3">Vadītāja soma: ko ņemt līdzi <span class="c" data-lsk></span></h2><div data-lidzi class="ielade">Ielādē sarakstu…</div></div>${ekip.map(x => det(x, false)).join('')}</div>
-    <div class="vadPan" data-pan="mars" hidden>${m ? `<h2 class="v3">${esc(m.nosaukums)}</h2>${[m.sezona, m.garums, m.ilgums, m.grutiba].filter(Boolean).length ? `<div class="cipsi">${[m.sezona, m.garums, m.ilgums, m.grutiba].filter(Boolean).map(c => `<span class="c">${esc(c)}</span>`).join('')}</div>` : ''}<div class="apr">${md(m.apraksts)}</div><div class="rinda">${navPogas(m.kur, true)}${marsU ? `<a class="poga gaisa maza" target="_blank" rel="noopener" href="${esc(marsU)}">Maršruta karte ↗</a>` : ''}</div>` : `<p class="mazs">${p.lokacija ? 'Vietai "' + esc(p.lokacija) + '" maršruts nav atrasts.' : 'Tabulā vieta nav norādīta.'} Maršrutu nosaka pasākuma vieta tabulā.</p>`}</div></div>`;
+    <div class="vadPan" data-pan="mars" hidden>${m ? `<h2 class="v3">${esc(m.nosaukums)}</h2>${[m.sezona, m.garums, m.ilgums, m.grutiba].filter(Boolean).length ? `<div class="cipsi">${[m.sezona, m.garums, m.ilgums, m.grutiba].filter(Boolean).map(c => `<span class="c">${esc(c)}</span>`).join('')}</div>` : ''}<div class="apr">${md(marsApr)}</div>` : `<p class="mazs">${p.lokacija ? 'Vietai "' + esc(p.lokacija) + '" maršruts nav atrasts.' : 'Tabulā vieta nav norādīta.'} Maršrutu nosaka pasākuma vieta tabulā.</p>`}</div></div>`;
   document.body.append(d);
   const aizv = () => d.remove();
   d.querySelector('[data-aizv]').onclick = aizv;
