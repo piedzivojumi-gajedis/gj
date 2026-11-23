@@ -684,7 +684,7 @@ svg.liniju path.blav{opacity:.15}
       <div class="karte det" id="agDet"><p class="mazs">Izvēlies aģentu.</p></div>
     </section>
 
-    <!-- ZIŅU SAGATAVES (tikai Toms) -->
+    <!-- ZIŅU SAGATAVES (Toms, Markuss) -->
     <section class="sad" id="s-sagataves">
       <div class="galva"><div><h1>Ziņu sagataves</h1><p>Gatavas ziņas, ko sūtam, kad kāds interesējas par piedāvājumu vasarā vai ziemā, atsauksmes forma u.c. Katru var nokopēt ar vienu klikšķi.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="zinSaite" target="_blank" hidden>Tabula ↗</a><button class="poga zala" onclick="zinForma()">+ Jauna ziņa</button></div></div>
       <div class="karte" id="zinForma" hidden style="margin-bottom:16px">
@@ -1973,7 +1973,7 @@ function izveleties(t, id, kluss) {
 }
 window.addEventListener('resize', () => { if ($('#s-agenti').classList.contains('ak')) liniju(); });
 
-/* ziņu sagataves (tikai Toms) */
+/* ziņu sagataves (Toms, Markuss) */
 let zinDati = [];
 const ZIN_KAT = {vasara: 'Piedāvājums vasarā', ziema: 'Piedāvājums ziemā', pirms: 'Pirms pasākuma', atsauksmes: 'Atsauksmes forma', cits: 'Citas ziņas'};
 const ZIN_IK_KOP = '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="12" height="12" rx="2"/><path d="M15.5 8.5V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"/></svg>';
