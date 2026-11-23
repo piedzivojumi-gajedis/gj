@@ -868,6 +868,7 @@ const pasApak = x => `${x.datums}, ${x.diena}, ${kadPas(x.dienasLidz)}${x.skaits
 function pasAtvert(x) {
   const d = document.createElement('div'), kv = k => { const c = (x.kol || [])[k - 1]; return c ? String(c[1] ?? '') : ''; };
   const kom = (x.komandaL || x.komanda.map(v => ({vards: v, loma: ''}))).map(c => ({...c}));
+  const lasit = LOMA.loma === 'komanda'; // komanda pasākumu tikai apskata
   const lauks = (k, n, t) => { const v = kv(k); return t === 'gars' ? `<label class="pilns">${n}<textarea data-k="${k}" rows="3">${esc(v)}</textarea></label>` : t === 'date' ? `<label>${n}<input type="date" data-k="${k}" value="${isoD(v)}"></label>` : `<label>${n}<input data-k="${k}" value="${esc(v)}"></label>`; };
   const atzHtml = a => { const pz = (x.piez || {})[a.s] || ''; return `<div class="pasAtz" data-s="${a.s}"><label class="rut"><input type="checkbox" data-k="${a.k}"${x.statuss[a.s] ? ' checked' : ''}${LOMA.loma === 'komanda' ? ' disabled' : ''}><span>${esc(a.n)}</span></label><button type="button" class="poga gaisa maza ikP"${LOMA.loma === 'komanda' ? ' hidden' : ''} data-kom="${a.k}" aria-label="Komentārs: ${esc(a.n)}" title="Komentārs">${IK_KOM}</button>${pz ? `<div class="komT">${esc(pz)}</div>` : ''}</div>`; };
   d.className = 'modal';
@@ -879,17 +880,17 @@ function pasAtvert(x) {
       <div class="lauki">${lauks(12, 'Izvēlētā ēdienkarte', 'gars')}${lauks(13, 'Ēdiena alternatīvas', 'gars')}${lauks(14, 'Papildus prasības', 'gars')}${lauks(15, 'Info no klienta', 'gars')}</div>
       <div class="clGrupa">Vietas${x.vietas ? ` <span style="text-transform:none;letter-spacing:0;font-weight:500">· no vadītāju faila, maršruts ${esc(x.vietas.marsruts)}</span>` : ''}</div>
       <div data-vietas></div>
-      <details class="pasCita"${kv(23) || kv(24) ? ' open' : ''}><summary>Cita ēdināšanas vieta (ja šim pasākumam atšķiras)</summary><div class="lauki">${lauks(23, 'Vietas nosaukums')}${lauks(24, 'Adrese vai Google Maps saite')}</div></details>
+      <details class="pasCita"${kv(23) || kv(24) ? ' open' : ''}${lasit && !kv(23) && !kv(24) ? ' hidden' : ''}><summary>Cita ēdināšanas vieta (ja šim pasākumam atšķiras)</summary><div class="lauki">${lauks(23, 'Vietas nosaukums')}${lauks(24, 'Adrese vai Google Maps saite')}</div></details>
       <div class="clGrupa">Komanda</div>
       <div class="komCips" data-komc></div><div data-komr></div>
-      <div class="komJauns"><input placeholder="Vēl kāds cilvēks (vārds)" aria-label="Pievienot cilvēku komandai" data-komj><button type="button" class="poga gaisa maza" data-komp>Pievienot</button></div>
+      <div class="komJauns"${lasit ? ' hidden' : ''}><input placeholder="Vēl kāds cilvēks (vārds)" aria-label="Pievienot cilvēku komandai" data-komj><button type="button" class="poga gaisa maza" data-komp>Pievienot</button></div>
       <div class="rinda" style="margin-top:16px"><button type="button" class="poga zala" data-sag>Sagatavoties</button>${x.saite && LOMA.loma === 'toms' ? `<a class="poga gaisa maza" target="_blank" rel="noopener" href="${esc(x.saite)}">Atvērt tabulā ↗</a>` : ''}</div><div class="zinja" data-z></div>
     </form>
-    <div class="clGrupa">Atzīmē ar roku</div>
+    ${lasit ? '' : `<div class="clGrupa">Atzīmē ar roku</div>
     <div class="pasAtzG">${PAS_ATZ.filter(a => !a.ai).map(atzHtml).join('')}</div>
     <div class="clGrupa">Atzīmē AI, kad izdarīts${LOMA.loma === 'toms' ? '<button type="button" class="poga gaisa maza" data-ai style="margin-left:auto;text-transform:none;letter-spacing:0">Pārbaudīt tagad</button>' : ''}</div>
     <div class="pasAtzG">${PAS_ATZ.filter(a => a.ai).map(atzHtml).join('')}</div>
-    <p class="mazs" style="margin:8px 0 0">Viss saglabājas automātiski. AI reizi dienā pārbauda nosūtītos e-pastus un rēķinus; ja izdarīts citādi, pieliec komentāru.</p></div>`;
+    <p class="mazs" style="margin:8px 0 0">Viss saglabājas automātiski. AI reizi dienā pārbauda nosūtītos e-pastus un rēķinus; ja izdarīts citādi, pieliec komentāru.</p>`}</div>`;
   document.body.append(d);
   const f = d.querySelector('form'), z = d.querySelector('[data-z]');
   f.querySelectorAll('[data-k]').forEach(i => i.dataset.ved = i.value);
@@ -916,6 +917,7 @@ function pasAtvert(x) {
   vietasZim();
   // komanda: Toms/Markuss/Gustavs izvēlas ar klikšķi, citus pievieno; katram var ierakstīt lomu
   const komZim = () => {
+    if (lasit) { d.querySelector('[data-komc]').hidden = true; d.querySelector('[data-komr]').innerHTML = kom.length ? kom.map(c => `<div class="komR"><b>${esc(c.vards)}</b>${c.loma ? `<span class="mazs">${esc(c.loma)}</span>` : ''}</div>`).join('') : '<p class="mazs" style="margin:6px 0 0">Komanda vēl nav izvēlēta.</p>'; return; }
     d.querySelector('[data-komc]').innerHTML = PAS_KOMANDA.map(v => { const on = kom.some(c => c.vards.toLowerCase() === v.toLowerCase()); return `<button type="button" class="komC" aria-pressed="${on}" data-v="${v}">${on ? '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>' : ''}${v}</button>`; }).join('');
     d.querySelector('[data-komr]').innerHTML = kom.length ? kom.map((c, i) => `<div class="komR"><b>${esc(c.vards)}</b><input placeholder="Loma (piem. vadītājs, pavārs)" aria-label="Loma: ${esc(c.vards)}" value="${esc(c.loma)}" data-loma="${i}"><button type="button" class="poga gaisa maza" data-nonemt="${i}" aria-label="Noņemt ${esc(c.vards)}">×</button></div>`).join('') : '<p class="mazs" style="margin:6px 0 0">Komanda vēl nav izvēlēta.</p>';
     d.querySelectorAll('.komC').forEach(b => b.onclick = () => { const v = b.dataset.v, i = kom.findIndex(c => c.vards.toLowerCase() === v.toLowerCase()); if (i >= 0) kom.splice(i, 1); else kom.push({vards: v, loma: ''}); komZim(); komSagl(); });
@@ -940,6 +942,7 @@ function pasAtvert(x) {
   function komSagl() { const t = komTeksts(); if (t === komVed) return; komVed = t; saglabat({komanda: kom.map(c => ({vards: c.vards.trim(), loma: c.loma.trim()}))}); }
   komZim();
   f.onsubmit = e => e.preventDefault();
+  if (lasit) f.querySelectorAll('input[data-k],textarea[data-k]').forEach(i => { i.readOnly = true; });
   f.querySelectorAll('input[data-k],textarea[data-k]').forEach(i => i.addEventListener('change', () => {
     if (i.value === i.dataset.ved) return;
     i.dataset.ved = i.value; saglabat({[i.dataset.k]: i.value});
