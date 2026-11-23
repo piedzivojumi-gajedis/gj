@@ -1985,8 +1985,8 @@ const VIETAS = [
 ];
 const AGENTI = [
   {id: 'atg', nos: 'Atgādinājums', tips: 'skripts', kad: 'katru dienu 9:00', trig: 'gjAtgadinajumi', vietas: ['pas', 'gmail'], ko: 'Dienu pirms pasākuma sūta klientam "Jau rīt tiekamies Gājēdis piedzīvojumā!" un atzīmē kolonnu V.'},
-  {id: 'ats', nos: 'Atsauksmju e-pasts', tips: 'skripts', kad: 'katru dienu 20:00', trig: 'sutitAtsauksmes', vietas: ['pas', 'gmail'], ko: 'Pasākuma dienā sūta Gmail veidni "paldies-atsauksme", atzīmē kolonnu T un nokrāso A:B tumši zaļu.'},
-  {id: 'pied', nos: 'Piedāvājumu melnraksti', tips: 'skripts', kad: 'ik 10 minūtes', trig: 'sagatavotPiedavajumus', vietas: ['gmail'], ko: 'Jauniem pieprasījumiem (mājaslapas forma, atslēgvārdi, etiķete "sagatavot-piedavajumu") izveido melnrakstu ar piedāvājuma veidni. Sūti tu pats.'},
+  {id: 'ats', nos: 'Atsauksmju e-pasts', tips: 'skripts', kad: 'katru dienu 20:00', trig: 'gjAtsauksmesAuto', vietas: ['pas', 'gmail'], ko: 'Pasākuma dienā 20:00 sūta Ziņu sagatavju ziņu "Atsauksmes forma", atzīmē "Novērtē" un nokrāso A:B zaļu.'},
+  {id: 'pied', nos: 'Piedāvājumu melnraksti', tips: 'skripts', kad: 'ik 10 minūtes', trig: 'gjPiedavajumiAuto', vietas: ['gmail'], ko: 'Jauniem pieprasījumiem (pirmā vēstule ar atslēgvārdiem vai etiķete "sagatavot-piedavajumu") izveido Gmail melnrakstu ar Ziņu sagatavju piedāvājumu (oktobris–aprīlis ziemas, citādi vasaras). Sūti tu pats.'},
   {id: 'kops', nos: 'Kopsavilkums un optimizētājs', tips: 'skripts', kad: 'katru dienu 7:30', trig: 'gjKopsavilkumsAuto', vietas: ['pas', 'rek', 'gmail'], ko: 'Savelk, kas izdarīts un kas jādara, neatbildētos e-pastus, kavētos rēķinus, un ar Claude iesaka, ko darīt labāk.'},
   {id: 'bak', nos: 'Backup', tips: 'skripts', kad: 'katru dienu 23:00', trig: 'gjBackupAuto', vietas: ['pas', 'rek', 'drive', 'jaun'], ko: 'Saliek visas tabulas un noteikumus vienā zip failā Drive mapē "Gājēdis programma - backup". Ja neizdodas, atsūta e-pastu.'},
   {id: 'atr', nos: 'Atrakstīšanās', tips: 'skripts', kad: 'ik 6 stundas', trig: 'gjAtrakstisanasAuto', vietas: ['gmail', 'jaun'], ko: 'Kas atbild "Atrakstīties", to atzīmē jaunumu sarakstā kā atrakstījušos.'},
@@ -2104,7 +2104,7 @@ async function ieladetIest() {
     const a = await run('gjAutomatika');
     const t = n => a.trigeri.includes(n) ? '<span class="c ok">ieslēgts</span>' : '<span class="c ne">nav</span>';
     $('#autoInfo').className = '';
-    $('#autoInfo').innerHTML = `<table class="tab vienk"><tr><td>Atgādinājums 9:00</td><td>${t('gjAtgadinajumi')}</td></tr><tr><td>Atsauksmes 20:00</td><td>${t('sutitAtsauksmes')}</td></tr><tr><td>Piedāvājumu melnraksti</td><td>${t('sagatavotPiedavajumus')}</td></tr><tr><td>Kopsavilkums 7:30</td><td>${t('gjKopsavilkumsAuto')}</td></tr><tr><td>Atrakstīšanās</td><td>${t('gjAtrakstisanasAuto')}</td></tr><tr><td>Backup 23:00</td><td>${t('gjBackupAuto')}</td></tr><tr><td>Apmeklējums pirmdienās 8:00</td><td>${t('apSutitParskatu')}</td></tr></table>`;
+    $('#autoInfo').innerHTML = `<table class="tab vienk"><tr><td>Atgādinājums 9:00</td><td>${t('gjAtgadinajumi')}</td></tr><tr><td>Atsauksmes 20:00</td><td>${t('gjAtsauksmesAuto')}</td></tr><tr><td>Piedāvājumu melnraksti</td><td>${t('gjPiedavajumiAuto')}</td></tr><tr><td>Kopsavilkums 7:30</td><td>${t('gjKopsavilkumsAuto')}</td></tr><tr><td>Atrakstīšanās</td><td>${t('gjAtrakstisanasAuto')}</td></tr><tr><td>Backup 23:00</td><td>${t('gjBackupAuto')}</td></tr><tr><td>Apmeklējums pirmdienās 8:00</td><td>${t('apSutitParskatu')}</td></tr></table>`;
   } catch (x) { $('#autoInfo').innerHTML = `<p class="zinja kl">${esc(x.message)}</p>`; }
   ieladetBak(); ieladetPiekl();
 }
