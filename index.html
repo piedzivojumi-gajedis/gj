@@ -311,6 +311,8 @@ h1,h2,.karte,.zn,.tab td{overflow-wrap:anywhere}
 .vadM{align-self:start}.vadM summary{list-style:none;cursor:pointer;display:flex;gap:var(--s3);align-items:center;justify-content:space-between}.vadM summary::-webkit-details-marker{display:none}
 .vadM summary .tx{display:grid;gap:6px;min-width:0}.vadM summary .cipsi{margin:0}.vadM summary>.ik{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;transition:transform var(--t-atri) var(--ease)}.vadM[open] summary>.ik{transform:rotate(180deg)}
 .vadK .apr{white-space:pre-wrap;font-size:14.5px;margin-top:10px;max-width:75ch}
+/* jaunās spēles (dokuments "komandas aktivitātes"): ezera tonis */
+.vadK.jauna{background:var(--c-ezers-1);border-color:var(--c-ezers)}.vadD.jauna summary b{color:var(--c-ezers-9)}.c.jn{background:var(--c-ezers);color:var(--c-balts)}
 /* aģentu karte */
 .karteA{position:relative;display:grid;grid-template-columns:1fr 150px 1fr;gap:0;align-items:start}
 .kol{display:flex;flex-direction:column;gap:var(--s3)}
@@ -513,7 +515,7 @@ svg.liniju path.blav{opacity:.15}
       <div class="galva"><div><h1>Pārgājienu vadītājiem</h1><p>Katram pasākumam savs logs: vietas, maršruts, vadītājs, dienas plāns, spēles un ekipējums.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="vadSaite" target="_blank" hidden>Tabula ↗</a><button class="poga zala vadLab" onclick="vadForma()">+ Pievienot</button></div></div>
       <div class="karte" id="vadForma" hidden style="margin-bottom:16px">
         <h2 class="v3" id="vadFV">Jauns ieraksts</h2>
-        <form id="fVad" onsubmit="return vadSaglabat(event)"><input type="hidden" name="id">
+        <form id="fVad" onsubmit="return vadSaglabat(event)"><input type="hidden" name="id"><input type="hidden" name="iezime">
           <div class="lauki">
             <label>Veids<select name="tips" onchange="vadLauki()"><option value="marsruts">Maršruts</option><option value="spele">Spēle</option><option value="plans">Dienas plāns</option><option value="ekipejums">Ekipējums</option><option value="info">Cita informācija</option></select></label>
             <label>Nosaukums<input name="nosaukums" required></label>
@@ -1279,8 +1281,8 @@ function vadMarsKarte(x, i) {
 }
 function vadKarte(x, i) {
   if (x.tips === 'marsruts') return vadMarsKarte(x, i);
-  const cipsi = [x.sezona, x.garums, x.ilgums, x.grutiba, x.cilveki ? x.cilveki + ' cilv.' : ''].filter(Boolean).map(c => `<span class="c">${esc(c)}</span>`).join('');
-  return `<div class="karte vadK"><div class="galva" style="margin:0;align-items:baseline"><h2 class="v3" style="margin:0">${esc(x.nosaukums)}</h2><span class="mazs">${esc(x.atjaunots)}</span></div>${x.kur ? `<div class="mazs" style="margin-top:4px">${esc(x.kur)}</div>` : ''}${cipsi ? `<div class="cipsi">${cipsi}</div>` : ''}${x.apraksts ? `<div class="apr">${md(x.apraksts)}</div>` : ''}${x.vajag ? `<p class="mazs" style="margin:10px 0 0"><b>Vajag līdzi:</b> ${esc(x.vajag)}</p>` : ''}<div class="rinda">${x.tips === 'marsruts' ? navPogas(x.kur, true) : ''}${/^https?:\/\//.test(x.saite) ? `<a class="poga gaisa maza" target="_blank" rel="noopener" href="${esc(x.saite)}">Saite ↗</a>` : ''}<button class="poga gaisa maza vadLab" onclick="vadForma(${i})">Labot</button><button class="poga gaisa maza vadLab" onclick="vadDzest(${i})">Dzēst</button></div></div>`;
+  const cipsi = (x.iezime === 'jauna' ? '<span class="c jn">Jauna</span>' : '') + [x.sezona, x.garums, x.ilgums, x.grutiba, x.cilveki ? x.cilveki + ' cilv.' : ''].filter(Boolean).map(c => `<span class="c">${esc(c)}</span>`).join('');
+  return `<div class="karte vadK${x.iezime === 'jauna' ? ' jauna' : ''}"><div class="galva" style="margin:0;align-items:baseline"><h2 class="v3" style="margin:0">${esc(x.nosaukums)}</h2><span class="mazs">${esc(x.atjaunots)}</span></div>${x.kur ? `<div class="mazs" style="margin-top:4px">${esc(x.kur)}</div>` : ''}${cipsi ? `<div class="cipsi">${cipsi}</div>` : ''}${x.apraksts ? `<div class="apr">${md(x.apraksts)}</div>` : ''}${x.vajag ? `<p class="mazs" style="margin:10px 0 0"><b>Vajag līdzi:</b> ${esc(x.vajag)}</p>` : ''}<div class="rinda">${x.tips === 'marsruts' ? navPogas(x.kur, true) : ''}${/^https?:\/\//.test(x.saite) ? `<a class="poga gaisa maza" target="_blank" rel="noopener" href="${esc(x.saite)}">Saite ↗</a>` : ''}<button class="poga gaisa maza vadLab" onclick="vadForma(${i})">Labot</button><button class="poga gaisa maza vadLab" onclick="vadDzest(${i})">Dzēst</button></div></div>`;
 }
 function vadZimet() {
   const q = $('#vadMekl').value.trim().toLowerCase();
@@ -1306,7 +1308,7 @@ function vadAtvert(atsl) {
   const p = vadPas.find(x => x.atslega === atsl); if (!p) return;
   const m = vadMarsruts(p), speles = vadDati.filter(x => x.tips === 'spele'), plans = vadDati.filter(x => ['plans', 'info'].includes(x.tips) && !/avoti/i.test(x.nosaukums)), ekip = vadDati.filter(x => x.tips === 'ekipejums');
   const lauks = (k, v) => v ? `<dt>${k}</dt><dd>${md(v)}</dd>` : '';
-  const det = (x, atv) => `<details class="vadD"${atv ? ' open' : ''}><summary><b>${esc(x.nosaukums)}</b>${[x.ilgums, x.cilveki ? x.cilveki + ' cilv.' : '', x.sezona].filter(Boolean).map(c => ` <span class="c">${esc(c)}</span>`).join('')}</summary>${x.apraksts ? `<div class="apr">${md(x.apraksts)}</div>` : ''}${x.vajag ? `<p class="mazs" style="margin:8px 0 0"><b>Vajag līdzi:</b> ${esc(x.vajag)}</p>` : ''}${/^https?:\/\//.test(x.saite) ? `<p style="margin:8px 0 0"><a target="_blank" rel="noopener" href="${esc(x.saite)}">Saite ↗</a></p>` : ''}</details>`;
+  const det = (x, atv) => `<details class="vadD${x.iezime === 'jauna' ? ' jauna' : ''}"${atv ? ' open' : ''}><summary><b>${esc(x.nosaukums)}</b>${x.iezime === 'jauna' ? ' <span class="c jn">Jauna</span>' : ''}${[x.ilgums, x.grutiba, x.cilveki ? x.cilveki + ' cilv.' : '', x.sezona].filter(Boolean).map(c => ` <span class="c">${esc(c)}</span>`).join('')}</summary>${x.apraksts ? `<div class="apr">${md(x.apraksts)}</div>` : ''}${x.vajag ? `<p class="mazs" style="margin:8px 0 0"><b>Vajag līdzi:</b> ${esc(x.vajag)}</p>` : ''}${/^https?:\/\//.test(x.saite) ? `<p style="margin:8px 0 0"><a target="_blank" rel="noopener" href="${esc(x.saite)}">Saite ↗</a></p>` : ''}</details>`;
   // vietas: tikšanās un ēdināšanas vieta no maršruta apraksta; ierakstīta cita ēdināšanas vieta aizstāj
   const poga = (ik, n, u) => u ? `<a class="poga gaisa" target="_blank" rel="noopener" href="${esc(u)}">${VAD_IK[ik]}${n} ↗</a>` : '';
   const cita = p.edVieta || p.edSaite ? (/^https?:\/\//i.test(p.edSaite) ? p.edSaite : navSaites(p.edSaite || p.edVieta)?.gmaps || '') : '';
@@ -1372,7 +1374,7 @@ function vadAtvert(atsl) {
 }
 function vadForma(i) {
   const x = i === undefined ? {tips: vadTips === 'pasakumi' ? 'marsruts' : vadTips} : vadDati[i], f = $('#fVad');
-  f.reset(); f.elements.id.value = '';
+  f.reset(); f.elements.id.value = ''; f.elements.iezime.value = '';
   Object.entries(x).forEach(([k, v]) => { if (f.elements[k]) f.elements[k].value = v; });
   $('#vadFV').textContent = i === undefined ? 'Jauns ieraksts' : 'Labot: ' + x.nosaukums; $('#vadZ').className = 'zinja';
   vadLauki(); $('#vadForma').hidden = false; $('#vadForma').scrollIntoView({behavior: 'smooth'}); f.elements.nosaukums.focus();
