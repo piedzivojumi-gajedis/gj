@@ -308,6 +308,8 @@ h1,h2,.karte,.zn,.tab td{overflow-wrap:anywhere}
 .tabs{display:flex;gap:6px;flex-wrap:wrap}
 .tabs button{all:unset;cursor:pointer;font:600 13.5px var(--f-ui);padding:var(--s2) 14px;border-radius:var(--r-pill);box-shadow:inset 0 0 0 1px var(--linija);transition:background-color var(--t-atri) var(--ease),color var(--t-atri) var(--ease),transform var(--t-atri) var(--ease)}
 .tabs button:hover{background:var(--virsma-neitr)}.tabs button.ak{background:var(--teksts);color:#fff;box-shadow:none}
+.vadM{align-self:start}.vadM summary{list-style:none;cursor:pointer;display:flex;gap:var(--s3);align-items:center;justify-content:space-between}.vadM summary::-webkit-details-marker{display:none}
+.vadM summary .tx{display:grid;gap:6px;min-width:0}.vadM summary .cipsi{margin:0}.vadM summary>.ik{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;transition:transform var(--t-atri) var(--ease)}.vadM[open] summary>.ik{transform:rotate(180deg)}
 .vadK .apr{white-space:pre-wrap;font-size:14.5px;margin-top:10px;max-width:75ch}
 /* aģentu karte */
 .karteA{position:relative;display:grid;grid-template-columns:1fr 150px 1fr;gap:0;align-items:start}
@@ -1254,7 +1256,29 @@ function vadMarsruts(p) {
   const l = normV(p.lokacija); if (!l) return null;
   return m.find(x => normV(x.nosaukums).split(/[^a-z0-9]+/).some(v => v.length >= 4 && l.includes(v))) || null;
 }
+/* maršruta apraksts bez vietu/maršruta saišu rindām (tās ir pogās) un pogas no šīm rindām */
+const vadAprTirs = t => String(t || '').split('\n').filter(r => !/^\s*(Tikšanās vieta|Ēdināšanas vieta|Maršruts:|Variants\s*\d|Divi varianti)/i.test(r)).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+function vadVietasNo(apr) {
+  const v = []; let cur = null;
+  String(apr || '').split('\n').forEach(r => {
+    r = r.trim();
+    if (/^Variants\s*\d/i.test(r)) { cur = {nos: r}; v.push(cur); return; }
+    const k = /^Tikšanās vieta/i.test(r) ? 'tiks' : /^Ēdināšanas vieta/i.test(r) ? 'ed' : /^Maršruts:/i.test(r) ? 'mars' : ''; if (!k) return;
+    if (!cur) { cur = {nos: ''}; v.push(cur); }
+    const u = (r.match(/https?:\/\/\S+/) || [''])[0], ko = r.match(/\((-?\d+\.\d+),\s*(-?\d+\.\d+)\)/);
+    cur[k] = u || (ko ? navSaites(ko[1] + ',' + ko[2]).gmaps : '');
+  });
+  return v;
+}
+const vadPoga = (ik, n, u) => u ? `<a class="poga gaisa" target="_blank" rel="noopener" href="${esc(u)}">${VAD_IK[ik]}${n} ↗</a>` : '';
+function vadMarsKarte(x, i) {
+  const cipsi = [x.sezona, x.garums, x.ilgums, x.grutiba].filter(Boolean).map(c => `<span class="c">${esc(c)}</span>`).join('');
+  const vr = vadVietasNo(x.apraksts), kop = /^https?:\/\//.test(x.saite) ? x.saite : '';
+  const pogas = vr.map(v => `<div class="vadVar">${v.nos && vr.length > 1 ? `<span class="etik">${esc(v.nos)}</span>` : ''}<div class="vadVp">${vadPoga('tiks', 'Tikšanās vieta', v.tiks)}${vadPoga('ed', 'Ēdināšanas vieta', v.ed)}${vadPoga('mars', 'Maršruts', v.mars || (vr.length > 1 ? '' : kop))}</div></div>`).join('') || (kop ? `<div class="vadVp">${vadPoga('mars', 'Maršruts', kop)}</div>` : '');
+  return `<details class="karte vadK vadM"><summary><span class="tx"><b>${esc(x.nosaukums)}</b>${cipsi ? `<span class="cipsi">${cipsi}</span>` : ''}</span><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="vadAug" style="margin-top:var(--s3)">${pogas}</div>${vadAprTirs(x.apraksts) ? `<div class="apr">${md(vadAprTirs(x.apraksts))}</div>` : ''}<div class="rinda"><span class="mazs" style="margin-right:auto">${esc(x.atjaunots)}</span><button class="poga gaisa maza vadLab" onclick="vadForma(${i})">Labot</button><button class="poga gaisa maza vadLab" onclick="vadDzest(${i})">Dzēst</button></div></details>`;
+}
 function vadKarte(x, i) {
+  if (x.tips === 'marsruts') return vadMarsKarte(x, i);
   const cipsi = [x.sezona, x.garums, x.ilgums, x.grutiba, x.cilveki ? x.cilveki + ' cilv.' : ''].filter(Boolean).map(c => `<span class="c">${esc(c)}</span>`).join('');
   return `<div class="karte vadK"><div class="galva" style="margin:0;align-items:baseline"><h2 class="v3" style="margin:0">${esc(x.nosaukums)}</h2><span class="mazs">${esc(x.atjaunots)}</span></div>${x.kur ? `<div class="mazs" style="margin-top:4px">${esc(x.kur)}</div>` : ''}${cipsi ? `<div class="cipsi">${cipsi}</div>` : ''}${x.apraksts ? `<div class="apr">${md(x.apraksts)}</div>` : ''}${x.vajag ? `<p class="mazs" style="margin:10px 0 0"><b>Vajag līdzi:</b> ${esc(x.vajag)}</p>` : ''}<div class="rinda">${x.tips === 'marsruts' ? navPogas(x.kur, true) : ''}${/^https?:\/\//.test(x.saite) ? `<a class="poga gaisa maza" target="_blank" rel="noopener" href="${esc(x.saite)}">Saite ↗</a>` : ''}<button class="poga gaisa maza vadLab" onclick="vadForma(${i})">Labot</button><button class="poga gaisa maza vadLab" onclick="vadDzest(${i})">Dzēst</button></div></div>`;
 }
@@ -1292,7 +1316,7 @@ function vadAtvert(atsl) {
   if (kopejas) vietas += `<div class="vadVp">${kopejas}</div>`;
   if (!vietas) vietas = `<p class="mazs" style="margin:0">${p.lokacija ? 'Vietai "' + esc(p.lokacija) + '" vietas un maršruts nav atrasti.' : 'Tabulā "Pasākumi" vieta nav norādīta.'}</p>`;
   // maršruta apraksts bez vietu un maršruta saitēm: tās jau ir pogās augšā
-  const marsApr = m ? String(m.apraksts || '').split('\n').filter(r => !/^\s*(Tikšanās vieta|Ēdināšanas vieta|Maršruts:|Variants\s*\d|Divi varianti)/i.test(r)).join('\n').replace(/\n{3,}/g, '\n\n').trim() : '';
+  const marsApr = m ? vadAprTirs(m.apraksts) : '';
   const kl = [p.info, p.prasibas ? 'Prasības: ' + p.prasibas : ''].filter(Boolean).join('\n\n');
   // klienta kontakti: teksts no tabulas + pogas zvanīt / rakstīt
   const tel = [...new Set((String(p.kontakti || '').match(/\+?\d[\d ]{6,}\d/g) || []).map(t => t.replace(/ /g, '')))];
