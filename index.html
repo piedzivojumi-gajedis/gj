@@ -122,6 +122,10 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 @keyframes griez{to{transform:rotate(360deg)}}
 .darbs{display:flex;gap:var(--s3);padding:var(--s3) 0;border-top:1px solid var(--linija)}
 .darbs:first-child{border-top:0}
+.epPunkts{flex:none;width:9px;height:9px;border-radius:50%;margin-top:7px;box-shadow:inset 0 0 0 1.5px var(--linija)}
+.epR.nel .epPunkts{background:var(--c-ezers);box-shadow:none}
+.epT{min-width:0;overflow-wrap:anywhere;font-weight:500}.epR.nel .epT{font-weight:700}
+.epF{font-size:13.5px;margin-top:4px;color:var(--pelēks);overflow-wrap:anywhere}.epR.nel .epF{color:var(--c-tinte-2)}
 .prio{flex:none;width:8px;height:8px;border-radius:50%;margin-top:7px}
 .p1{background:var(--ugunskurs)}.p2{background:var(--dzeltens)}.p3{background:#9aa58f}
 .ietek{background:var(--c-mezs-0);border:1px solid var(--mezs-gaiss);border-radius:var(--r-m);padding:var(--s3) 14px;margin:var(--s3) 0}
@@ -616,7 +620,8 @@ svg.liniju path.blav{opacity:.15}
 
     <!-- E-PASTI -->
     <section class="sad" id="s-epasti">
-      <div class="galva"><div><h1>E-pasti</h1><p>Iesūtne: kam vēl nav atbildēts. Uzspied "Atvērt Gmail", lai atbildētu.</p></div><div class="rinda" style="margin:0"><a class="poga" target="_blank" rel="noopener" href="https://mail.google.com/mail/?authuser=piedzivojumi%40gajedis.lv#inbox">Atvērt Gmail ↗</a><button class="poga gaisa" onclick="ieladetEp()">Atjaunot</button></div></div>
+      <div class="galva"><div><h1>E-pasti</h1><p>Iesūtne sinhronizējas ar Gmail ik minūti: redzams, kuri e-pasti ir lasīti, kuri nē un kuri gaida atbildi.</p></div><div class="rinda" style="margin:0"><a class="poga" target="_blank" rel="noopener" href="https://mail.google.com/mail/?authuser=piedzivojumi%40gajedis.lv#inbox">Atvērt Gmail ↗</a><button class="poga gaisa" onclick="ieladetEp()">Atjaunot</button></div></div>
+      <div class="tabs" id="epFil" role="group" aria-label="Filtrs" style="margin-bottom:var(--s3)"></div>
       <div class="karte"><div id="epSar" class="ielade">Ielādē…</div></div>
     </section>
 
@@ -1764,17 +1769,39 @@ async function rekPdf(nr) {
   } catch (x) { const st = d.querySelector('[data-s]'); st.className = 'zinja kl'; st.textContent = x.message; }
 }
 
-/* e-pasti */
+/* e-pasti: iesūtne ar lasīts/nelasīts, sinhronizējas ar Gmail ik minūti */
+let epDati = [], epFiltrs = 'visi';
 async function ieladetEp() {
   if (!kluss) { $('#epSar').className = 'ielade'; $('#epSar').textContent = 'Lasu iesūtni…'; }
   try {
-    await kesh('gjEpastuSaraksts', [], e => {
-      $('#epSar').className = '';
-      $('#nEp').hidden = !e.length; $('#nEp').textContent = e.length;
-      $('#epSar').innerHTML = e.length ? e.map(x => `<div class="darbs"><span class="prio ${x.pieprasijums ? 'p1' : x.dienas >= 3 ? 'p2' : 'p3'}"></span><div style="flex:1;min-width:0"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:baseline"><b style="min-width:0;overflow-wrap:anywhere">${esc(x.temats)}</b>${x.pieprasijums ? '<span class="c ne">pieprasījums</span>' : ''}<span class="mazs" style="margin-left:auto">${esc(x.datums)} · ${x.dienas} d.</span></div><div class="mazs" style="overflow-wrap:anywhere">${esc(x.no)}</div><div style="font-size:13.5px;margin-top:4px;color:var(--c-tinte-2);overflow-wrap:anywhere">${esc(x.fragments)}…</div><div class="rinda" style="margin-top:8px"><a class="poga gaisa maza" target="_blank" rel="noopener" href="${esc(x.saite)}">Atvērt Gmail ↗</a></div></div></div>`).join('') : '<p class="tukss">Visiem e-pastiem atbildēts.</p>';
-    });
+    await kesh('gjEpastuSaraksts', [], e => { epDati = e; epZimet(); });
   } catch (x) { $('#epSar').className = ''; $('#epSar').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
 }
+function epZimet() {
+  const nel = epDati.filter(x => x.nelasits).length, gaida = epDati.filter(x => x.gaida).length;
+  $('#nEp').hidden = !nel; $('#nEp').textContent = nel;
+  $('#epFil').innerHTML = [['visi', 'Visi', epDati.length], ['nelasiti', 'Nelasītie', nel], ['gaida', 'Gaida atbildi', gaida]].map(([k, n, c]) => `<button type="button" data-f="${k}" class="${epFiltrs === k ? 'ak' : ''}" aria-pressed="${epFiltrs === k}">${n} (${c})</button>`).join('');
+  const v = epDati.filter(x => epFiltrs === 'visi' || (epFiltrs === 'nelasiti' ? x.nelasits : x.gaida)).sort((a, b) => b.ts - a.ts);
+  $('#epSar').className = '';
+  $('#epSar').innerHTML = v.length ? v.map(x => `<div class="darbs epR${x.nelasits ? ' nel' : ''}" data-id="${esc(x.id)}"><span class="epPunkts" aria-hidden="true"></span><div style="flex:1;min-width:0"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:baseline"><b class="epT">${esc(x.temats)}${x.skaits > 1 ? ` <span class="mazs">(${x.skaits})</span>` : ''}</b>${x.nelasits ? '<span class="c jn">nelasīts</span>' : ''}${x.gaida ? '<span class="c br">gaida atbildi</span>' : ''}${x.pieprasijums ? '<span class="c ne">pieprasījums</span>' : ''}<span class="mazs" style="margin-left:auto">${esc(x.datums)} · ${x.dienas} d.</span></div><div class="mazs" style="overflow-wrap:anywhere">${esc(x.no)}</div><div class="epF">${esc(x.fragments)}…</div><div class="rinda" style="margin-top:8px"><a class="poga gaisa maza" target="_blank" rel="noopener" href="${esc(x.saite)}" data-atv>Atvērt Gmail ↗</a><button type="button" class="poga gaisa maza" data-las>${x.nelasits ? 'Atzīmēt kā lasītu' : 'Atzīmēt kā nelasītu'}</button></div></div></div>`).join('') : `<p class="tukss">${epFiltrs === 'nelasiti' ? 'Visi e-pasti izlasīti.' : epFiltrs === 'gaida' ? 'Visiem e-pastiem atbildēts.' : 'Iesūtne tukša.'}</p>`;
+}
+async function epLasits(x, lasits) {
+  if (!x || x.nelasits === !lasits) return;
+  x.nelasits = !lasits; epZimet();
+  try { localStorage.removeItem(kAtsl('gjEpastuSaraksts', [])); } catch (e) {}
+  try { await run('gjEpastsLasits', x.id, lasits); } catch (k) { x.nelasits = lasits; epZimet(); alertZ(k.message); }
+}
+$('#epFil').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { epFiltrs = b.dataset.f; epZimet(); } });
+$('#epSar').addEventListener('click', e => {
+  const r = e.target.closest('.epR'); if (!r) return; const x = epDati.find(y => y.id === r.dataset.id);
+  if (e.target.closest('[data-las]')) epLasits(x, x.nelasits);
+  else if (e.target.closest('[data-atv]')) epLasits(x, true); // Gmail atverot to atzīmē kā lasītu
+});
+// sinhronizācija: kamēr E-pasti atvērti, ik minūti klusi pārlasa iesūtni
+setInterval(async () => {
+  if (document.hidden || kluss || !$('#s-epasti').classList.contains('ak') || document.querySelector('.app').hidden) return;
+  kluss = true; try { await ieladetEp(); } finally { kluss = false; }
+}, 60000);
 // Esc aizver augšējo logu arī tad, ja fokuss nav logā (piem. pēc pogas atspējošanas saglabājot)
 document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; const m = [...document.querySelectorAll('.modal')].pop(); if (m && !m.contains(document.activeElement)) m.remove(); });
 function alertZ(t) { const z = document.createElement('div'); z.className = 'zinja kl'; z.style.cssText = 'display:block;position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:30'; z.textContent = t; document.body.append(z); setTimeout(() => z.remove(), 5000); }
