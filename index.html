@@ -273,6 +273,15 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 .vadD summary{color:var(--teksts);font-size:14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .vadD .apr{white-space:pre-wrap;font-size:14.5px;margin:0 0 10px;overflow-wrap:anywhere}
 .vadD .cl{padding-left:2px}
+.vadAug{display:grid;gap:var(--s3);margin:var(--s3) 0 0}
+.vadCipsi{display:flex;flex-wrap:wrap;gap:var(--s2)}.vadCipsi .vieta{padding:var(--s2) var(--s3);flex:1 1 140px}
+.vadVar{display:grid;gap:6px}.vadVp{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.vadVp .poga{display:inline-flex;align-items:center;gap:8px;min-width:0;white-space:normal;text-align:left}
+.vadVp .ik,.zinaK .ik{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.vadKl{background:var(--virsma-neitr);border-radius:var(--r-m);padding:var(--s3);font-size:14.5px;white-space:pre-wrap;overflow-wrap:anywhere}.vadKl .etik{display:block;margin-bottom:4px;white-space:normal}
+.vadPTabs{margin:var(--s5) 0 var(--s2)}.vadPan .apr{white-space:pre-wrap;font-size:14.5px;overflow-wrap:anywhere}
+.zinaK .zt{white-space:pre-wrap;font-size:14.5px;overflow-wrap:anywhere;margin:var(--s2) 0 0;max-height:260px;overflow:auto}
+.zinaK .rinda .poga{display:inline-flex;align-items:center;gap:6px}
 .vadF{margin-top:10px}.vadFr{display:flex;gap:var(--s2);align-items:center}.vadFr input{flex:1;min-width:0}
 .vadSoma{margin-top:16px;background:var(--c-mezs-0);border:1px solid var(--mezs-gaiss);border-radius:var(--r);padding:var(--s4)}
 .vadSoma .v3{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap}
@@ -430,6 +439,7 @@ svg.liniju path.blav{opacity:.15}
       <button data-s="kopsavilkums"><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M8 8.5h8"/><path d="M8 12h8"/><path d="M8 15.5h5"/></svg>Kopsavilkums</button>
       <button data-s="apmeklejums"><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7.5 15.5v-3"/><path d="M12 15.5v-7"/><path d="M16.5 15.5v-5"/></svg>Apmeklējums</button>
       <button data-s="agenti"><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="2.5"/><path d="M12 8V4.5"/><circle cx="12" cy="3.5" r="1"/><path d="M9 13.5v1"/><path d="M15 13.5v1"/><path d="M2 13v3"/><path d="M22 13v3"/></svg>Aģenti</button>
+      <button data-s="sagataves"><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-5A8 8 0 1 1 21 12z"/><path d="M8.5 10.5h7"/><path d="M8.5 14h4.5"/></svg>Ziņu sagataves</button>
       <button data-s="noteikumi"><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h13.5v15H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h13.5"/><path d="M9 7.5h6"/></svg>Noteikumi</button>
       <button data-s="iestatijumi"><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10"/><path d="M18 6h2"/><circle cx="16" cy="6" r="2"/><path d="M4 12h3"/><path d="M11 12h9"/><circle cx="9" cy="12" r="2"/><path d="M4 18h12"/><path d="M20 18h0"/><circle cx="18" cy="18" r="2"/></svg>Iestatījumi</button>
     </nav>
@@ -498,12 +508,12 @@ svg.liniju path.blav{opacity:.15}
 
     <!-- VADĪTĀJIEM -->
     <section class="sad" id="s-vaditajiem">
-      <div class="galva"><div><h1>Pārgājienu vadītājiem</h1><p>Katram pasākumam savs logs: vadītājs, maršruts, spēles, norise un ko ņemt līdzi.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="vadSaite" target="_blank" hidden>Tabula ↗</a><button class="poga zala vadLab" onclick="vadForma()">+ Pievienot</button></div></div>
+      <div class="galva"><div><h1>Pārgājienu vadītājiem</h1><p>Katram pasākumam savs logs: vietas, maršruts, vadītājs, dienas plāns, spēles un ekipējums.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="vadSaite" target="_blank" hidden>Tabula ↗</a><button class="poga zala vadLab" onclick="vadForma()">+ Pievienot</button></div></div>
       <div class="karte" id="vadForma" hidden style="margin-bottom:16px">
         <h2 class="v3" id="vadFV">Jauns ieraksts</h2>
         <form id="fVad" onsubmit="return vadSaglabat(event)"><input type="hidden" name="id">
           <div class="lauki">
-            <label>Veids<select name="tips" onchange="vadLauki()"><option value="marsruts">Maršruts</option><option value="spele">Spēle</option><option value="info">Informācija</option></select></label>
+            <label>Veids<select name="tips" onchange="vadLauki()"><option value="marsruts">Maršruts</option><option value="spele">Spēle</option><option value="plans">Dienas plāns</option><option value="ekipejums">Ekipējums</option><option value="info">Cita informācija</option></select></label>
             <label>Nosaukums<input name="nosaukums" required></label>
             <label data-t="marsruts">Sākuma punkts (adrese vai koordinātes)<input name="kur" placeholder="Ķemeru tīrelis, stāvlaukums"></label>
             <label data-t="marsruts">Garums<input name="garums" placeholder="6 km"></label>
@@ -511,14 +521,14 @@ svg.liniju path.blav{opacity:.15}
             <label data-t="marsruts">Grūtība<select name="grutiba"><option value="">–</option><option>viegls</option><option>vidējs</option><option>grūts</option></select></label>
             <label data-t="spele">Cilvēku skaits<input name="cilveki" placeholder="6–30"></label>
             <label data-t="spele">Vajag līdzi<input name="vajag" placeholder="virve, 2 bumbas"></label>
-            <label data-t="marsruts info">Sezona<select name="sezona"><option value="">–</option><option>vasara</option><option>ziema</option><option>vasara, ziema</option></select></label>
+            <label data-t="marsruts plans info">Sezona<select name="sezona"><option value="">–</option><option>vasara</option><option>ziema</option><option>vasara, ziema</option></select></label>
             <label class="pilns">Apraksts<textarea name="apraksts" rows="8" placeholder="Kā iet, kur apstāties, noteikumi, svarīgi zināt…"></textarea></label>
             <label class="pilns">Saite (karte, Wikiloc, dokuments)<input name="saite" placeholder="https://"></label>
           </div>
           <div class="rinda"><button class="poga zala">Saglabāt</button><button type="button" class="poga gaisa" onclick="$('#vadForma').hidden=true">Atcelt</button></div><div class="zinja" id="vadZ"></div>
         </form>
       </div>
-      <div class="rinda" style="margin:0 0 16px"><div class="tabs" id="vadTabs"><button data-t="pasakumi" class="ak">Pasākumi</button><button data-t="marsruts">Maršruti</button><button data-t="spele">Spēles</button><button data-t="info">Informācija</button></div><input id="vadMekl" type="search" placeholder="Meklēt…" aria-label="Meklēt" style="flex:1;min-width:180px;max-width:320px;margin-left:auto" oninput="vadZimet()"></div>
+      <div class="rinda" style="margin:0 0 16px"><div class="tabs" id="vadTabs"><button data-t="pasakumi" class="ak">Pasākumi</button><button data-t="plans">Dienas plāns</button><button data-t="spele">Spēles</button><button data-t="ekipejums">Ekipējums</button><button data-t="marsruts">Visi maršruti</button></div><input id="vadMekl" type="search" placeholder="Meklēt…" aria-label="Meklēt" style="flex:1;min-width:180px;max-width:320px;margin-left:auto" oninput="vadZimet()"></div>
       <div class="rezgis r2" id="vadSar"><div class="karte ielade">Ielādē…</div></div>
     </section>
 
@@ -670,6 +680,23 @@ svg.liniju path.blav{opacity:.15}
       <div class="karte det" id="agDet"><p class="mazs">Izvēlies aģentu.</p></div>
     </section>
 
+    <!-- ZIŅU SAGATAVES (tikai Toms) -->
+    <section class="sad" id="s-sagataves">
+      <div class="galva"><div><h1>Ziņu sagataves</h1><p>Gatavas ziņas, ko sūtam, kad kāds interesējas par piedāvājumu vasarā vai ziemā, atsauksmes forma u.c. Katru var nokopēt ar vienu klikšķi.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="zinSaite" target="_blank" hidden>Tabula ↗</a><button class="poga zala" onclick="zinForma()">+ Jauna ziņa</button></div></div>
+      <div class="karte" id="zinForma" hidden style="margin-bottom:16px">
+        <h2 class="v3" id="zinFV">Jauna ziņa</h2>
+        <form id="fZin" onsubmit="return zinSaglabat(event)"><input type="hidden" name="id">
+          <div class="lauki">
+            <label>Kategorija<select name="kat"><option value="vasara">Piedāvājums vasarā</option><option value="ziema">Piedāvājums ziemā</option><option value="atsauksmes">Atsauksmes forma</option><option value="cits">Cits</option></select></label>
+            <label>Nosaukums<input name="nosaukums" placeholder="Pirmā atbilde uz pieprasījumu"></label>
+            <label class="pilns">Ziņas teksts<textarea name="teksts" rows="12" required placeholder="Sveiki! Paldies par interesi…"></textarea></label>
+          </div>
+          <div class="rinda"><button class="poga zala">Saglabāt</button><button type="button" class="poga gaisa" onclick="$('#zinForma').hidden=true">Atcelt</button></div><div class="zinja" id="zinZ"></div>
+        </form>
+      </div>
+      <div id="zinSar"><div class="karte ielade">Ielādē…</div></div>
+    </section>
+
     <!-- NOTEIKUMI -->
     <section class="sad" id="s-noteikumi">
       <div class="galva"><div><h1>Tavi noteikumi</h1><p>Pēc tiem strādā programma, čats un Claude. Sastādi tos kopā ar Gājēdi: kad pasaki "saglabā", viņš ieliek tos pareizajā vietā (tu apstiprini ar pogu).</p></div><div class="rinda" style="margin:0"><button class="poga zala" onclick="catsJautat('Palīdzi sastādīt noteikumu par ')">Sastādīt ar Gājēdi</button><button class="poga gaisa" onclick="notJauns()">+ Ar roku</button></div></div>
@@ -768,7 +795,7 @@ const forma = f => Object.fromEntries(new FormData(f).entries());
 let ielad = {}, kluss = false;
 
 /* navigācija */
-const IEL = {janoperk: ieladetJan, finanses: ieladetFin, izaugsme: ieladetIz, pasakumi: ieladetPas, sagatavosanas: ieladetSag, vaditajiem: ieladetVad, rekini: ieladetRek, epasti: ieladetEp, marketings: ieladetMark, kopsavilkums: () => ieladetKops(false), apmeklejums: () => ieladetApm(false), agenti: zimetKarti, noteikumi: ieladetNot, iestatijumi: ieladetIest};
+const IEL = {janoperk: ieladetJan, finanses: ieladetFin, izaugsme: ieladetIz, pasakumi: ieladetPas, sagatavosanas: ieladetSag, vaditajiem: ieladetVad, rekini: ieladetRek, epasti: ieladetEp, marketings: ieladetMark, kopsavilkums: () => ieladetKops(false), apmeklejums: () => ieladetApm(false), agenti: zimetKarti, sagataves: ieladetZin, noteikumi: ieladetNot, iestatijumi: ieladetIest};
 function iet(s) {
   document.querySelectorAll('.sad').forEach(x => x.classList.toggle('ak', x.id === 's-' + s));
   document.querySelectorAll('#nav button').forEach(b => { b.classList.toggle('ak', b.dataset.s === s); if (b.dataset.s === s) { b.setAttribute('aria-current', 'page'); $('#augsaNos').textContent = b.textContent.replace(b.querySelector('.ik').textContent, '').replace(/\d+$/, '').trim(); } else b.removeAttribute('aria-current'); });
@@ -1212,7 +1239,8 @@ async function sabSaglabat(e) {
 
 /* vadītājiem: pasākumu logi + maršruti, spēles, informācija */
 let vadDati = [], vadPas = [], vadTips = 'pasakumi';
-const VAD_NOS = {marsruts: 'maršrutu', spele: 'spēļu', info: 'informācijas'};
+const VAD_NOS = {marsruts: 'maršrutu', spele: 'spēļu', plans: 'dienas plāna', ekipejums: 'ekipējuma'};
+const vadTipi = t => t === 'plans' ? ['plans', 'info'] : [t];
 async function ieladetVad() {
   try { await kesh('gjVaditajiem', [], v => { vadDati = v.ieraksti; vadPas = v.pasakumi || []; $('#vadSaite').href = v.saite; $('#vadSaite').hidden = LOMA.loma !== 'toms'; vadZimet(); }); }
   catch (x) { $('#vadSar').innerHTML = `<p class="zinja kl liel" style="display:block">${esc(x.message)}</p>`; }
@@ -1238,31 +1266,56 @@ function vadZimet() {
     $('#vadSar').querySelectorAll('.vadP').forEach(b => b.onclick = () => vadAtvert(b.dataset.a));
     return;
   }
-  const s = vadDati.filter(x => x.tips === vadTips && (!q || Object.values(x).join(' ').toLowerCase().includes(q)));
+  const s = vadDati.filter(x => vadTipi(vadTips).includes(x.tips) && (!q || Object.values(x).join(' ').toLowerCase().includes(q)));
   $('#vadSar').innerHTML = s.length ? s.map(x => vadKarte(x, vadDati.indexOf(x))).join('') : `<p class="tukss liel">${q ? 'Nekas nav atrasts.' : `Vēl nav neviena ${VAD_NOS[vadTips]} ieraksta. Spied "+ Pievienot".`}</p>`;
 }
-/* pasākuma logs vadītājam */
+/* pasākuma logs vadītājam: augšā vienmēr vietas, maršruts, starts, klienta info, vadītājs; zemāk cilnes */
+const VAD_IK = {
+  tiks: '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>',
+  ed: '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v7a2 2 0 0 0 2 2v9"/><path d="M11 3v7a2 2 0 0 1-2 2"/><path d="M17 21V3c-2 1.5-3 4-3 7v3h3"/></svg>',
+  mars: '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a3.5 3.5 0 0 0 0-7H8a3.5 3.5 0 0 1 0-7h8"/></svg>'
+};
+function vadVietaSaite(v) { if (!v) return ''; if (v.saite) return v.saite; const n = navSaites(v.koord || v.teksts); return n ? n.gmaps : ''; }
 function vadAtvert(atsl) {
   const p = vadPas.find(x => x.atslega === atsl); if (!p) return;
-  const m = vadMarsruts(p), speles = vadDati.filter(x => x.tips === 'spele'), info = vadDati.filter(x => x.tips === 'info' && !/avoti/i.test(x.nosaukums));
+  const m = vadMarsruts(p), speles = vadDati.filter(x => x.tips === 'spele'), plans = vadDati.filter(x => ['plans', 'info'].includes(x.tips) && !/avoti/i.test(x.nosaukums)), ekip = vadDati.filter(x => x.tips === 'ekipejums');
   const lauks = (k, v) => v ? `<dt>${k}</dt><dd>${md(v)}</dd>` : '';
   const det = (x, atv) => `<details class="vadD"${atv ? ' open' : ''}><summary><b>${esc(x.nosaukums)}</b>${[x.ilgums, x.cilveki ? x.cilveki + ' cilv.' : '', x.sezona].filter(Boolean).map(c => ` <span class="c">${esc(c)}</span>`).join('')}</summary>${x.apraksts ? `<div class="apr">${md(x.apraksts)}</div>` : ''}${x.vajag ? `<p class="mazs" style="margin:8px 0 0"><b>Vajag līdzi:</b> ${esc(x.vajag)}</p>` : ''}${/^https?:\/\//.test(x.saite) ? `<p style="margin:8px 0 0"><a target="_blank" rel="noopener" href="${esc(x.saite)}">Saite ↗</a></p>` : ''}</details>`;
+  // vietas: tikšanās un ēdināšanas vieta no maršruta apraksta; ierakstīta cita ēdināšanas vieta aizstāj
+  const poga = (ik, n, u) => u ? `<a class="poga gaisa" target="_blank" rel="noopener" href="${esc(u)}">${VAD_IK[ik]}${n} ↗</a>` : '';
+  const cita = p.edVieta || p.edSaite ? (/^https?:\/\//i.test(p.edSaite) ? p.edSaite : navSaites(p.edSaite || p.edVieta)?.gmaps || '') : '';
+  const vr = (p.vietas && p.vietas.varianti) || [], marsU = m && /^https?:\/\//.test(m.saite) ? m.saite : '';
+  let vietas = vr.map(v => `<div class="vadVar">${v.nos && vr.length > 1 ? `<span class="etik">${esc(v.nos)}</span>` : ''}<div class="vadVp">${poga('tiks', 'Tikšanās vieta ar klientiem', vadVietaSaite(v.tiks))}${cita ? '' : poga('ed', 'Ēdināšanas vieta', vadVietaSaite(v.ed))}${vr.length > 1 ? poga('mars', 'Maršruts', ((m && m.apraksts || '').split(v.nos)[1] || '').match(/Maršruts:\s*(https?:\/\/\S+)/)?.[1] || '') : ''}</div></div>`).join('');
+  const kopejas = (cita ? poga('ed', 'Ēdināšanas vieta' + (p.edVieta ? ': ' + esc(p.edVieta) : ''), cita) : '') + (vr.length > 1 ? '' : poga('mars', 'Maršruts', marsU));
+  if (kopejas) vietas += `<div class="vadVp">${kopejas}</div>`;
+  if (!vietas) vietas = `<p class="mazs" style="margin:0">${p.lokacija ? 'Vietai "' + esc(p.lokacija) + '" vietas un maršruts nav atrasti.' : 'Tabulā "Pasākumi" vieta nav norādīta.'}</p>`;
+  const kl = [p.info, p.prasibas ? 'Prasības: ' + p.prasibas : ''].filter(Boolean).join('\n\n');
+  const vad = LOMA.loma === 'komanda'
+    ? `<div class="vieta"><span class="etik">Vada</span>${esc(p.vaditajs || 'nav norādīts')}</div>` : '';
   const d = document.createElement('div');
   d.className = 'modal';
-  d.innerHTML = `<div class="karte plata" role="dialog" aria-modal="true" aria-labelledby="vmV"><div class="galva" style="margin:0 0 4px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="vmV">${esc(p.klients)}</h2><p>${esc(p.datums)}, ${esc(p.diena)}, ${kadPas(p.dienasLidz)}</p></div><button class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div>
-    <form class="vadF"><label><span>Pārgājiena vadītājs${p.vadNo === 'tabulā' ? ' <span class="mazs">(no tabulas)</span>' : ''}</span><span class="vadFr"><input name="vaditajs" value="${esc(p.vaditajs)}" placeholder="Ieraksti, kas vadīs"><button class="poga zala maza">Saglabāt</button></span></label><span class="mazs" data-z></span></form>
-    <div class="vadSoma"><h2 class="v3">Vadītāja soma: ko ņemt līdzi <span class="c" data-lsk></span></h2><div data-lidzi class="ielade">Ielādē sarakstu…</div></div>
-    <dl class="lauki2">${LOMA.loma === 'komanda' ? lauks('Pārgājiena vadītājs', p.vaditajs || 'nav norādīts') : ''}${lauks('Starta laiks', p.laiks)}${lauks('Vieta', p.lokacija)}${lauks('Cilvēki', p.skaits)}${lauks('Komanda', [p.komanda.join(', '), p.extra].filter(Boolean).join(', '))}${lauks('Prasības', p.prasibas)}${lauks('Ēdienkarte', p.edienkarte)}${lauks('Alternatīvā ēdienkarte', p.alt)}${lauks('Papildus info', p.info)}</dl>
-    <div class="rinda">${navPogas(p.lokacija, true)}</div>
-    <h2 class="v3" style="margin-top:22px">Maršruts${m ? ': ' + esc(m.nosaukums) : ''}</h2>${m ? `${[m.sezona, m.garums, m.ilgums, m.grutiba].filter(Boolean).length ? `<div class="cipsi">${[m.sezona, m.garums, m.ilgums, m.grutiba].filter(Boolean).map(c => `<span class="c">${esc(c)}</span>`).join('')}</div>` : ''}<div class="apr">${md(m.apraksts)}</div><div class="rinda">${navPogas(m.kur, true)}${/^https?:\/\//.test(m.saite) ? `<a class="poga gaisa maza" target="_blank" rel="noopener" href="${esc(m.saite)}">Maršruta karte ↗</a>` : ''}</div>` : `<p class="mazs">${p.lokacija ? 'Vietai "' + esc(p.lokacija) + '" maršruts nav atrasts.' : 'Tabulā "Pasākumi 2026" vieta nav norādīta.'} Maršrutu nosaka pasākuma vieta tabulā.</p>`}
-    <h2 class="v3" style="margin-top:22px">Norise un informācija</h2>${info.map(x => det(x, false)).join('') || '<p class="mazs">Nav ierakstu.</p>'}
-    <h2 class="v3" style="margin-top:22px">Spēles</h2>${speles.map(x => det(x, false)).join('') || '<p class="mazs">Nav spēļu.</p>'}</div>`;
+  d.innerHTML = `<div class="karte plata" role="dialog" aria-modal="true" aria-labelledby="vmV"><div class="galva" style="margin:0 0 4px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="vmV">${esc(p.klients)}</h2><p>${esc(p.datums)}, ${esc(p.diena)}, ${kadPas(p.dienasLidz)}${p.lokacija ? ' · ' + esc(p.lokacija) : ''}</p></div><button class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div>
+    <div class="vadAug">
+      <div class="vadCipsi"><div class="vieta"><span class="etik">Starta laiks</span>${esc(p.laiks || 'nav norādīts')}</div>${p.skaits ? `<div class="vieta"><span class="etik">Cilvēki</span>${esc(p.skaits)}</div>` : ''}${m ? `<div class="vieta"><span class="etik">Maršruts</span>${esc(m.nosaukums)}</div>` : ''}${vad}</div>
+      ${vietas}
+      ${kl ? `<div class="vadKl"><span class="etik">Papildus info no klienta</span>${md(kl)}</div>` : ''}
+      <form class="vadF" style="margin:0"><label><span>Pārgājiena vadītājs${p.vadNo === 'tabulā' ? ' <span class="mazs">(no tabulas)</span>' : ''}</span><span class="vadFr"><input name="vaditajs" value="${esc(p.vaditajs)}" placeholder="Ieraksti, kas vadīs"><button class="poga zala maza">Saglabāt</button></span></label><span class="mazs" data-z></span></form>
+    </div>
+    <div class="tabs vadPTabs" role="tablist"><button data-p="plans" class="ak">Dienas plāns</button><button data-p="speles">Spēles</button><button data-p="ekip">Ekipējums</button><button data-p="mars">Info par maršrutu</button></div>
+    <div class="vadPan" data-pan="plans"><dl class="lauki2" style="margin-top:0">${lauks('Komanda', [p.komanda.join(', '), p.extra].filter(Boolean).join(', '))}${lauks('Ēdienkarte', p.edienkarte)}${lauks('Alternatīvā ēdienkarte', p.alt)}</dl>${plans.map((x, i) => det(x, i === 0)).join('') || '<p class="mazs">Dienas plāns vēl nav ierakstīts.</p>'}</div>
+    <div class="vadPan" data-pan="speles" hidden>${speles.map(x => det(x, false)).join('') || '<p class="mazs">Nav spēļu.</p>'}</div>
+    <div class="vadPan" data-pan="ekip" hidden><div class="vadSoma" style="margin-top:0"><h2 class="v3">Vadītāja soma: ko ņemt līdzi <span class="c" data-lsk></span></h2><div data-lidzi class="ielade">Ielādē sarakstu…</div></div>${ekip.map(x => det(x, false)).join('')}</div>
+    <div class="vadPan" data-pan="mars" hidden>${m ? `<h2 class="v3">${esc(m.nosaukums)}</h2>${[m.sezona, m.garums, m.ilgums, m.grutiba].filter(Boolean).length ? `<div class="cipsi">${[m.sezona, m.garums, m.ilgums, m.grutiba].filter(Boolean).map(c => `<span class="c">${esc(c)}</span>`).join('')}</div>` : ''}<div class="apr">${md(m.apraksts)}</div><div class="rinda">${navPogas(m.kur, true)}${marsU ? `<a class="poga gaisa maza" target="_blank" rel="noopener" href="${esc(marsU)}">Maršruta karte ↗</a>` : ''}</div>` : `<p class="mazs">${p.lokacija ? 'Vietai "' + esc(p.lokacija) + '" maršruts nav atrasts.' : 'Tabulā vieta nav norādīta.'} Maršrutu nosaka pasākuma vieta tabulā.</p>`}</div></div>`;
   document.body.append(d);
   const aizv = () => d.remove();
   d.querySelector('[data-aizv]').onclick = aizv;
   d.onclick = e => { if (e.target === d) aizv(); };
   d.addEventListener('keydown', e => { if (e.key === 'Escape') aizv(); });
   d.querySelector('[data-aizv]').focus();
+  d.querySelectorAll('.vadPTabs button').forEach(b => b.onclick = () => {
+    d.querySelectorAll('.vadPTabs button').forEach(x => x.classList.toggle('ak', x === b));
+    d.querySelectorAll('.vadPan').forEach(x => x.hidden = x.dataset.pan !== b.dataset.p);
+  });
   d.querySelector('form').onsubmit = async e => {
     e.preventDefault(); const f = e.target, b = f.querySelector('button'), z = f.querySelector('[data-z]'); b.disabled = true; z.textContent = 'Saglabāju…';
     try { const o = await run('gjVadPasakumsSaglabat', atsl, f.vaditajs.value.trim(), ''); if (o.vaditajs) { p.vaditajs = o.vaditajs; p.vadNo = 'ierakstīts'; } else ieladetVad(); vadZimet(); aizv(); vadAtvert(atsl); }
@@ -1871,6 +1924,45 @@ function izveleties(t, id, kluss) {
   }
 }
 window.addEventListener('resize', () => { if ($('#s-agenti').classList.contains('ak')) liniju(); });
+
+/* ziņu sagataves (tikai Toms) */
+let zinDati = [];
+const ZIN_KAT = {vasara: 'Piedāvājums vasarā', ziema: 'Piedāvājums ziemā', atsauksmes: 'Atsauksmes forma', cits: 'Citas ziņas'};
+const ZIN_IK_KOP = '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="12" height="12" rx="2"/><path d="M15.5 8.5V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"/></svg>';
+async function ieladetZin() {
+  try { await kesh('gjSagataves', [], v => { zinDati = v.zinas; $('#zinSaite').href = v.saite; $('#zinSaite').hidden = false; zinZimet(); }); }
+  catch (x) { $('#zinSar').innerHTML = `<p class="zinja kl liel" style="display:block">${esc(x.message)}</p>`; }
+}
+function zinZimet() {
+  $('#zinSar').innerHTML = Object.entries(ZIN_KAT).map(([k, n]) => {
+    const z = zinDati.filter(x => x.kat === k);
+    return `<h2 class="v3" style="margin:22px 0 10px">${n}</h2><div class="rezgis r2">${z.map(x => `<div class="karte zinaK"><div class="galva" style="margin:0;align-items:baseline"><h2 class="v3" style="margin:0">${esc(x.nosaukums)}</h2><span class="mazs">${esc(x.atjaunots)}</span></div><div class="zt">${esc(x.teksts)}</div><div class="rinda"><button class="poga zala maza" onclick="zinKopet(this,'${esc(x.id)}')">${ZIN_IK_KOP}Kopēt</button><button class="poga gaisa maza" onclick="zinForma('${esc(x.id)}')">Labot</button><button class="poga gaisa maza" onclick="zinDzest('${esc(x.id)}')">Dzēst</button></div></div>`).join('') || `<button class="karte tukss" style="text-align:left;cursor:pointer;width:100%;font:inherit" onclick="zinForma(undefined,'${k}')">Vēl nav ziņu. Spied, lai pievienotu.</button>`}</div>`;
+  }).join('');
+}
+async function zinKopet(b, id) {
+  const x = zinDati.find(y => y.id === id); if (!x) return;
+  try { await navigator.clipboard.writeText(x.teksts); b.innerHTML = ZIN_IK_KOP + 'Nokopēts'; setTimeout(() => { if (b.isConnected) b.innerHTML = ZIN_IK_KOP + 'Kopēt'; }, 1800); }
+  catch (k) { alertZ('Neizdevās nokopēt. Iezīmē tekstu un nokopē ar roku.'); }
+}
+function zinForma(id, kat) {
+  const x = zinDati.find(y => y.id === id) || {kat: kat || 'vasara'}, f = $('#fZin');
+  f.reset(); f.elements.id.value = x.id || ''; f.elements.kat.value = x.kat; f.elements.nosaukums.value = x.nosaukums || ''; f.elements.teksts.value = x.teksts || '';
+  $('#zinFV').textContent = x.id ? 'Labot: ' + x.nosaukums : 'Jauna ziņa'; $('#zinZ').className = 'zinja';
+  $('#zinForma').hidden = false; $('#zinForma').scrollIntoView({behavior: 'smooth'}); f.elements.teksts.focus();
+}
+async function zinSaglabat(e) {
+  e.preventDefault(); const b = e.target.querySelector('.zala'); b.disabled = true;
+  try {
+    const o = await run('gjSagatavesSaglabat', forma(e.target)), i = zinDati.findIndex(x => x.id === o.id);
+    if (i >= 0) zinDati[i] = o; else zinDati.push(o);
+    $('#zinForma').hidden = true; zinZimet();
+  } catch (x) { zinja('#zinZ', esc(x.message), 'kl'); }
+  b.disabled = false; return false;
+}
+async function zinDzest(id) {
+  const x = zinDati.find(y => y.id === id); if (!x || !confirm(`Dzēst ziņu "${x.nosaukums}"?`)) return;
+  try { await run('gjSagatavesDzest', id); zinDati = zinDati.filter(y => y !== x); zinZimet(); } catch (k) { alertZ(k.message); }
+}
 
 /* noteikumi */
 async function ieladetNot() {
