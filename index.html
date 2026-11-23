@@ -724,7 +724,7 @@ svg.liniju path.blav{opacity:.15}
       <div class="galva"><div><h1>Iestatījumi</h1></div></div>
       <div class="rezgis r2">
         <div class="karte"><h2 class="v3">Claude API atslēga</h2>
-          <p class="mazs">Vajag čatam, kopsavilkuma tekstam, optimizētājam, e-pastu nolasīšanai un vēstuļu rakstīšanai. Atslēgu izveido console.anthropic.com → API Keys. Tā glabājas tikai šī skripta iestatījumos.</p>
+          <p class="mazs">Vajag čatam, kopsavilkuma tekstam, optimizētājam, e-pastu nolasīšanai un vēstuļu rakstīšanai. Mac lietotnē Claude strādā ar tavu Claude abonementu (Claude Code šajā datorā), atslēga nav vajadzīga. Atslēga vajadzīga tikai telefonā, tīmekļa versijā un automātiskajiem darbiem. To izveido console.anthropic.com → API Keys, un tā glabājas tikai šī skripta iestatījumos.</p>
           <div class="rinda"><input id="atslega" type="password" placeholder="sk-ant-..." style="flex:1"><button class="poga" onclick="saglAtsl()">Saglabāt</button></div>
           <div class="zinja" id="atslZ"></div>
         </div>
@@ -1736,9 +1736,11 @@ function rekKopsZimet(r) {
   const g = String(new Date().getFullYear()), g2 = g.slice(2), sg = r.filter(x => String(x.nr).endsWith('-' + g2));
   const sum = (a, k) => a.reduce((s, x) => s + (k === 'cena' && !naudaN(x.cena) ? naudaN(x.kopa) / 1.21 : naudaN(x[k])), 0), ne = sg.filter(x => !x.apmaksats), kav = ne.filter(x => x.kavets);
   const k = (e, c, apr, kr) => `<div class="karte"><div class="etik">${e}</div><div class="cip" style="margin-top:8px${kr ? ';color:' + kr : ''}">${c}</div><div class="mazs" style="margin-top:6px">${apr}</div></div>`;
-  $('#rekKops').innerHTML = k('Izrakstīts ' + g, eur(sum(sg, 'cena')), `${sg.length} rēķini, bez PVN · ar PVN ${eur(sum(sg, 'kopa'))}`)
-    + k('Apmaksāts', eur(sum(sg.filter(x => x.apmaksats), 'kopa')), `${sg.length - ne.length} rēķini, ar PVN`, 'var(--mezs)')
-    + k('Neapmaksāts', eur(sum(ne, 'kopa')), `${ne.length} rēķini${kav.length ? ', ' + kav.length + ' kavēti' : ''} (ar PVN)`, ne.length ? 'var(--ugunskurs)' : 'var(--mezs)');
+  // lielais cipars ar PVN, apakšā tā pati summa bez PVN
+  const ap = sg.filter(x => x.apmaksats);
+  $('#rekKops').innerHTML = k('Izrakstīts ' + g, eur(sum(sg, 'kopa')), `${sg.length} rēķini · bez PVN ${eur(sum(sg, 'cena'))}`)
+    + k('Apmaksāts', eur(sum(ap, 'kopa')), `${ap.length} rēķini · bez PVN ${eur(sum(ap, 'cena'))}`, 'var(--mezs)')
+    + k('Neapmaksāts', eur(sum(ne, 'kopa')), `${ne.length} rēķini${kav.length ? ', ' + kav.length + ' kavēti' : ''} · bez PVN ${eur(sum(ne, 'cena'))}`, ne.length ? 'var(--ugunskurs)' : 'var(--mezs)');
 }
 async function ieladetRek() {
   try {
@@ -1783,7 +1785,7 @@ function epZimet() {
   $('#epFil').innerHTML = [['visi', 'Visi', epDati.length], ['nelasiti', 'Nelasītie', nel], ['gaida', 'Gaida atbildi', gaida]].map(([k, n, c]) => `<button type="button" data-f="${k}" class="${epFiltrs === k ? 'ak' : ''}" aria-pressed="${epFiltrs === k}">${n} (${c})</button>`).join('');
   const v = epDati.filter(x => epFiltrs === 'visi' || (epFiltrs === 'nelasiti' ? x.nelasits : x.gaida)).sort((a, b) => b.ts - a.ts);
   $('#epSar').className = '';
-  $('#epSar').innerHTML = v.length ? v.map(x => `<div class="darbs epR${x.nelasits ? ' nel' : ''}" data-id="${esc(x.id)}"><span class="epPunkts" aria-hidden="true"></span><div style="flex:1;min-width:0"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:baseline"><b class="epT">${esc(x.temats)}${x.skaits > 1 ? ` <span class="mazs">(${x.skaits})</span>` : ''}</b>${x.nelasits ? '<span class="c jn">nelasīts</span>' : ''}${x.gaida ? '<span class="c br">gaida atbildi</span>' : ''}${x.pieprasijums ? '<span class="c ne">pieprasījums</span>' : ''}<span class="mazs" style="margin-left:auto">${esc(x.datums)} · ${x.dienas} d.</span></div><div class="mazs" style="overflow-wrap:anywhere">${esc(x.no)}</div><div class="epF">${esc(x.fragments)}…</div><div class="rinda" style="margin-top:8px"><a class="poga gaisa maza" target="_blank" rel="noopener" href="${esc(x.saite)}" data-atv>Atvērt Gmail ↗</a><button type="button" class="poga gaisa maza" data-las>${x.nelasits ? 'Atzīmēt kā lasītu' : 'Atzīmēt kā nelasītu'}</button></div></div></div>`).join('') : `<p class="tukss">${epFiltrs === 'nelasiti' ? 'Visi e-pasti izlasīti.' : epFiltrs === 'gaida' ? 'Visiem e-pastiem atbildēts.' : 'Iesūtne tukša.'}</p>`;
+  $('#epSar').innerHTML = v.length ? v.map(x => `<div class="darbs epR${x.nelasits ? ' nel' : ''}" data-id="${esc(x.id)}"><span class="epPunkts" aria-hidden="true"></span><div style="flex:1;min-width:0"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:baseline"><b class="epT">${esc(x.temats)}${x.skaits > 1 ? ` <span class="mazs">(${x.skaits})</span>` : ''}</b>${x.nelasits ? '<span class="c jn">nelasīts</span>' : ''}${x.gaida ? '<span class="c br">gaida atbildi</span>' : ''}${x.pieprasijums ? '<span class="c ne">pieprasījums</span>' : ''}<span class="mazs" style="margin-left:auto">${esc(x.datums)} · ${x.dienas} d.</span></div><div class="mazs" style="overflow-wrap:anywhere">${esc(x.no)}</div><div class="epF">${esc(x.fragments)}…</div><div class="rinda" style="margin-top:8px"><a class="poga gaisa maza" target="_blank" rel="noopener" href="${esc(x.saite)}" data-atv>Atvērt Gmail ↗</a><button type="button" class="poga gaisa maza" data-las>${x.nelasits ? 'Atzīmēt kā lasītu' : 'Atzīmēt kā nelasītu'}</button>${x.gaida ? '<button type="button" class="poga gaisa maza" data-ng>Negaida atbildi</button>' : x.negaida ? '<button type="button" class="poga gaisa maza" data-ng>Atkal gaida atbildi</button>' : ''}</div></div></div>`).join('') : `<p class="tukss">${epFiltrs === 'nelasiti' ? 'Visi e-pasti izlasīti.' : epFiltrs === 'gaida' ? 'Visiem e-pastiem atbildēts.' : 'Iesūtne tukša.'}</p>`;
 }
 async function epLasits(x, lasits) {
   if (!x || x.nelasits === !lasits) return;
@@ -1791,10 +1793,17 @@ async function epLasits(x, lasits) {
   try { localStorage.removeItem(kAtsl('gjEpastuSaraksts', [])); } catch (e) {}
   try { await run('gjEpastsLasits', x.id, lasits); } catch (k) { x.nelasits = lasits; epZimet(); alertZ(k.message); }
 }
+async function epNegaida(x) {
+  if (!x) return;
+  const ng = x.gaida; x.gaida = !ng; x.negaida = ng; epZimet();
+  try { localStorage.removeItem(kAtsl('gjEpastuSaraksts', [])); } catch (e) {}
+  try { await run('gjEpastsNegaida', x.id, ng); } catch (k) { x.gaida = ng; x.negaida = !ng; epZimet(); alertZ(k.message); }
+}
 $('#epFil').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { epFiltrs = b.dataset.f; epZimet(); } });
 $('#epSar').addEventListener('click', e => {
   const r = e.target.closest('.epR'); if (!r) return; const x = epDati.find(y => y.id === r.dataset.id);
   if (e.target.closest('[data-las]')) epLasits(x, x.nelasits);
+  else if (e.target.closest('[data-ng]')) epNegaida(x);
   else if (e.target.closest('[data-atv]')) epLasits(x, true); // Gmail atverot to atzīmē kā lasītu
 });
 // sinhronizācija: kamēr E-pasti atvērti, ik minūti klusi pārlasa iesūtni
