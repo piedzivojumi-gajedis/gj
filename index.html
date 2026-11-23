@@ -196,6 +196,7 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 .komC .ik{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 .komR{display:grid;grid-template-columns:minmax(70px,auto) minmax(0,1fr) auto;gap:var(--s2);align-items:center;margin-top:var(--s2)}
 .komR b{overflow-wrap:anywhere}.komR input{padding:7px 10px;font-size:14px;min-width:0}
+.lauksL{min-width:0;overflow-wrap:anywhere;white-space:pre-line}.pasLab .lauki:not(:has(.lauksL,label))::after{content:'Nav ierakstīts.';color:var(--pelēks);font-size:14px}.lauksL .etik{display:block;margin-bottom:2px}.lauksL.pilns{grid-column:1/-1}
 .pasCita{margin-top:var(--s3)}.pasCita summary{cursor:pointer;font:600 13px var(--f-ui);color:var(--pelēks)}.pasCita .lauki{margin-top:var(--s2)}
 .vietasV{margin-top:var(--s2)}.vietasG{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--s2);margin-top:var(--s2)}
 .vieta{background:var(--virsma-neitr);border-radius:var(--r-m);padding:var(--s3);font-size:14px;overflow-wrap:anywhere;min-width:0}.vieta .etik{display:block;margin-bottom:2px}
@@ -870,8 +871,8 @@ const pasApak = x => `${x.datums}, ${x.diena}, ${kadPas(x.dienasLidz)}${x.skaits
 function pasAtvert(x) {
   const d = document.createElement('div'), kv = k => { const c = (x.kol || [])[k - 1]; return c ? String(c[1] ?? '') : ''; };
   const kom = (x.komandaL || x.komanda.map(v => ({vards: v, loma: ''}))).map(c => ({...c}));
-  const lasit = LOMA.loma === 'komanda'; // komanda pasākumu tikai apskata
-  const lauks = (k, n, t) => { const v = kv(k); return t === 'gars' ? `<label class="pilns">${n}<textarea data-k="${k}" rows="3">${esc(v)}</textarea></label>` : t === 'date' ? `<label>${n}<input type="date" data-k="${k}" value="${isoD(v)}"></label>` : `<label>${n}<input data-k="${k}" value="${esc(v)}"></label>`; };
+  const lasit = LOMA.loma === 'komanda'; // komanda pasākumu tikai apskata: teksts, nevis ailes
+  const lauks = (k, n, t) => { const v = kv(k); if (lasit) return `<input type="hidden" data-k="${k}" value="${esc(v)}">` + (v.trim() ? `<div class="lauksL${t === 'gars' ? ' pilns' : ''}"><span class="etik">${n}</span><div>${t === 'gars' ? md(v) : esc(v)}</div></div>` : ''); return t === 'gars' ? `<label class="pilns">${n}<textarea data-k="${k}" rows="3">${esc(v)}</textarea></label>` : t === 'date' ? `<label>${n}<input type="date" data-k="${k}" value="${isoD(v)}"></label>` : `<label>${n}<input data-k="${k}" value="${esc(v)}"></label>`; };
   const atzHtml = a => { const pz = (x.piez || {})[a.s] || ''; return `<div class="pasAtz" data-s="${a.s}"><label class="rut"><input type="checkbox" data-k="${a.k}"${x.statuss[a.s] ? ' checked' : ''}${LOMA.loma === 'komanda' ? ' disabled' : ''}><span>${esc(a.n)}</span></label><button type="button" class="poga gaisa maza ikP"${LOMA.loma === 'komanda' ? ' hidden' : ''} data-kom="${a.k}" aria-label="Komentārs: ${esc(a.n)}" title="Komentārs">${IK_KOM}</button>${pz ? `<div class="komT">${esc(pz)}</div>` : ''}</div>`; };
   d.className = 'modal';
   d.innerHTML = `<div class="karte plata pasK" role="dialog" aria-modal="true" aria-labelledby="pmV"><div class="galva" style="margin:0 0 4px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="pmV">${esc(x.klients)}</h2><p data-apak>${esc(pasApak(x))}</p></div><button class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div>
