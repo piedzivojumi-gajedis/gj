@@ -65,6 +65,9 @@ p{text-wrap:pretty}
 .splash{position:fixed;inset:0;z-index:70;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
 .splash img{width:96px}
 .splash .ielade{padding:0}
+.parladet{all:unset;cursor:pointer;margin-top:var(--s2);display:flex;align-items:center;justify-content:center;gap:var(--s2);padding:9px 14px;border-radius:var(--r-pill);border:1px solid var(--linija);color:var(--pelēks);font:600 13.5px var(--f-ui);transition:background-color var(--t-atri) var(--ease),transform var(--t-atri) var(--ease)}
+.parladet:hover{background:var(--virsma-hover)}.parladet:active{transform:scale(.97)}
+.parladet .ik{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 .catpoga{all:unset;cursor:pointer;margin-top:var(--s3);background:var(--mezs);color:#fff;border-radius:var(--r-pill);padding:11px 14px;text-align:center;font:600 14px var(--f-teksts);letter-spacing:.02em;transition:filter var(--t-atri) var(--ease),transform var(--t-atri) var(--ease)}
 .catpoga:hover{filter:brightness(1.1)}
 /* galvenā daļa */
@@ -146,6 +149,13 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 .prog i{display:block;height:100%;background:var(--mezs);transition:width var(--t) var(--ease)}
 .posms{margin-top:22px}
 .posms .v3{display:flex;align-items:baseline;gap:var(--s2);margin-bottom:4px}
+.lk.k1{--lk:var(--c-ezers);--lk-g:var(--c-ezers-1);--lk-t:var(--c-ezers-9)}.lk.k2{--lk:var(--c-ogas);--lk-g:var(--c-ogas-1);--lk-t:var(--c-ogas-9)}.lk.k3{--lk:var(--c-zelts);--lk-g:var(--c-zelts-1);--lk-t:var(--c-zelts-9)}
+.lk.k4{--lk:var(--c-uguns);--lk-g:var(--c-uguns-1);--lk-t:var(--c-uguns-9)}.lk.k5{--lk:var(--c-mezs);--lk-g:var(--c-mezs-1);--lk-t:var(--c-mezs-9)}.lk.k6{--lk:var(--c-akmens);--lk-g:var(--c-smilts-3);--lk-t:var(--c-tinte-2)}
+.clTabs button.lk.lk{background:var(--lk-g);color:var(--lk-t)}
+.clTabs button.lk::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--lk);flex:none;box-shadow:0 0 0 2px var(--c-balts)}
+.clTabs button.lk small{opacity:1;padding:2px 7px;border-radius:var(--r-pill)}.clTabs button.lk.sark small{background:var(--ugunskurs-gaiss);color:var(--c-uguns-9)}.clTabs button.lk.zals small{background:var(--mezs-gaiss);color:var(--mezs)}
+.posms.lk{background:var(--lk-g);border:1px solid var(--lk);border-radius:var(--r-m);padding:var(--s3) var(--s2)}.posms.lk>.v3{color:var(--lk-t)}
+.clTabs button .ik{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 .cl{display:flex;align-items:center;gap:10px;padding:var(--s2) 0;border-top:1px solid var(--linija-viegla);font:15px var(--f-teksts);color:var(--teksts)}
 .cl input[type=checkbox]{flex:none;width:18px;height:18px;padding:0;accent-color:var(--mezs);cursor:pointer}
 .cl input[disabled]{cursor:default}
@@ -1018,19 +1028,22 @@ async function sagIelade(atslega) {
   } catch (x) { if (atslega === sagIzv) $('#sagDet').innerHTML = `<p class="zinja kl" style="display:block">${esc(x.message)}</p>`; }
 }
 function sagPunktsHtml(x, cilveki) {
-  const chip = (x.parnests ? `<span class="c br">${esc(x.parnests)}</span>` : '') + (x.auto ? '<span class="c">automātiski</span>' : x.tabula ? '<span class="c">tabulā</span>' : '');
+  const chip = (x.parnests ? `<span class="c br">${esc(x.parnests)}</span>` : '') + (x.tabula ? '<span class="c">AI atzīmē</span>' : '');
   const slegts = x.auto || (x.tabula && LOMA.loma === 'komanda');
   const izv = x.tabula ? '' : `<select data-kas title="Atbildīgais"${LOMA.loma === 'komanda' ? ' disabled' : ''}><option value="">kurš?</option>${cilveki.map(c => `<option${c === x.atbildigais ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select><button type="button" class="dz" data-dz title="Dzēst">×</button>`;
   return `<div class="cl${x.izdarits ? ' gat' : ''}" data-id="${esc(x.id)}"><input type="checkbox"${x.izdarits ? ' checked' : ''}${slegts ? ' disabled' : ''} aria-label="${esc(x.teksts)}"><span class="tx">${esc(x.teksts)}</span>${chip}${izv}</div>`;
 }
-/* ailes: Pirms pasākuma, Pēc pasākuma, Jānopērk papildus, Ēdiens, Ko ņemt līdzi. Sarkana, līdz viss atzīmēts, tad zaļa */
+/* ailes: Pirms pasākuma, Jānopērk papildus, Ēdiens, Ko ņemt līdzi, Pēc pasākuma (pēdējā). Sarkana, līdz viss atzīmēts, tad zaļa */
+const IK_RATI = '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/><path d="M2.5 3h2.7l2.4 11.6a1.6 1.6 0 0 0 1.6 1.3h8.5a1.6 1.6 0 0 0 1.6-1.2L21 7H6"/></svg>';
 const AILES = [
   {id: 'pirms', nos: 'Pirms pasākuma', f: m => ['nedela', 'diena', 'pasakums'].includes(m.id)},
-  {id: 'pec', nos: 'Pēc pasākuma', f: m => m.id === 'pec'},
-  {id: 'janoperk', nos: 'Jānopērk papildus', f: m => m.janoperk},
+  {id: 'janoperk', nos: 'Jānopērk papildus', ik: IK_RATI, f: m => m.janoperk},
   {id: 'ediens', nos: 'Ēdiens', f: m => m.ediens},
-  {id: 'lidzi', nos: 'Ko ņemt līdzi', f: m => m.lidzi}
+  {id: 'lidzi', nos: 'Ko ņemt līdzi', f: m => m.lidzi},
+  {id: 'pec', nos: 'Pēc pasākuma', f: m => m.id === 'pec'}
 ];
+/* "Ko ņemt līdzi" apakškategorijām katrai sava krāsa */
+const LIDZI_KR = {l_trauki: 'k1', l_galds: 'k2', l_virt: 'k3', l_ugunskurs: 'k4', l_pargajiens: 'k5', l_parejais: 'k6'};
 let sagAile = null, sagTab = null;
 const aileGrupas = a => sagCl.posmi.filter(a.f);
 const sagGat = pk => pk.length > 0 && pk.every(x => x.izdarits);
@@ -1038,14 +1051,14 @@ const sagKrasa = m => sagGat(m.punkti) || (m.janoperk && !m.punkti.length) ? 'za
 function aileKrasa(a) { const g = aileGrupas(a), pk = g.flatMap(m => m.punkti); return a.id === 'janoperk' ? (pk.every(x => x.izdarits) ? 'zals' : 'sark') : sagGat(pk) ? 'zals' : 'sark'; }
 function sagTabPoga(m, attr) {
   const d = m.punkti.filter(x => x.izdarits).length, ak = m.id === sagTab, k = sagKrasa(m);
-  return `<button type="button" class="${k}${ak ? ' ak' : ''}" ${attr}="${m.id}" aria-pressed="${ak}">${k === 'zals' ? '✓ ' : ''}${esc(m.nos)} <small>${d}/${m.punkti.length}</small>${m.kavets ? '<span class="c ne">kavējas</span>' : ''}</button>`;
+  return `<button type="button" class="${k}${ak ? ' ak' : ''}${m.lidzi ? ' lk ' + (LIDZI_KR[m.id] || 'k6') : ''}" ${attr}="${m.id}" aria-pressed="${ak}">${k === 'zals' ? '✓ ' : ''}${esc(m.nos)} <small>${d}/${m.punkti.length}</small>${m.kavets ? '<span class="c ne">kavējas</span>' : ''}</button>`;
 }
 function sagTabsZimet() {
   $('#tabsAiles').innerHTML = AILES.map(a => {
     const pk = aileGrupas(a).flatMap(m => m.punkti), d = pk.filter(x => x.izdarits).length, k = aileKrasa(a), ak = a.id === sagAile;
-    return `<button type="button" class="${k}${ak ? ' ak' : ''}" data-aile="${a.id}" aria-pressed="${ak}">${k === 'zals' ? '✓ ' : ''}${esc(a.nos)} <small>${d}/${pk.length}</small>${aileGrupas(a).some(m => m.kavets) ? '<span class="c ne">kavējas</span>' : ''}</button>`;
+    return `<button type="button" class="${k}${ak ? ' ak' : ''}" data-aile="${a.id}" aria-pressed="${ak}">${k === 'zals' ? '✓ ' : ''}${a.ik || ''}${esc(a.nos)} <small>${d}/${pk.length}</small>${aileGrupas(a).some(m => m.kavets) ? '<span class="c ne">kavējas</span>' : ''}</button>`;
   }).join('');
-  if ($('#tabsLidzi')) $('#tabsLidzi').innerHTML = aileGrupas(AILES[4]).map(m => sagTabPoga(m, 'data-tab')).join('');
+  if ($('#tabsLidzi')) $('#tabsLidzi').innerHTML = aileGrupas(AILES.find(a => a.id === 'lidzi')).map(m => sagTabPoga(m, 'data-tab')).join('');
   document.querySelectorAll('#sagSaturs .posms[data-posms]').forEach(el => {
     const m = sagCl.posmi.find(x => x.id === el.dataset.posms); if (!m) return;
     const sk = el.querySelector('.skg'); if (sk) { sk.className = 'c skg ' + (sagKrasa(m) === 'zals' ? 'ok' : 'ne'); sk.textContent = m.punkti.filter(x => x.izdarits).length + '/' + m.punkti.length; }
@@ -1053,7 +1066,7 @@ function sagTabsZimet() {
 }
 function posmsHtml(m, kopa) {
   const c = sagCl;
-  return `<div class="posms" data-posms="${m.id}"><h2 class="v3">${esc(m.nos)}${m.termins && !kopa ? ` <span class="mazs">līdz ${esc(m.termins)}</span>` : ''}${kopa ? '' : ' <span class="c skg"></span>'}</h2>${m.punkti.map(x => sagPunktsHtml(x, c.cilveki)).join('') || `<p class="mazs tuksP">${m.ediens ? 'Te raksti sastāvdaļu sarakstu pēc klienta izvēlētās ēdienkartes.' : 'Šeit vēl nav neviena punkta.'}</p>`}<form class="clJauns"><input placeholder="${m.ediens ? 'Pievienot ēdienu…' : 'Pievienot punktu…'}" aria-label="Pievienot: ${esc(m.nos)}"><button class="poga gaisa maza">Pievienot</button></form></div>`;
+  return `<div class="posms${m.lidzi ? ' lk ' + (LIDZI_KR[m.id] || 'k6') : ''}" data-posms="${m.id}"><h2 class="v3">${esc(m.nos)}${m.termins && !kopa ? ` <span class="mazs">līdz ${esc(m.termins)}</span>` : ''}${kopa ? '' : ' <span class="c skg"></span>'}</h2>${m.punkti.map(x => sagPunktsHtml(x, c.cilveki)).join('') || `<p class="mazs tuksP">${m.ediens ? 'Te raksti sastāvdaļu sarakstu pēc klienta izvēlētās ēdienkartes.' : 'Šeit vēl nav neviena punkta.'}</p>`}<form class="clJauns"><input placeholder="${m.ediens ? 'Pievienot ēdienu…' : 'Pievienot punktu…'}" aria-label="Pievienot: ${esc(m.nos)}"><button class="poga gaisa maza">Pievienot</button></form></div>`;
 }
 /* ēdienkarte un ierobežojumi no tabulas "Pasākumi 2026" */
 function edienInfo() {
@@ -1071,7 +1084,9 @@ function sagSatursZimet() {
   } else if (a.id === 'pirms') {
     // viens saraksts bez apakšsadaļām; jauni punkti nonāk posmā "nedela"
     const m0 = g.find(m => m.id === 'nedela') || g[0];
-    if (m0) h += posmsHtml({...m0, nos: a.nos, punkti: g.flatMap(m => m.punkti)}, true);
+    // AI atzīmējamie punkti augšā (pēc posmu secības)
+    const pk = g.flatMap(m => m.punkti), ai = pk.filter(x => x.tabula);
+    if (m0) h += posmsHtml({...m0, nos: a.nos, punkti: ai.concat(pk.filter(x => !x.tabula))}, true);
   } else h += g.map(m => posmsHtml(m)).join('');
   if (a.id === 'janoperk') h += '<p class="mazs" style="margin:8px 0 0">Ko nenopērk, tas automātiski pāriet uz nākamajiem pasākumiem, līdz atzīmē. Viss saraksts: sadaļa <a href="#" onclick="iet(\'janoperk\');return false">Jānopērk</a>.</p>';
   $('#sagSaturs').innerHTML = h;
