@@ -691,7 +691,7 @@ svg.liniju path.blav{opacity:.15}
         <h2 class="v3" id="zinFV">Jauna ziņa</h2>
         <form id="fZin" onsubmit="return zinSaglabat(event)"><input type="hidden" name="id">
           <div class="lauki">
-            <label>Kategorija<select name="kat"><option value="vasara">Piedāvājums vasarā</option><option value="ziema">Piedāvājums ziemā</option><option value="atsauksmes">Atsauksmes forma</option><option value="cits">Cits</option></select></label>
+            <label>Kategorija<select name="kat"><option value="vasara">Piedāvājums vasarā</option><option value="ziema">Piedāvājums ziemā</option><option value="pirms">Pirms pasākuma</option><option value="atsauksmes">Atsauksmes forma</option><option value="cits">Cits</option></select></label>
             <label>Nosaukums<input name="nosaukums" placeholder="Pirmā atbilde uz pieprasījumu"></label>
             <label class="pilns">Ziņas teksts<textarea name="teksts" rows="12" required placeholder="Sveiki! Paldies par interesi…"></textarea></label>
           </div>
@@ -1975,7 +1975,7 @@ window.addEventListener('resize', () => { if ($('#s-agenti').classList.contains(
 
 /* ziņu sagataves (tikai Toms) */
 let zinDati = [];
-const ZIN_KAT = {vasara: 'Piedāvājums vasarā', ziema: 'Piedāvājums ziemā', atsauksmes: 'Atsauksmes forma', cits: 'Citas ziņas'};
+const ZIN_KAT = {vasara: 'Piedāvājums vasarā', ziema: 'Piedāvājums ziemā', pirms: 'Pirms pasākuma', atsauksmes: 'Atsauksmes forma', cits: 'Citas ziņas'};
 const ZIN_IK_KOP = '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="12" height="12" rx="2"/><path d="M15.5 8.5V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"/></svg>';
 async function ieladetZin() {
   try { await kesh('gjSagataves', [], v => { zinDati = v.zinas; $('#zinSaite').href = v.saite; $('#zinSaite').hidden = false; zinZimet(); }); }
