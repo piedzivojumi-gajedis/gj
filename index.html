@@ -800,7 +800,20 @@ let ielad = {}, kluss = false;
 
 /* navigācija */
 const IEL = {janoperk: ieladetJan, finanses: ieladetFin, izaugsme: ieladetIz, pasakumi: ieladetPas, sagatavosanas: ieladetSag, vaditajiem: ieladetVad, rekini: ieladetRek, epasti: ieladetEp, marketings: ieladetMark, kopsavilkums: () => ieladetKops(false), apmeklejums: () => ieladetApm(false), agenti: zimetKarti, sagataves: ieladetZin, noteikumi: ieladetNot, iestatijumi: ieladetIest};
-function iet(s) {
+/* katrai sadaļai sava saite (#sadala): var nosūtīt, un pārlādējot paliek tajā pašā sadaļā */
+const GAS_VEST = !!(window.google && google.script && google.script.history);
+let urlSad = decodeURIComponent((location.hash || '').slice(1));
+if (GAS_VEST) {
+  google.script.url.getLocation(l => { if (l.hash) urlSad = l.hash; });
+  google.script.history.setChangeHandler(e => { const s = e.location.hash; if (s && LOMA.sadalas.includes(s)) iet(s, true); });
+} else window.addEventListener('hashchange', () => { const s = decodeURIComponent(location.hash.slice(1)); if (s && LOMA.sadalas.includes(s)) iet(s, true); });
+function urlLikt(s, aizst) {
+  if (GAS_VEST) { if (urlSad !== s) google.script.history[aizst ? 'replace' : 'push'](null, null, s); }
+  else if (location.hash.slice(1) !== s) history[aizst ? 'replaceState' : 'pushState'](null, '', '#' + s);
+  urlSad = s;
+}
+function iet(s, bezUrl) {
+  if (!bezUrl) urlLikt(s);
   document.querySelectorAll('.sad').forEach(x => x.classList.toggle('ak', x.id === 's-' + s));
   document.querySelectorAll('#nav button').forEach(b => { b.classList.toggle('ak', b.dataset.s === s); if (b.dataset.s === s) { b.setAttribute('aria-current', 'page'); $('#augsaNos').textContent = b.textContent.replace(b.querySelector('.ik').textContent, '').replace(/\d+$/, '').trim(); } else b.removeAttribute('aria-current'); });
   izvelne(false);
@@ -2169,7 +2182,9 @@ function saktUI(L) {
   document.body.classList.toggle('lasit', LOMA.loma === 'komanda');
   $('#apaksa').innerHTML = esc('Gājēdis · ' + LOMA.nos) + (gjKods ? ' · <a href="#" onclick="iziet();return false" style="color:inherit">iziet</a>' : '');
   ielad = {};
-  if (LOMA.sadalas.includes('sakums')) { iet('sakums'); ieladetSak(LOMA.sakums); } else iet(LOMA.sadalas[0]);
+  const sakS = LOMA.sadalas.includes(urlSad) ? urlSad : LOMA.sadalas.includes('sakums') ? 'sakums' : LOMA.sadalas[0];
+  iet(sakS, true); urlLikt(sakS, true);
+  if (LOMA.sadalas.includes('sakums')) ieladetSak(LOMA.sakums);
   versija = LOMA.versija || null; atjLaiks = Date.now();
   // pārējās biežāk lietotās sadaļas ielādē jau fonā, lai tās atveras uzreiz
   setTimeout(() => ['janoperk', 'pasakumi', 'sagatavosanas', 'vaditajiem', 'finanses', 'rekini', 'izaugsme'].forEach(s => {
