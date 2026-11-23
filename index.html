@@ -456,7 +456,7 @@ svg.liniju path.blav{opacity:.15}
 
     <!-- PASĀKUMI -->
     <section class="sad" id="s-pasakumi">
-      <div class="galva"><div><h1>Pasākumi</h1><p>Visi pasākumi vienuviet (tabula "AI_gajedis_programma pasākumi") un kalendārs.</p></div><button class="poga zala" id="pasJauns" onclick="pasFormaRadit()">+ Jauns pasākums</button></div>
+      <div class="galva"><div><h1>Pasākumi</h1><p>Visi pasākumi vienuviet (tabula "AI_gajedis_programma dati", cilne Pasākumi) un kalendārs.</p></div><button class="poga zala" id="pasJauns" onclick="pasFormaRadit()">+ Jauns pasākums</button></div>
       <div class="karte" id="pasForma" hidden style="margin-bottom:16px">
         <h2 class="v3">Jauns pasākums</h2>
         <p class="mazs" style="margin:0 0 14px">Jauna rinda tabulā pēc datuma, un kalendārā "Gājēdis - klients" ar ielūgumiem Markusam, Gustavam un Tomam.</p>
@@ -1465,7 +1465,7 @@ $('#finTab').addEventListener('change', async e => {
   try { await run('gjFinAtmaksats', x.id, on); } catch (k) { x.atmaksats = !on; finZimet(); alertZ(k.message); }
 });
 
-/* gājēdis izaugsme: darbu checklists (tabula "AI_gajedis_programma izaugsme") */
+/* gājēdis izaugsme: darbu checklists (tabula "AI_gajedis_programma dati", cilne Izaugsme) */
 let izDati = null, izKas = '', izStat = 'visi', izAtl = null; // izAtl: atlasīto darbu id (Set), kad ieslēgta atlase
 const sodIso = () => new Date().toLocaleDateString('sv-SE');
 const persK = v => /^tom/i.test(v) ? 'p-toms' : /^mark/i.test(v) ? 'p-markuss' : '';
