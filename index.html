@@ -277,7 +277,7 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 .vadCipsi{display:flex;flex-wrap:wrap;gap:var(--s2)}.vadCipsi .vieta{padding:var(--s2) var(--s3);flex:1 1 140px}
 .vadVar{display:grid;gap:6px}.vadVp{display:flex;flex-wrap:wrap;gap:var(--s2)}
 .vadVp .poga{display:inline-flex;align-items:center;gap:8px;min-width:0;white-space:normal;text-align:left}
-.vadVp .ik,.zinaK .ik{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.vadVp .ik,.zinaK .ik,.vadKl .ik{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 .vadKl{background:var(--virsma-neitr);border-radius:var(--r-m);padding:var(--s3);font-size:14.5px;white-space:pre-wrap;overflow-wrap:anywhere}.vadKl .etik{display:block;margin-bottom:4px;white-space:normal}
 .vadPTabs{margin:var(--s5) 0 var(--s2)}.vadPan .apr{white-space:pre-wrap;font-size:14.5px;overflow-wrap:anywhere}
 .zinaK .zt{white-space:pre-wrap;font-size:14.5px;overflow-wrap:anywhere;margin:var(--s2) 0 0;max-height:260px;overflow:auto}
@@ -1273,6 +1273,8 @@ function vadZimet() {
 const VAD_IK = {
   tiks: '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>',
   ed: '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v7a2 2 0 0 0 2 2v9"/><path d="M11 3v7a2 2 0 0 1-2 2"/><path d="M17 21V3c-2 1.5-3 4-3 7v3h3"/></svg>',
+  tel: '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h3.5l1.8 4.5-2.3 1.4a11 11 0 0 0 6.6 6.6l1.4-2.3 4.5 1.8V19a1.5 1.5 0 0 1-1.5 1.5A16.5 16.5 0 0 1 3.5 5 1.5 1.5 0 0 1 5 3.5z"/></svg>',
+  pasts: '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m3 6 9 7 9-7"/></svg>',
   mars: '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a3.5 3.5 0 0 0 0-7H8a3.5 3.5 0 0 1 0-7h8"/></svg>'
 };
 function vadVietaSaite(v) { if (!v) return ''; if (v.saite) return v.saite; const n = navSaites(v.koord || v.teksts); return n ? n.gmaps : ''; }
@@ -1290,6 +1292,10 @@ function vadAtvert(atsl) {
   if (kopejas) vietas += `<div class="vadVp">${kopejas}</div>`;
   if (!vietas) vietas = `<p class="mazs" style="margin:0">${p.lokacija ? 'Vietai "' + esc(p.lokacija) + '" vietas un maršruts nav atrasti.' : 'Tabulā "Pasākumi" vieta nav norādīta.'}</p>`;
   const kl = [p.info, p.prasibas ? 'Prasības: ' + p.prasibas : ''].filter(Boolean).join('\n\n');
+  // klienta kontakti: teksts no tabulas + pogas zvanīt / rakstīt
+  const tel = [...new Set((String(p.kontakti || '').match(/\+?\d[\d ]{6,}\d/g) || []).map(t => t.replace(/ /g, '')))];
+  const kontPogas = tel.map(t => `<a class="poga gaisa" href="tel:${esc(t)}">${VAD_IK.tel}Zvanīt ${esc(t)}</a>`).join('') + (p.epasts ? `<a class="poga gaisa" href="mailto:${esc(p.epasts)}">${VAD_IK.pasts}${esc(p.epasts)}</a>` : '');
+  const kont = p.kontakti || p.epasts ? `<div class="vadKl"><span class="etik">Klienta kontakti</span>${esc(p.kontakti || '')}${kontPogas ? `<div class="vadVp" style="margin-top:var(--s2)">${kontPogas}</div>` : ''}</div>` : '';
   const vad = LOMA.loma === 'komanda'
     ? `<div class="vieta"><span class="etik">Vada</span>${esc(p.vaditajs || 'nav norādīts')}</div>` : '';
   const d = document.createElement('div');
@@ -1298,6 +1304,7 @@ function vadAtvert(atsl) {
     <div class="vadAug">
       <div class="vadCipsi"><div class="vieta"><span class="etik">Starta laiks</span>${esc(p.laiks || 'nav norādīts')}</div>${p.skaits ? `<div class="vieta"><span class="etik">Cilvēki</span>${esc(p.skaits)}</div>` : ''}${m ? `<div class="vieta"><span class="etik">Maršruts</span>${esc(m.nosaukums)}</div>` : ''}${vad}</div>
       ${vietas}
+      ${kont}
       ${kl ? `<div class="vadKl"><span class="etik">Papildus info no klienta</span>${md(kl)}</div>` : ''}
       <form class="vadF" style="margin:0"><label><span>Pārgājiena vadītājs${p.vadNo === 'tabulā' ? ' <span class="mazs">(no tabulas)</span>' : ''}</span><span class="vadFr"><input name="vaditajs" value="${esc(p.vaditajs)}" placeholder="Ieraksti, kas vadīs"><button class="poga zala maza">Saglabāt</button></span></label><span class="mazs" data-z></span></form>
     </div>
