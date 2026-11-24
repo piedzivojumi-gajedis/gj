@@ -1220,6 +1220,7 @@ function sagDetZimet() {
   if (!AILES.some(a => a.id === sagAile)) sagAile = (AILES.find(a => aileKrasa(a) === 'sark') || AILES[0]).id;
   $('#sagDet').innerHTML = `<div class="galva" style="margin:0 0 8px;flex-wrap:nowrap;align-items:flex-start"><div style="min-width:0"><h2>${esc(c.klients)}</h2><p>${esc(c.datums)}, ${esc(c.diena)}, ${kadPas(c.dienasLidz)}${info ? ' · ' + info : ''}</p></div><div class="cip" id="sagSk">${d}/${visi.length}</div></div><div id="sagPr">${sagProg(d, visi.length)}</div>
     ${c.prasibas ? `<p class="zinja info" style="display:block"><b>Prasības:</b> ${esc(c.prasibas)}</p>` : ''}
+    <div class="rinda vadLab" style="margin:0 0 var(--s3)"><button class="poga gaisa maza" onclick="dailAtvert()">${VAD_IK.pasts}Pasūtīt batoniņus un ēdienkartes</button>${c.dail ? `<span class="mazs">Nosūtīts ${esc(c.dail.kad)}${c.dail.bat ? ' · batoniņi ' + esc(c.dail.bat) : ''}${c.dail.edi ? ' · ēdienkartes ' + esc(c.dail.edi) : ''}</span>` : ''}</div>
     <div class="clTabs ailes" id="tabsAiles"></div>
     <div id="sagSaturs"></div>`;
   sagSatursZimet();
@@ -1695,6 +1696,60 @@ async function izDzest(x, pec) {
   if (!confirm(`Dzēst "${x.uzdevums}"?`)) return;
   izDati.darbi = izDati.darbi.filter(z => z !== x); if (pec) pec(); izZimet(); delete ielad.sakums;
   try { await run('gjIzDzest', await istaisId(x.id)); } catch (k) { alertZ(k.message); ieladetIz(); }
+}
+/* batoniņu un ēdienkaršu pasūtījums Daiļkrāsotājiem: viena poga, e-pasts aiziet uzreiz */
+function dailTeksts(c, o) {
+  const r = [];
+  if (o.bat) r.push(`- Batoniņi: ${o.batSk || '?'} gab.`);
+  if (o.edi) r.push(`- Ēdienkartes: ${o.ediSk || '?'} gab.${o.ediVar ? '\n  Variants: ' + o.ediVar : ''}`);
+  const ko = o.bat && o.edi ? 'batoniņiem un ēdienkartēm' : o.bat ? 'batoniņiem' : 'ēdienkartēm';
+  return {
+    temats: `Gājēdis: ${o.bat && o.edi ? 'batoniņi un ēdienkartes' : o.bat ? 'batoniņi' : 'ēdienkartes'} ${c.datums}`,
+    teksts: `Labdien!\n\nSūtu informāciju par ${ko} Gājēža pasākumam ${c.datums} (${c.klients}):\n\n${r.join('\n')}${o.piez ? '\n\n' + o.piez : ''}\n\nPaldies!\nGājēdis Piedzīvojumi`
+  };
+}
+function dailAtvert() {
+  const c = sagCl, d = document.createElement('div'), sk = parseInt(c.skaits, 10) || '';
+  d.className = 'modal';
+  d.innerHTML = `<form class="karte plata" role="dialog" aria-modal="true" aria-labelledby="dailV"><div class="galva" style="margin:0 0 8px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="dailV">Batoniņi un ēdienkartes</h2><p>${esc(c.klients)} · ${esc(c.datums)}${c.skaits ? ' · ' + esc(c.skaits) + ' cilv.' : ''}</p></div><div class="rinda" style="margin:0"><button type="button" class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div></div>
+    <div class="lauki">
+      <fieldset class="izKamF pilns"><legend>Ko sūtām</legend><label class="cb"><input type="checkbox" name="bat" checked>Batoniņi</label><label class="cb"><input type="checkbox" name="edi" checked>Ēdienkartes</label></fieldset>
+      <label data-bat>Batoniņu skaits<input name="batSk" type="number" min="1" inputmode="numeric" value="${sk}"></label>
+      <label data-edi>Ēdienkaršu skaits<input name="ediSk" type="number" min="1" inputmode="numeric" value="${sk}"></label>
+      <label class="pilns" data-edi>Ēdienkartes variants<textarea name="ediVar" rows="2">${esc(c.edienkarte || '')}</textarea></label>
+      <label class="pilns">Piezīme (nav obligāta)<textarea name="piez" rows="2"></textarea></label>
+      <fieldset class="izKamF pilns"><legend>Kam sūtīt</legend>${(c.dailKam || []).map((k, i) => `<label class="cb"><input type="checkbox" name="kam" value="${esc(k)}"${i === 0 ? ' checked' : ''}>${esc(k)}</label>`).join('')}</fieldset>
+      <label class="pilns">Cita adrese (nav obligāta)<input name="citi" type="email" inputmode="email" placeholder="vards@uznemums.lv"></label>
+      <label class="pilns">Temats<input name="temats" required></label>
+      <label class="pilns">E-pasts<textarea name="teksts" rows="8" required></textarea></label>
+    </div>
+    <div class="rinda"><button class="poga zala" data-sut>${VAD_IK.pasts}Nosūtīt</button><button type="button" class="poga gaisa" data-atc>Atcelt</button></div><div class="zinja" id="dailZ"></div></form>`;
+  document.body.append(d);
+  const f = d.querySelector('form'), aizv = () => d.remove();
+  let rokas = false; // after a manual edit of subject/text, don't overwrite it
+  const vert = () => ({bat: f.bat.checked, edi: f.edi.checked, batSk: f.batSk.value, ediSk: f.ediSk.value, ediVar: f.ediVar.value.trim(), piez: f.piez.value.trim()});
+  const atjaunot = () => {
+    const o = vert();
+    f.querySelectorAll('[data-bat]').forEach(x => x.hidden = !o.bat); f.querySelectorAll('[data-edi]').forEach(x => x.hidden = !o.edi);
+    if (!rokas) { const t = dailTeksts(c, o); f.temats.value = t.temats; f.teksts.value = t.teksts; augt(f.teksts); }
+  };
+  f.addEventListener('input', e => { if (e.target === f.temats || e.target === f.teksts) rokas = true; else atjaunot(); });
+  f.addEventListener('change', e => { if (e.target.type === 'checkbox' && e.target.name !== 'kam') atjaunot(); });
+  atjaunot();
+  d.querySelector('[data-aizv]').onclick = aizv; d.querySelector('[data-atc]').onclick = aizv; d.onclick = e => { if (e.target === d) aizv(); };
+  d.addEventListener('keydown', e => { if (e.key === 'Escape') aizv(); });
+  d.querySelector('[data-aizv]').focus();
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const o = vert(), kam = [...f.querySelectorAll('[name=kam]:checked')].map(x => x.value), b = f.querySelector('[data-sut]');
+    if (!o.bat && !o.edi) return zinja('#dailZ', 'Atzīmē batoniņus, ēdienkartes vai abus.', 'kl');
+    if (!kam.length && !f.citi.value.trim()) return zinja('#dailZ', 'Izvēlies, kam sūtīt.', 'kl');
+    b.disabled = true; b.innerHTML = VAD_IK.pasts + 'Sūta…';
+    try {
+      const r = await run('gjDailSutit', c.atslega, Object.assign(o, {kam, citi: f.citi.value, temats: f.temats.value, teksts: f.teksts.value}));
+      aizv(); sagCl.dail = r; sagDetZimet(); sagIelade(c.atslega); // reload: 'Batoniņi pasūtīti' is now ticked
+    } catch (x) { zinja('#dailZ', esc(x.message), 'kl'); b.disabled = false; b.innerHTML = VAD_IK.pasts + 'Nosūtīt'; }
+  };
 }
 /* darba logs: jauns vai labot */
 function izAtvert(x) {
