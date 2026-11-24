@@ -377,6 +377,18 @@ svg.liniju path.blav{opacity:.15}
 .darb pre{white-space:pre-wrap;font:12.5px/1.45 var(--f-ui);margin:var(--s2) 0;color:#333}
 .cats form{display:flex;gap:var(--s2);padding:14px;border-top:1px solid var(--linija)}
 .cats textarea{min-height:46px;max-height:140px;flex:1}
+.cats.velk{box-shadow:inset 0 0 0 3px var(--mezs)}
+.catsPiel{display:flex;flex-wrap:wrap;gap:var(--s2);padding:10px 14px 0;border-top:1px solid var(--linija)}
+.catsPiel+form{border-top:0}
+.pielS{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;width:68px;font:500 11px var(--f-ui);color:var(--pelēks)}
+.pielS img,.pielS .pielF{width:64px;height:64px;border-radius:var(--r-m);object-fit:cover;border:1px solid var(--linija);background:var(--virsma-hover)}
+.pielS .pielF{display:flex;align-items:center;justify-content:center;font:700 12px var(--f-ui);color:var(--teksts)}
+.pielN{max-width:68px;overflow-wrap:anywhere;text-align:center;line-height:1.2}
+.pielS button{all:unset;cursor:pointer;position:absolute;top:-6px;right:-4px;width:22px;height:22px;border-radius:50%;background:var(--teksts);color:var(--balts);font:700 13px/22px var(--f-ui);text-align:center;transition:transform var(--t-atri) var(--ease)}
+.pielS button:active{transform:scale(.97)}
+.znPiel{display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px;margin-bottom:6px;white-space:normal}
+.znPiel img{max-width:160px;max-height:160px;border-radius:var(--r-m);display:block}
+.znPiel .pielF{font:600 12px var(--f-ui);background:rgba(255,255,255,.15);padding:4px 8px;border-radius:var(--r-s)}
 .ieteik{display:flex;flex-wrap:wrap;gap:6px;padding:0 20px 10px}
 .ieteik button{all:unset;cursor:pointer;font:600 12px var(--f-ui);border:1px solid var(--linija);border-radius:var(--r-pill);padding:5px 10px;color:#444;transition:border-color var(--t-atri) var(--ease),transform var(--t-atri) var(--ease)}
 .ieteik button:hover{border-color:var(--teksts)}
@@ -773,7 +785,8 @@ svg.liniju path.blav{opacity:.15}
   <header><h2>Jautā Gājēdim</h2><button class="aizv" id="skalrunis" title="Lasīt atbildes balsī" onclick="balssToggle()" style="margin-left:auto;font-size:18px">🔇</button><button class="aizv" style="margin-left:0" onclick="$('#cats').classList.remove('ak')">×</button></header>
   <div class="zinas" id="zinas"><div class="zn vins">Sveiks! Vari prasīt jebko par pasākumiem, rēķiniem, e-pastiem vai likt man sagatavot jaunu pasākumu, rēķinu vai vēstuli. Darbības tu apstiprini ar pogu.</div></div>
   <div class="ieteik"><button>Kas šonedēļ jādara?</button><button>Kuri rēķini nav apmaksāti?</button><button>Izraksti rēķinu</button><button>Uztaisi jaunumu vēstuli</button><button>Kuriem e-pastiem jāatbild?</button><button>Ko varētu darīt labāk?</button></div>
-  <form onsubmit="return catsSutit(event)"><button type="button" class="poga gaisa" id="mic" title="Runāt" onclick="klausities()" style="padding:10px 14px">🎤</button><textarea id="catsIn" placeholder="Raksti vai spied 🎤 un runā…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();catsSutit(event)}"></textarea><button class="poga zala">→</button></form>
+  <div class="catsPiel" id="catsPiel" hidden></div>
+  <form onsubmit="return catsSutit(event)"><input type="file" id="catsFails" multiple accept="image/*,application/pdf,.txt,.csv,.md" hidden onchange="catsPievienot(this.files);this.value=''"><button type="button" class="poga gaisa" id="catsSpr" title="Pievienot attēlu vai failu" aria-label="Pievienot attēlu vai failu" onclick="$('#catsFails').click()" style="padding:10px 12px"><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="m21 11.5-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l8.6-8.6a3.7 3.7 0 0 1 5.2 5.2l-8.6 8.6a1.8 1.8 0 0 1-2.6-2.6l7.9-7.9"/></svg></button><button type="button" class="poga gaisa" id="mic" title="Runāt" onclick="klausities()" style="padding:10px 14px">🎤</button><textarea id="catsIn" placeholder="Raksti vai spied 🎤 un runā…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();catsSutit(event)}"></textarea><button class="poga zala">→</button></form>
 </aside>
 
 <script>
@@ -2319,18 +2332,57 @@ function catsJautat(t) { catsAtvert(); const i = $('#catsIn'); if (!i.value) i.v
 document.querySelectorAll('.ieteik button').forEach(b => b.onclick = () => { $('#catsIn').value = b.textContent; catsSutit(); });
 function md(t) { return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(https?:\/\/[^\s<)]+)/g, '<a href="$1" target="_blank">$1</a>'); }
 function zn(t, kl) { const d = document.createElement('div'); d.className = 'zn ' + kl; d.innerHTML = t; $('#zinas').append(d); $('#zinas').scrollTop = 1e9; return d; }
+/* pielikumi čatā: ielīmēt (Cmd+V), ievilkt vai poga ar saspraudi; attēli tiek samazināti pirms sūtīšanas */
+let catsFaili = [];
+const CATS_MAX = 8e6;
+function catsPielZimet() {
+  const b = $('#catsPiel'); b.hidden = !catsFaili.length;
+  b.innerHTML = catsFaili.map((f, i) => `<span class="pielS" title="${esc(f.nos)}">${f.att ? `<img src="${f.att}" alt="">` : `<span class="pielF">${esc(f.ext)}</span>`}<span class="pielN">${esc(f.nos)}</span><button type="button" data-i="${i}" aria-label="Noņemt ${esc(f.nos)}">×</button></span>`).join('');
+  b.querySelectorAll('button').forEach(x => x.onclick = () => { catsFaili.splice(+x.dataset.i, 1); catsPielZimet(); });
+}
+const lasitURL = f => new Promise((ok, kl) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = kl; r.readAsDataURL(f); });
+async function samazinat(f) { // max 1600 px, JPEG: smaller upload, same answer
+  const url = await lasitURL(f);
+  if (f.type === 'image/gif') return url;
+  const img = await new Promise((ok, kl) => { const i = new Image(); i.onload = () => ok(i); i.onerror = kl; i.src = url; });
+  const k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+  c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+  const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', .85);
+}
+async function catsPievienot(saraksts) {
+  for (const f of [...saraksts]) {
+    const nos = f.name || 'ekranuznemums.png', ext = (nos.split('.').pop() || '').toLowerCase();
+    try {
+      if (f.type.startsWith('image/')) { const u = await samazinat(f); catsFaili.push({nos, att: u, bloks: {type: 'image', source: {type: 'base64', media_type: u.slice(5, u.indexOf(';')), data: u.split(',')[1]}}}); }
+      else if (f.type === 'application/pdf' || ext === 'pdf') { if (f.size > CATS_MAX) { alertZ(nos + ': fails par lielu (līdz 8 MB).'); continue; } const u = await lasitURL(f); catsFaili.push({nos, ext: 'PDF', bloks: {type: 'document', source: {type: 'base64', media_type: 'application/pdf', data: u.split(',')[1]}}}); }
+      else if (/^text\//.test(f.type) || ['txt', 'csv', 'md'].includes(ext)) { if (f.size > 1e6) { alertZ(nos + ': fails par lielu (līdz 1 MB).'); continue; } catsFaili.push({nos, ext: ext.toUpperCase() || 'TXT', bloks: {type: 'text', text: `Fails "${nos}":\n` + await f.text()}}); }
+      else alertZ(nos + ': var pievienot attēlus, PDF un teksta failus.');
+    } catch (x) { alertZ(nos + ': neizdevās nolasīt.'); }
+  }
+  catsPielZimet(); $('#catsIn').focus();
+}
+$('#catsIn').addEventListener('paste', e => { const f = [...(e.clipboardData || {}).files || []]; if (f.length) { e.preventDefault(); catsPievienot(f); } });
+$('#cats').addEventListener('dragover', e => { if ([...e.dataTransfer.types].includes('Files')) { e.preventDefault(); $('#cats').classList.add('velk'); } });
+$('#cats').addEventListener('dragleave', e => { if (e.target === $('#cats')) $('#cats').classList.remove('velk'); });
+$('#cats').addEventListener('drop', e => { $('#cats').classList.remove('velk'); if (e.dataTransfer.files.length) { e.preventDefault(); catsPievienot(e.dataTransfer.files); } });
+// after the answer, file contents leave the history (Claude has already seen them): later requests stay small
+const bezPielikumiem = v => v.map(m => Array.isArray(m.content) && m.role === 'user' ? {...m, content: m.content.map(b => b.type === 'image' || b.type === 'document' ? {type: 'text', text: '(pielikums jau apskatīts iepriekš)'} : b.type === 'text' && b.text.startsWith('Fails "') ? {type: 'text', text: b.text.split('\n')[0] + ' (jau apskatīts)'} : b)} : m);
 async function catsSutit(e) {
   if (e) e.preventDefault();
-  const t = $('#catsIn').value.trim(); if (!t) return false;
-  $('#catsIn').value = ''; zn(esc(t), 'es');
+  const faili = catsFaili; let t = $('#catsIn').value.trim(); if (!t && !faili.length) return false;
+  if (!t) t = 'Apskati pielikumu.';
+  $('#catsIn').value = ''; catsFaili = []; catsPielZimet();
+  const b = zn(esc(t), 'es');
+  if (faili.length) b.insertAdjacentHTML('afterbegin', `<span class="znPiel">${faili.map(f => f.att ? `<img src="${f.att}" alt="${esc(f.nos)}">` : `<span class="pielF">${esc(f.ext)} · ${esc(f.nos)}</span>`).join('')}</span>`);
   const gaida = zn('<span class="ielade" style="padding:0">domāju…</span>', 'vins');
   try {
-    const pedeja = vesture[vesture.length - 1];
-    const jauna = pedeja && pedeja.role === 'user' && typeof pedeja.content === 'string'
+    const pedeja = vesture[vesture.length - 1], saturs = faili.length ? faili.map(f => f.bloks).concat([{type: 'text', text: t}]) : t;
+    const jauna = !faili.length && pedeja && pedeja.role === 'user' && typeof pedeja.content === 'string'
       ? vesture.slice(0, -1).concat([{role: 'user', content: pedeja.content + '\n\n' + t}])
-      : vesture.concat([{role: 'user', content: t}]);
+      : vesture.concat([{role: 'user', content: saturs}]);
     const r = await run('gjCats', jauna);
-    vesture = r.vesture; gaida.innerHTML = md(r.atbilde || '(gatavs)'); runat(r.atbilde);
+    vesture = bezPielikumiem(r.vesture); gaida.innerHTML = md(r.atbilde || '(gatavs)'); runat(r.atbilde);
     r.darbibas.forEach(darbiba);
   } catch (x) { gaida.innerHTML = '<span style="color:var(--ugunskurs)">' + esc(x.message) + '</span>'; }
   $('#zinas').scrollTop = 1e9; return false;
