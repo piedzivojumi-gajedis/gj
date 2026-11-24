@@ -804,7 +804,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;
 let gjKods = '';
 try { gjKods = localStorage.getItem('gjKods') || ''; } catch (e) {}
 // lasīšanas funkcijas; jebkurš cits izsaukums skaitās izmaiņa (rakstiNr), lai fona atjaunošana nepārraksta tikko atzīmēto
-const LASA = new Set(['gjKasEsmu', 'gjVersija', 'gjSakums', 'gjPasakumuSaraksts', 'gjSagatavosanas', 'gjCheklists', 'gjJanoperk', 'gjVaditajiem', 'gjFinanses', 'gjIzaugsme', 'gjRekini', 'gjSanemeji', 'gjKlientuBaze', 'gjCheklistaSablons', 'gjRekinaPdf', 'gjKopejasFinanses', 'gjEpastuSaraksts', 'gjVestules', 'gjMateriali', 'gjKopsavilkums', 'gjNoteikumi']);
+const LASA = new Set(['gjKasEsmu', 'gjVersija', 'gjSakums', 'gjPasakumuSaraksts', 'gjSagatavosanas', 'gjCheklists', 'gjJanoperk', 'gjVaditajiem', 'gjFinanses', 'gjIzaugsme', 'gjRekini', 'gjSanemeji', 'gjKlientuBaze', 'gjCheklistaSablons', 'gjRekinaPdf', 'gjKopejasFinanses', 'gjEpastuSaraksts', 'gjVestules', 'gjMateriali', 'gjKopsavilkums', 'gjNoteikumi', 'gjSagataves', 'gjApmeklejums', 'gjAutomatika', 'gjBackupInfo', 'gjPiekluves']);
 // rakstiGaida: cik izmaiņu vēl saglabājas; rakstiBeidz: kad pēdējā saglabājās (savas izmaiņas nepārzīmē sarakstu)
 let rakstiNr = 0, rakstiGaida = 0, rakstiBeidz = 0;
 const run = (fn, ...a) => {
