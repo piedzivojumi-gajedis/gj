@@ -98,6 +98,7 @@ main{padding:34px clamp(16px,4vw,48px) 80px;max-width:1240px;width:100%}
 .c{font:600 11.5px var(--f-ui);padding:3px 9px;border-radius:var(--r-pill);background:var(--virsma-neitr);color:#444;white-space:nowrap}
 .c.ok{background:var(--mezs-gaiss);color:var(--mezs)}.c.ne{background:var(--ugunskurs-gaiss);color:var(--c-uguns-9)}.c.br{background:var(--dzeltens-gaiss);color:var(--c-zelts-9)}
 .poga{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);background:var(--teksts);color:#fff;padding:10px 18px;border-radius:var(--r-pill);font:600 14px var(--f-teksts);letter-spacing:.02em;white-space:nowrap;transition:background-color var(--t-atri) var(--ease),box-shadow var(--t-atri) var(--ease),filter var(--t-atri) var(--ease),transform var(--t-atri) var(--ease)}
+.poga .ik{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 .poga:hover{background:#333}.poga.zala{background:var(--mezs)}.poga.zala:hover{filter:brightness(1.12)}.poga.gaisa{background:transparent;color:var(--teksts);box-shadow:inset 0 0 0 1px var(--linija)}
 .poga.gaisa:hover{background:var(--virsma-neitr);box-shadow:inset 0 0 0 1px var(--c-smilts-6)}.poga.maza{padding:6px var(--s3);font-size:12.5px}.poga[disabled]{opacity:.5;pointer-events:none}
 .poga:active,.catpoga:active,.nav button:active,.tabs button:active,.clTabs button:active,.ieteik button:active{transform:scale(.97)}
@@ -225,6 +226,20 @@ table.tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeri
 .pasLeg{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);font:500 12.5px var(--f-ui);color:var(--pelēks);margin:0 0 var(--s2)}
 .pasLeg span{display:inline-flex;align-items:center;gap:6px}.pasLeg i{width:12px;height:12px;border-radius:4px;display:inline-block}
 .pasLeg .tuv i{background:var(--dzeltens)}.pasLeg .tal i{background:var(--mezs)}.pasLeg .pag i{background:var(--c-smilts-6)}
+.kalG{display:flex;align-items:center;gap:var(--s2);margin:0 0 var(--s1)}.kalG h2{margin:0 var(--s2);min-width:0}.kalG [data-m="0"]{margin-left:auto}
+.kal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-bottom:var(--s4)}
+.kalH{font:600 11.5px var(--f-ui);text-transform:uppercase;letter-spacing:.05em;color:var(--pelēks);text-align:center;padding:2px 0}
+.kalD{all:unset;box-sizing:border-box;min-height:84px;padding:6px;border-radius:var(--r-m);display:flex;flex-direction:column;gap:3px;font:500 12px/1.25 var(--f-ui);min-width:0}
+.kalD b{font:600 13px var(--f-ui)}
+.kalD.brivs{background:var(--balts);box-shadow:inset 0 0 0 1px var(--linija);color:var(--teksts)}
+.kalD.brivs.ned{background:var(--virsma-hover)}
+.kalD.ir{background:var(--mezs);color:var(--balts);cursor:pointer;position:relative;transition:filter var(--t-atri) var(--ease),transform var(--t-atri) var(--ease)}
+.kalD.ir:hover{filter:brightness(1.12)}.kalD.ir:active{transform:scale(.97)}
+.kalD.bij{opacity:.5}
+.kalD.sod{box-shadow:inset 0 0 0 2px var(--dzeltens)}
+.kalN{overflow-wrap:anywhere}
+.kalSk{position:absolute;top:5px;right:6px;font:700 10.5px var(--f-ui);background:var(--balts);color:var(--mezs);border-radius:var(--r-pill);padding:0 5px}
+.pasLeg .kIr i{background:var(--mezs)}.pasLeg .kBr i{background:var(--balts);box-shadow:inset 0 0 0 1px var(--linija)}.pasLeg .kSod i{box-shadow:inset 0 0 0 2px var(--dzeltens)}
 .pasR .kom{font-size:13px;color:var(--pelēks);text-align:right;flex:none;max-width:160px}
 .lauki2{display:grid;grid-template-columns:minmax(120px,38%) 1fr;gap:0;margin:var(--s2) 0 0;font-size:14px}
 .lauki2 dt{font:600 12px var(--f-ui);color:var(--pelēks);padding:7px 10px 7px 0;border-top:1px solid var(--linija-viegla)}
@@ -435,6 +450,7 @@ svg.liniju path.blav{opacity:.15}
   img,video,iframe,table,pre{max-width:100%}
   pre{white-space:pre-wrap}
   textarea{max-height:65vh}
+  .kal{gap:3px}.kalD{min-height:44px;padding:4px;align-items:center;justify-content:center}.kalD .kalN{display:none}.kalD.ir::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--balts)}
   .tab td.sum{white-space:nowrap}.tab.vienk th{white-space:nowrap;letter-spacing:.02em}.tab.vienk th,.tab.vienk td{padding:var(--s2) 6px}
   .tab:not(.vienk) td[data-l]{text-align:left}
 }
@@ -518,7 +534,7 @@ svg.liniju path.blav{opacity:.15}
           <div class="zinja" id="pasZ"></div>
         </form>
       </div>
-      <div class="karte"><div class="rinda" style="margin:0 0 10px"><div class="tabs" id="pasFiltrs"><button data-f="nak" class="ak">Nākamie</button><button data-f="visi">Rādīt visus</button></div><input id="pasMekl" type="search" placeholder="Meklēt klientu, vietu…" aria-label="Meklēt pasākumu" style="flex:1;min-width:180px;max-width:320px;margin-left:auto" oninput="pasZimet()"></div><div id="pasTab" class="ielade">Ielādē…</div></div>
+      <div class="karte"><div class="rinda" style="margin:0 0 10px"><div class="tabs" id="pasFiltrs"><button data-f="nak" class="ak">Nākamie</button><button data-f="visi">Rādīt visus</button><button data-f="kal">Kalendārs</button></div><input id="pasMekl" type="search" placeholder="Meklēt klientu, vietu…" aria-label="Meklēt pasākumu" style="flex:1;min-width:180px;max-width:320px;margin-left:auto" oninput="pasZimet()"></div><div id="pasTab" class="ielade">Ielādē…</div></div>
     </section>
 
     <!-- SAGATAVOŠANĀS -->
@@ -965,6 +981,8 @@ document.querySelectorAll('#pasFiltrs button').forEach(b => b.onclick = () => { 
 const PAS_TUV = 14; // tuvākie = nākamās 14 dienas
 const pasLaiks = x => x.dienasLidz < 0 ? 'pag' : x.dienasLidz <= PAS_TUV ? 'tuv' : 'tal';
 function pasZimet() {
+  $('#pasMekl').hidden = pasFiltrs === 'kal';
+  if (pasFiltrs === 'kal') return pasKal();
   const q = $('#pasMekl').value.trim().toLowerCase();
   const s = pasDati.filter(x => (pasFiltrs === 'visi' || x.dienasLidz >= 0) && (!q || [x.klients, x.lokacija, x.kontakti, x.datums].join(' ').toLowerCase().includes(q)));
   const pag = pasDati.filter(x => x.dienasLidz < 0).length;
@@ -974,6 +992,36 @@ function pasZimet() {
   s.slice().sort((a, b) => b.iso.localeCompare(a.iso)).forEach(x => (grupas[x.iso.slice(0, 7)] = grupas[x.iso.slice(0, 7)] || []).push(x));
   $('#pasTab').innerHTML = leg + Object.entries(grupas).map(([m, xs]) => `<div class="pasMen">${MEN[+m.slice(5) - 1]} ${m.slice(0, 4)}<span style="text-transform:none;letter-spacing:0;font-weight:500">· ${xs.length} ${xs.length === 1 ? 'pasākums' : 'pasākumi'}</span></div>` + xs.map(x => `<button class="pasR ${pasLaiks(x)}" data-i="${pasDati.indexOf(x)}">${datk(x)}<span class="tx"><b>${esc(x.klients)}</b><span class="mazs" style="display:block">${esc(x.datums)}, ${esc(x.diena)}, ${kadPas(x.dienasLidz)}${x.laiks ? ' · sākums ' + esc(x.laiks) : ''}${esc(izbrT(x))}</span></span><span class="pasMeta"><span>${x.skaits ? esc(x.skaits) + ' dalībn.' : '<span class="mazs">skaits nav</span>'}</span><span class="mazs">${esc(x.lokacija || 'vieta nav norādīta')}</span></span></button>`).join('')).join('')
     + (pasFiltrs === 'nak' && pag ? `<p class="mazs" style="text-align:center;margin:16px 0 0">${pag} pagājušie pasākumi paslēpti. <a href="#" onclick="$('#pasFiltrs [data-f=visi]').click();return false">Rādīt visus</a></p>` : '');
+  $('#pasTab').querySelectorAll('.pasR').forEach(b => b.onclick = () => pasAtvert(pasDati[+b.dataset.i]));
+}
+/* kalendārs: mēnesis pa dienām, redzams, kuras dienas aizņemtas un kuras brīvas */
+let pasKalMen = '';
+function pasKal() {
+  const sod = new Date().toLocaleDateString('sv-SE');
+  if (!pasKalMen) pasKalMen = sod.slice(0, 7);
+  const [g, m] = pasKalMen.split('-').map(Number), dienas = new Date(g, m, 0).getDate(), nobide = (new Date(g, m - 1, 1).getDay() + 6) % 7;
+  const pecD = {}; pasDati.forEach(x => { if (x.iso && x.iso.startsWith(pasKalMen)) (pecD[x.iso] = pecD[x.iso] || []).push(x); });
+  const iso = d => `${pasKalMen}-${String(d).padStart(2, '0')}`, men = Object.values(pecD).flat();
+  let h = '';
+  for (let i = 0; i < nobide; i++) h += '<span class="kalD tuks" aria-hidden="true"></span>';
+  for (let d = 1; d <= dienas; d++) {
+    const k = iso(d), xs = pecD[k] || [], bijis = k < sod, nedB = (nobide + d - 1) % 7 > 4;
+    const kl = ['kalD', xs.length ? 'ir' : 'brivs', bijis ? 'bij' : '', k === sod ? 'sod' : '', nedB ? 'ned' : ''].filter(Boolean).join(' ');
+    h += xs.length
+      ? `<button class="${kl}" data-d="${k}" aria-label="${d}. ${MEN[m - 1].toLowerCase()}: ${esc(xs.map(x => x.klients).join(', '))}"><b>${d}</b>${xs.map(x => `<span class="kalN">${esc(x.klients)}</span>`).join('')}${xs.length > 1 ? `<span class="kalSk">${xs.length}</span>` : ''}</button>`
+      : `<span class="${kl}"><b>${d}</b></span>`;
+  }
+  const brivas = dienas - Object.keys(pecD).length, brivasSes = [...Array(dienas)].filter((_, i) => (nobide + i) % 7 === 5 && !pecD[iso(i + 1)]).length;
+  $('#pasTab').innerHTML = `<div class="kalG"><button class="poga gaisa maza" data-m="-1" aria-label="Iepriekšējais mēnesis"><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button><h2 class="v3">${MEN[m - 1]} ${g}</h2><button class="poga gaisa maza" data-m="1" aria-label="Nākamais mēnesis"><svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>${pasKalMen !== sod.slice(0, 7) ? '<button class="poga gaisa maza" data-m="0">Šodien</button>' : ''}</div>
+    <p class="mazs" style="margin:0 0 var(--s3)">${men.length} ${men.length === 1 ? 'pasākums' : 'pasākumi'} · ${brivas} brīvas dienas · brīvas sestdienas: ${brivasSes}</p>
+    <div class="pasLeg"><span class="kIr"><i></i>Ir pasākums</span><span class="kBr"><i></i>Brīvs</span><span class="kSod"><i></i>Šodien</span></div>
+    <div class="kal">${['P', 'O', 'T', 'C', 'Pk', 'S', 'Sv'].map(x => `<span class="kalH">${x}</span>`).join('')}${h}</div>
+    ${men.length ? '<div class="pasMen">Šajā mēnesī</div>' + men.sort((a, b) => a.iso.localeCompare(b.iso)).map(x => `<button class="pasR ${pasLaiks(x)}" data-i="${pasDati.indexOf(x)}">${datk(x)}<span class="tx"><b>${esc(x.klients)}</b><span class="mazs" style="display:block">${esc(x.diena)}${x.lokacija ? ' · ' + esc(x.lokacija) : ''}${x.laiks ? ' · ' + esc(x.laiks) : ''}${x.skaits ? ' · ' + esc(x.skaits) + ' cilv.' : ''}</span></span></button>`).join('') : '<p class="tukss">Šajā mēnesī pasākumu nav.</p>'}`;
+  $('#pasTab').querySelectorAll('[data-m]').forEach(b => b.onclick = () => {
+    const n = +b.dataset.m, x = new Date(g, m - 1 + n, 1);
+    pasKalMen = n ? `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}` : sod.slice(0, 7); pasKal();
+  });
+  $('#pasTab').querySelectorAll('.kalD[data-d]').forEach(b => b.onclick = () => pasAtvert(pecD[b.dataset.d][0]));
   $('#pasTab').querySelectorAll('.pasR').forEach(b => b.onclick = () => pasAtvert(pasDati[+b.dataset.i]));
 }
 /* pasākuma kartīte: viss par pasākumu vienuviet; teksts ar "Saglabāt", atzīmes un komentāri saglabājas uzreiz */
