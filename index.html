@@ -523,12 +523,7 @@ svg.liniju path.blav{opacity:.15}
 
     <!-- SAGATAVOŠANĀS -->
     <section class="sad" id="s-sagatavosanas">
-      <div class="galva"><div><h1>Sagatavošanās</h1><p>Katram pasākumam savs saraksts, lai nekas nepaliek neizdarīts.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="sagSaite" target="_blank" hidden>Tabula ↗</a><button class="poga gaisa" id="sabPoga" onclick="sabRadit()">Standarta saraksts</button></div></div>
-      <div class="karte" id="sabForma" hidden style="margin-bottom:16px">
-        <h2 class="v3">Standarta saraksts</h2>
-        <p class="mazs" style="margin:0 0 14px">Katrā rindā viens punkts. To saņem pasākumi, kuru sarakstu vēl neesi atvēris; jau atvērtie nemainās.</p>
-        <form id="fSab" onsubmit="return sabSaglabat(event)"><div class="lauki" id="sabLauki"></div><div class="rinda"><button class="poga zala">Saglabāt</button><button type="button" class="poga gaisa" onclick="$('#sabForma').hidden=true">Atcelt</button></div><div class="zinja" id="sabZ"></div></form>
-      </div>
+      <div class="galva"><div><h1>Sagatavošanās</h1><p>Katram pasākumam savs saraksts, lai nekas nepaliek neizdarīts.</p></div><div class="rinda" style="margin:0"><a class="poga gaisa" id="sagSaite" target="_blank" hidden>Tabula ↗</a></div></div>
       <div class="sagRez">
         <div class="karte" id="sagSar" style="padding:10px"><div class="ielade">Ielādē…</div></div>
         <div class="karte" id="sagDet"><p class="tukss">Izvēlies pasākumu.</p></div>
@@ -1315,17 +1310,6 @@ $('#sagDet').addEventListener('submit', async e => {
   pagaidu[x.id] = run('gjCheklistaPievienot', atsl, posms, t).then(o => { el.dataset.id = o.id; x.id = o.id; return o.id; });
   try { await pagaidu[x.id]; } catch (k) { m.punkti.splice(m.punkti.indexOf(x), 1); el.remove(); alertZ('Nesaglabājās: ' + k.message); if (sagCl.atslega === atsl) sagGaita(); }
 });
-async function sabRadit() {
-  $('#sabForma').hidden = false; $('#sabLauki').innerHTML = '<div class="ielade">Ielādē…</div>'; $('#sabZ').className = 'zinja';
-  try { const s = await run('gjCheklistaSablons'); $('#sabLauki').innerHTML = s.map((m, i) => `${m.lidzi && !(s[i - 1] || {}).lidzi ? '<h2 class="v3 pilns" style="margin:10px 0 0">Ko ņemt līdzi</h2>' : ''}<label>${esc(m.nos)}<textarea name="${m.id}" rows="6">${esc(m.punkti.join('\n'))}</textarea></label>`).join(''); }
-  catch (x) { zinja('#sabZ', esc(x.message), 'kl'); }
-}
-async function sabSaglabat(e) {
-  e.preventDefault();
-  try { await run('gjSaglabatCheklistaSablonu', forma(e.target)); zinja('#sabZ', 'Saglabāts. Jaunie pasākumi saņems šo sarakstu.'); ieladetSag(); }
-  catch (x) { zinja('#sabZ', esc(x.message), 'kl'); }
-  return false;
-}
 
 /* vadītājiem: pasākumu logi + maršruti, spēles, informācija */
 let vadDati = [], vadPas = [], vadTips = 'pasakumi';
@@ -2291,7 +2275,6 @@ function saktUI(L) {
   $('#pasJauns').hidden = LOMA.loma === 'komanda';
   const toms = LOMA.loma === 'toms';
   document.querySelectorAll('.catpoga,.augsaCats,#cats,.tomam').forEach(e => e.hidden = !toms);
-  $('#sabPoga').hidden = LOMA.loma === 'komanda';
   document.body.classList.toggle('lasit', LOMA.loma === 'komanda');
   $('#apaksa').innerHTML = esc('Gājēdis · ' + LOMA.nos) + (gjKods ? ' · <a href="#" onclick="iziet();return false" style="color:inherit">iziet</a>' : '');
   ielad = {};
