@@ -1220,7 +1220,7 @@ function sagDetZimet() {
   if (!AILES.some(a => a.id === sagAile)) sagAile = (AILES.find(a => aileKrasa(a) === 'sark') || AILES[0]).id;
   $('#sagDet').innerHTML = `<div class="galva" style="margin:0 0 8px;flex-wrap:nowrap;align-items:flex-start"><div style="min-width:0"><h2>${esc(c.klients)}</h2><p>${esc(c.datums)}, ${esc(c.diena)}, ${kadPas(c.dienasLidz)}${info ? ' · ' + info : ''}</p></div><div class="cip" id="sagSk">${d}/${visi.length}</div></div><div id="sagPr">${sagProg(d, visi.length)}</div>
     ${c.prasibas ? `<p class="zinja info" style="display:block"><b>Prasības:</b> ${esc(c.prasibas)}</p>` : ''}
-    <div class="rinda vadLab" style="margin:0 0 var(--s3)"><button class="poga gaisa maza" onclick="dailAtvert()">${VAD_IK.pasts}Pasūtīt batoniņus un ēdienkartes</button>${c.dail ? `<span class="mazs">Nosūtīts ${esc(c.dail.kad)}${c.dail.bat ? ' · batoniņi ' + esc(c.dail.bat) : ''}${c.dail.edi ? ' · ēdienkartes ' + esc(c.dail.edi) : ''}</span>` : ''}</div>
+    ${LOMA.loma !== 'komanda' ? `<div class="rinda vadLab" style="margin:0 0 var(--s3)"><button class="poga gaisa maza" onclick="dailAtvert()">${VAD_IK.pasts}Pasūtīt batoniņus un ēdienkartes</button>${c.dail ? `<span class="mazs">Nosūtīts ${esc(c.dail.kad)}${c.dail.bat ? ' · batoniņi ' + esc(c.dail.bat) : ''}${c.dail.edi ? ' · ēdienkartes ' + esc(c.dail.edi) : ''}</span>` : ''}</div>` : ''}
     <div class="clTabs ailes" id="tabsAiles"></div>
     <div id="sagSaturs"></div>`;
   sagSatursZimet();
