@@ -1702,24 +1702,27 @@ function dailTeksts(c, o) {
   const r = [];
   if (o.bat) r.push(`- Batoniņi: ${o.batSk || '?'} gab.`);
   if (o.edi) r.push(`- Ēdienkartes: ${o.ediSk || '?'} gab.${o.ediVar ? '\n  Variants: ' + o.ediVar : ''}`);
-  const ko = o.bat && o.edi ? 'batoniņiem un ēdienkartēm' : o.bat ? 'batoniņiem' : 'ēdienkartēm';
+  // ready date = day before the event; event date and client name are not mentioned
+  const d = o.gatavs ? new Date(o.gatavs + 'T12:00') : null, kad = d ? `${o.gatavs.split('-').reverse().join('.')} (${d.toLocaleDateString('lv-LV', {weekday: 'long'}).toLowerCase()})` : '';
   return {
-    temats: `Gājēdis: ${o.bat && o.edi ? 'batoniņi un ēdienkartes' : o.bat ? 'batoniņi' : 'ēdienkartes'} ${c.datums}`,
-    teksts: `Labdien!\n\nSūtu informāciju par ${ko} Gājēža pasākumam ${c.datums} (${c.klients}):\n\n${r.join('\n')}${o.piez ? '\n\n' + o.piez : ''}\n\nPaldies!\nGājēdis Piedzīvojumi`
+    temats: `Gājēdis: ${o.bat && o.edi ? 'batoniņi un ēdienkartes' : o.bat ? 'batoniņi' : 'ēdienkartes'}${d ? ' līdz ' + o.gatavs.split('-').reverse().join('.') : ''}`,
+    teksts: `Labdien!\n\nLūdzu sagatavot${kad ? ' līdz ' + kad : ''}:\n\n${r.join('\n')}${o.piez ? '\n\n' + o.piez : ''}\n\nPaldies!\nGājēdis Piedzīvojumi`
   };
 }
+const dailGatavs = dat => { const [d, m, g] = String(dat).split('.').map(Number); if (!g) return ''; const x = new Date(g, m - 1, d - 1); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`; };
 function dailAtvert() {
   const c = sagCl, d = document.createElement('div'), sk = parseInt(c.skaits, 10) || '';
   d.className = 'modal';
   d.innerHTML = `<form class="karte plata" role="dialog" aria-modal="true" aria-labelledby="dailV"><div class="galva" style="margin:0 0 8px;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><h2 id="dailV">Batoniņi un ēdienkartes</h2><p>${esc(c.klients)} · ${esc(c.datums)}${c.skaits ? ' · ' + esc(c.skaits) + ' cilv.' : ''}</p></div><div class="rinda" style="margin:0"><button type="button" class="poga gaisa maza" data-aizv aria-label="Aizvērt">×</button></div></div>
     <div class="lauki">
+      <fieldset class="izKamF pilns"><legend>Kam sūtīt</legend>${(c.dailKam || []).map((k, i) => `<label class="cb"><input type="checkbox" name="kam" value="${esc(k)}"${i === 0 ? ' checked' : ''}>${esc(k)}</label>`).join('')}</fieldset>
+      <label class="pilns">Cita adrese (nav obligāta)<input name="citi" type="email" inputmode="email" placeholder="vards@uznemums.lv"></label>
       <fieldset class="izKamF pilns"><legend>Ko sūtām</legend><label class="cb"><input type="checkbox" name="bat" checked>Batoniņi</label><label class="cb"><input type="checkbox" name="edi" checked>Ēdienkartes</label></fieldset>
+      <label class="pilns">Sagatavošanas datums (dienu pirms pasākuma)<input name="gatavs" type="date" value="${dailGatavs(c.datums)}"></label>
       <label data-bat>Batoniņu skaits<input name="batSk" type="number" min="1" inputmode="numeric" value="${sk}"></label>
       <label data-edi>Ēdienkaršu skaits<input name="ediSk" type="number" min="1" inputmode="numeric" value="${sk}"></label>
       <label class="pilns" data-edi>Ēdienkartes variants<textarea name="ediVar" rows="2">${esc(c.edienkarte || '')}</textarea></label>
       <label class="pilns">Piezīme (nav obligāta)<textarea name="piez" rows="2"></textarea></label>
-      <fieldset class="izKamF pilns"><legend>Kam sūtīt</legend>${(c.dailKam || []).map((k, i) => `<label class="cb"><input type="checkbox" name="kam" value="${esc(k)}"${i === 0 ? ' checked' : ''}>${esc(k)}</label>`).join('')}</fieldset>
-      <label class="pilns">Cita adrese (nav obligāta)<input name="citi" type="email" inputmode="email" placeholder="vards@uznemums.lv"></label>
       <label class="pilns">Temats<input name="temats" required></label>
       <label class="pilns">E-pasts<textarea name="teksts" rows="8" required></textarea></label>
     </div>
@@ -1727,7 +1730,7 @@ function dailAtvert() {
   document.body.append(d);
   const f = d.querySelector('form'), aizv = () => d.remove();
   let rokas = false; // after a manual edit of subject/text, don't overwrite it
-  const vert = () => ({bat: f.bat.checked, edi: f.edi.checked, batSk: f.batSk.value, ediSk: f.ediSk.value, ediVar: f.ediVar.value.trim(), piez: f.piez.value.trim()});
+  const vert = () => ({gatavs: f.gatavs.value, bat: f.bat.checked, edi: f.edi.checked, batSk: f.batSk.value, ediSk: f.ediSk.value, ediVar: f.ediVar.value.trim(), piez: f.piez.value.trim()});
   const atjaunot = () => {
     const o = vert();
     f.querySelectorAll('[data-bat]').forEach(x => x.hidden = !o.bat); f.querySelectorAll('[data-edi]').forEach(x => x.hidden = !o.edi);
