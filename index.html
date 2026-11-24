@@ -90,6 +90,7 @@ main{padding:34px clamp(16px,4vw,48px) 80px;max-width:1240px;width:100%}
 .etik{font:600 12px var(--f-ui);color:var(--pelēks);text-transform:uppercase;letter-spacing:.06em}
 .saraksts{list-style:none;margin:0;padding:0}
 .saraksts li{padding:11px 0;border-top:1px solid var(--linija);display:flex;gap:var(--s3);align-items:flex-start}
+.sakPasR{cursor:pointer;margin:0 -10px;padding:11px 10px!important;border-radius:var(--r-m);transition:background-color var(--t-atri) var(--ease)}.sakPasR:hover{background:var(--virsma-hover)}
 .saraksts li:first-child{border-top:0}
 .datkaste{flex:none;width:52px;text-align:center;border-radius:var(--r-m);background:var(--mezs-gaiss);color:var(--c-mezs-9);padding:6px 0;font-family:var(--f-ui);font-variant-numeric:tabular-nums}
 .datkaste b{display:block;font-size:19px;line-height:1.1}.datkaste span{font-size:11px;color:var(--c-mezs)}
@@ -929,7 +930,7 @@ function sakZimet(d) {
   ].map(([e, c, uz]) => `<div class="karte" style="cursor:pointer" role="link" tabindex="0" onclick="iet('${uz}')" onkeydown="if(event.key==='Enter')iet('${uz}')"><div class="etik">${e}</div><div class="cip" style="margin-top:8px">${c}</div></div>`).join('');
   janSkaits(d.janoperk);
   $('#nRek').hidden = !d.neapmaksati.length; $('#nRek').textContent = d.neapmaksati.length;
-  $('#sakPas').innerHTML = d.pasakumi.length ? d.pasakumi.map(p => `<li>${datk(p)}<div style="min-width:0"><b>${esc(p.klients)}</b><div class="mazs">${esc(p.diena)}, ${kadPas(p.dienasLidz)} · ${esc(p.lokacija || 'vieta nav norādīta')} ${p.laiks ? '· ' + esc(p.laiks) : ''}${esc(izbrT(p))}</div><div class="cipsi">${stCip(p)}</div></div></li>`).join('') : '<li class="tukss">Tuvākajā laikā pasākumu nav.</li>';
+  $('#sakPas').innerHTML = d.pasakumi.length ? d.pasakumi.map(p => `<li class="sakPasR" role="button" tabindex="0" data-a="${esc(p.atslega)}" aria-label="Atvērt: ${esc(p.klients)}">${datk(p)}<div style="min-width:0"><b>${esc(p.klients)}</b><div class="mazs">${esc(p.diena)}, ${kadPas(p.dienasLidz)} · ${esc(p.lokacija || 'vieta nav norādīta')} ${p.laiks ? '· ' + esc(p.laiks) : ''}${esc(izbrT(p))}</div><div class="cipsi">${stCip(p)}</div></div></li>`).join('') : '<li class="tukss">Tuvākajā laikā pasākumu nav.</li>';
   // izaugsmes darbi tam, kas ienācis
   $('#sakManiV').textContent = (toms ? 'Toma' : LOMA.nos === 'Markuss' ? 'Markusa' : LOMA.nos) + ' izaugsmes darbi';
   $('#sakManiK').hidden = !LOMA.sadalas.includes('izaugsme');
@@ -1040,6 +1041,13 @@ const izbr = l => { const m = String(l || '').match(/(\d{1,2})[:.](\d{2})/); if 
 const izbrP = p => (p && p.izbrauksana) || izbr(p && p.laiks);
 const izbrT = p => izbrP(p) ? ' · izbraukšana no Viskaļiem ' + izbrP(p) : '';
 const pasApak = x => `${x.datums}, ${x.diena}, ${kadPas(x.dienasLidz)}${x.laiks ? ' · sākums ' + x.laiks : ''}${izbrT(x)}${x.skaits ? ' · ' + x.skaits + ' dalībnieki' : ''}`;
+// Sākums: uzspiežot uz pasākuma, atveras tas pats logs ar visu info kā sadaļā Pasākumi
+async function sakPasAtvert(a) {
+  if (!pasDati.some(x => x.atslega === a)) try { pasDati = await run('gjPasakumuSaraksts', true); } catch (k) { return alertZ(k.message); }
+  const x = pasDati.find(y => y.atslega === a); if (x) pasAtvert(x);
+}
+$('#sakPas').addEventListener('click', e => { const li = e.target.closest('.sakPasR'); if (li && !e.target.closest('a,button')) sakPasAtvert(li.dataset.a); });
+$('#sakPas').addEventListener('keydown', e => { const li = e.target.closest('.sakPasR'); if (li && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); sakPasAtvert(li.dataset.a); } });
 function pasAtvert(x) {
   const d = document.createElement('div'), kv = k => { const c = (x.kol || [])[k - 1]; return c ? String(c[1] ?? '') : ''; };
   const kom = (x.komandaL || x.komanda.map(v => ({vards: v, loma: ''}))).map(c => ({...c}));
@@ -1073,8 +1081,9 @@ function pasAtvert(x) {
   const izA = f.querySelector('input[data-k="26"]'), stA = f.querySelector('input[data-k="7"]');
   const izV = () => { if (izA) izA.placeholder = izbr(stA ? stA.value : kv(7)) ? izbr(stA ? stA.value : kv(7)) + ' (sākums − 3 h)' : 'sākums − 3 h'; };
   izV(); if (stA) stA.addEventListener('input', izV);
+  const ieprUrl = urlSad.startsWith('pasakumi/') ? 'pasakumi' : urlSad; // aizverot atgriežas tur, kur bija (arī Sākumā)
   urlLogs('pasakumi', x.atslega); saitesPogaSiet(d);
-  const aizv = () => { d.remove(); if (urlSad.startsWith('pasakumi/')) urlLogs('pasakumi'); };
+  const aizv = () => { d.remove(); if (urlSad.startsWith('pasakumi/')) urlLikt(ieprUrl, true); };
   d.querySelector('[data-aizv]').onclick = aizv;
   d.onclick = e => { if (e.target === d) aizv(); };
   d.addEventListener('keydown', e => { if (e.key === 'Escape') aizv(); });
